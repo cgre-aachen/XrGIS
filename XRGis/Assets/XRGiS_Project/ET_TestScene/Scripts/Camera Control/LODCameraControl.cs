@@ -1,3 +1,4 @@
+using UnityEditor.UIElements;
 using UnityEngine;
 
 namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
@@ -17,6 +18,8 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
         [SerializeField] private float sensitivity = .05f;
         [Tooltip("The speed of the camera")]
         [SerializeField] private float speed = 4;
+        private float _savedSpeed;
+        
 
         private Vector2 _velocity; // The current rotation velocity, in degrees
         private Vector2 _rotation; // The current rotation, in degrees
@@ -74,7 +77,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
 
         private void Start()
         {
-            //Cursor.lockState = CursorLockMode.Locked;
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Update() {
@@ -99,12 +102,13 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
             if(Input.GetKeyDown(KeyCode.Escape))
             {
                 acceleration=Vector2.zero;
+                _savedSpeed = speed;
                 speed = 0;
             }
             if(Input.GetKeyDown(KeyCode.Tab))
             {
                 acceleration= new Vector2(1000f, 1000f);
-                speed = 4;
+                speed = _savedSpeed;
             }
             
             // Upward movement with e
