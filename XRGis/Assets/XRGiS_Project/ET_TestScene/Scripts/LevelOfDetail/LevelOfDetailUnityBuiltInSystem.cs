@@ -19,7 +19,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
         {
             get
             {
-                _child ??= transform.GetChild(0).gameObject;
+                _child ??= transform.GetChild(1).gameObject;
                 _grandChild1 ??= _child.transform.GetChild(0).gameObject;
                 _greatGrandChild1 ??= _grandChild1.transform.GetChild(0).gameObject;
                 _mr1 ??= _greatGrandChild1.GetComponent<MeshRenderer>();

@@ -36,13 +36,13 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
                 {
                     case LevelOfDetailSystem.UnityBuiltIn:
                         // Disable custom system and enable Unity System
-                        _meshCollider ??= GetComponentInParent<MeshCollider>();
+                        _meshCollider ??= GetComponent<MeshCollider>();
                         _meshCollider.enabled = false;
                         
-                        _lodGroup ??= GetComponentInParent<LODGroup>();
+                        _lodGroup ??= GetComponent<LODGroup>();
                         _lodGroup.enabled = true;
 
-                        _child0 ??= transform.GetChild(0).gameObject;
+                        _child0 ??= transform.GetChild(1).gameObject;
                         _grandChild0 ??= _child0.transform.GetChild(0).gameObject;
                         _grandChild1 ??= _child0.transform.GetChild(1).gameObject;
                         _grandChild2 ??= _child0.transform.GetChild(2).gameObject;
@@ -55,13 +55,13 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
                     
                     case LevelOfDetailSystem.CustomSystem0:
                         // Disable Unity system and enable custom system
-                        _meshCollider ??= GetComponentInParent<MeshCollider>();
+                        _meshCollider ??= GetComponent<MeshCollider>();
                         _meshCollider.enabled = true;
                         
-                        _lodGroup ??= GetComponentInParent<LODGroup>();
+                        _lodGroup ??= GetComponent<LODGroup>();
                         _lodGroup.enabled = false;
 
-                        _child0 ??= transform.GetChild(0).gameObject;
+                        _child0 ??= transform.GetChild(1).gameObject;
                         _grandChild0 ??= _child0.transform.GetChild(0).gameObject;
                         _grandChild1 ??= _child0.transform.GetChild(1).gameObject;
                         _grandChild2 ??= _child0.transform.GetChild(2).gameObject;
@@ -104,7 +104,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
         private void Start()
         {
             // Set Default LOD System and LOD Level
-            _lodGroup = GetComponentInParent<LODGroup>();
+            _lodGroup = GetComponent<LODGroup>();
             _lodGroup.enabled = false;
         }
     }

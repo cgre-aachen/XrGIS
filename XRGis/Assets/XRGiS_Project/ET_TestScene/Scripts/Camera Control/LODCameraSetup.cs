@@ -22,7 +22,9 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
                 // Set the parent of the game object to the main camera
                 lodCollider.transform.SetParent(mainCamera.transform);
                 // Set the position of the game object to the position of the main camera
-                lodCollider.transform.position = new Vector3(0,0,radius[lods]);
+                var transform1 = mainCamera.transform;
+                var position = transform1.position;
+                lodCollider.transform.position = new Vector3(position.x,position.y,radius[lods]);
 
                 // Add a sphere collider and a rigidbody to the game object
                 lodCollider.AddComponent<Rigidbody>();

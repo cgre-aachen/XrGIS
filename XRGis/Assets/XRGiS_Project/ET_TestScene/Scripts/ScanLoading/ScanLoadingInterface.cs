@@ -72,9 +72,8 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
                 
                 // Game object is automatically created but not needed
                 GameObject unwantedChild0 = scanGameObject.transform.GetChild(0).gameObject;
-                //unwantedChild0.SetActive(false);
-                Object.Destroy(unwantedChild0);
-                
+                unwantedChild0.SetActive(false);
+
                 // Set the scale of the scan
                 scanGameObject.transform.localScale = new Vector3(Helper.modelScale, Helper.modelScale, Helper.modelScale);
                 

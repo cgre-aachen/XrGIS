@@ -28,10 +28,10 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
         private void OnTriggerEnter(Collider other)
         {
             // Find go of LOD0 and LOD1 in nested game objects of scan prefab
-            _child0 ??= transform.GetChild(1).gameObject;
-            _grandChild0 ??= _child0.transform.GetChild(0).gameObject;
-            _grandChild1 ??= _child0.transform.GetChild(1).gameObject;
-            _grandChild2 ??= _child0.transform.GetChild(2).gameObject;
+            _child0 ??= transform.GetChild(1).gameObject; // __UMS_LODs_
+            _grandChild0 ??= _child0.transform.GetChild(0).gameObject; // Level00
+            _grandChild1 ??= _child0.transform.GetChild(1).gameObject; // Level01
+            _grandChild2 ??= _child0.transform.GetChild(2).gameObject; // Level02
             
             var colliderGameObject = other.gameObject;
             var colliderName = colliderGameObject.name;
@@ -57,10 +57,10 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
         {
             
             // Find go of LOD0 and LOD1 in nested game objects of scan prefab
-            _child0 ??= transform.GetChild(1).gameObject;
-            _grandChild0 ??= _child0.transform.GetChild(0).gameObject;
-            _grandChild1 ??= _child0.transform.GetChild(1).gameObject;
-            _grandChild2 ??= _child0.transform.GetChild(2).gameObject;
+            _child0 ??= transform.GetChild(1).gameObject; // __UMS_LODs_
+            _grandChild0 ??= _child0.transform.GetChild(0).gameObject; // Level00
+            _grandChild1 ??= _child0.transform.GetChild(1).gameObject; // Level01
+            _grandChild2 ??= _child0.transform.GetChild(2).gameObject; // Level02
         
             var colliderGameObject = other.gameObject;
             var colliderName = colliderGameObject.name;
