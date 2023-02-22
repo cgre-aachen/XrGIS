@@ -108,7 +108,12 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
             if(Input.GetKeyDown(KeyCode.Tab))
             {
                 acceleration= new Vector2(1000f, 1000f);
-                speed = _savedSpeed;
+
+                if (speed == 0)
+                {
+                    speed = _savedSpeed;    
+                }
+
             }
             
             // Upward movement with e
