@@ -14,6 +14,8 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
         
         public GameObject cesiumParent;
         
+        public bool geoReference = false;
+        
         void Awake()
         {
             Instance = this;

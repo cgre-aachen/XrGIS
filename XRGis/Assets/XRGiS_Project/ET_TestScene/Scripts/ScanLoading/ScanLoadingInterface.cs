@@ -1,4 +1,6 @@
+using CesiumForUnity;
 using UnityEngine;
+using XRGiS_Project.ET_TestScene.Scripts.Geolocation;
 using XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail;
 using Object = UnityEngine.Object;
 
@@ -10,6 +12,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
         // Parent game object for all scans
         private static readonly GameObject ParentOfAllGameObjectsWithLevelOfDetail = new("LODParent");
         private static ScanLoadingHelper Helper => ScanLoadingHelper.Instance;
+        private static GeolocationHelper GeoHelper => GeolocationHelper.Instance;
         
         internal static void InstantiateAllFromList()
         {
@@ -41,6 +44,14 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
                 lodSystemSwitch.levelOfDetailBuiltInSystem = lodBuiltinSystem;
                 var lodCustomSystem0 = scanGameObject.AddComponent<LevelOfDetailCustomSystem>();
                 lodSystemSwitch.levelOfDetailCustomSystem0 = lodCustomSystem0;
+                
+                // Attach Geo reference objects
+                if (Helper.geoReference)
+                {
+                    scanGameObject.AddComponent<CesiumGlobeAnchor>();
+                    scanGameObject.AddComponent<CesiumOriginShift>();
+                }
+                
                 // Set an overall parent to all scans
                 scanGameObject.transform.SetParent(ParentOfAllGameObjectsWithLevelOfDetail.transform);
                 
@@ -74,8 +85,26 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
                 GameObject unwantedChild0 = scanGameObject.transform.GetChild(0).gameObject;
                 unwantedChild0.SetActive(false);
 
-                // Set the scale of the scan
-                scanGameObject.transform.localScale = new Vector3(Helper.modelScale, Helper.modelScale, Helper.modelScale);
+                // Geo reference the scan if wanted
+                if (Helper.geoReference)
+                {
+                    /*
+                    //Adjust the location 
+                    var globalAnchor = scanGameObject.GetComponent<CesiumGlobeAnchor>();
+                    globalAnchor.longitude = GeoHelper.longitudeCenter;
+                    globalAnchor.latitude = GeoHelper.latitudeCenter;
+                    */
+                    
+                    // Adjust the scale
+                    var scale = GeolocationInterface.GetScale(scanGameObject, GeoHelper.longitudeScale, GeoHelper.latitudeScale);
+                    scanGameObject.transform.localScale = new Vector3(scale, scale, scale);
+
+                }
+                else
+                {
+                    // Adjust the scale
+                    scanGameObject.transform.localScale = new Vector3(Helper.modelScale, Helper.modelScale, Helper.modelScale);
+                }
                 
                 // Recalculate the LOD bounds
                 scanGameObject.GetComponent<LODGroup>().RecalculateBounds();
