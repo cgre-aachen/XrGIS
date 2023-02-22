@@ -346,11 +346,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 46114406}
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalPosition: {x: 1.512, y: 6.484, z: -2.532}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 263266685}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!114 &46114409
@@ -660,13 +660,14 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 46114408}
   - {fileID: 937989198}
   - {fileID: 1436246459}
   - {fileID: 1939116917}
-  - {fileID: 317144350}
   - {fileID: 1944244341}
+  - {fileID: 317144350}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &317144349
 GameObject:
@@ -698,7 +699,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 263266685}
-  m_RootOrder: 3
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &317144351
 MonoBehaviour:
@@ -712,7 +713,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02b70542355cdf840b919385d7c2c34a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _activationRadius: 1000
+  _activationRadius: 100000
   _showActivationRadius: 1
   _originAuthority: 0
   _latitude: 50.821925181425414
@@ -734,6 +735,7 @@ GameObject:
   - component: {fileID: 937989199}
   - component: {fileID: 937989201}
   - component: {fileID: 937989202}
+  - component: {fileID: 937989203}
   m_Layer: 0
   m_Name: LODSystem
   m_TagString: Untagged
@@ -755,7 +757,7 @@ Transform:
   m_Children:
   - {fileID: 1668702468}
   m_Father: {fileID: 263266685}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &937989199
 MonoBehaviour:
@@ -849,6 +851,7 @@ MonoBehaviour:
   - {fileID: 7822863844452742296, guid: e40c3db9be5806f479caf8a4a884fcb0, type: 3}
   modelScale: 400
   cesiumParent: {fileID: 317144349}
+  geoReference: 1
 --- !u!114 &937989201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -878,6 +881,22 @@ MonoBehaviour:
   radius:
   - 20
   - 40
+--- !u!114 &937989203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937989196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2150812edebca444eaad2ef14ba645b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  longitudeScale: []
+  latitudeScale: []
+  longitudeCenter: 0
+  latitudeCenter: 0
 --- !u!1 &1179763275
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,13 +1103,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1436246454}
-  m_LocalRotation: {x: -0.000000052670842, y: -3.469449e-18, z: 1.0408342e-17, w: 1}
-  m_LocalPosition: {x: 0, y: 50, z: 0}
-  m_LocalScale: {x: 1.0000004, y: 1, z: 1.0000004}
+  m_LocalRotation: {x: 0.00000011527064, y: 0.0000000057141474, z: 0.0000000052856377,
+    w: 1}
+  m_LocalPosition: {x: -5.820739e-11, y: 50, z: 4.656613e-10}
+  m_LocalScale: {x: 1.0000007, y: 1.0000006, z: 1.0000006}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 263266685}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1436246462
 MonoBehaviour:
@@ -1142,7 +1162,7 @@ MonoBehaviour:
   maxVerticalAngleFromHorizon: 90
   inputLagPeriod: 0.005
   sensitivity: 0.05
-  speed: 200
+  speed: 100
 --- !u!114 &1436246464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1169,16 +1189,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _adjustOrientationForGlobeWhenMoving: 1
   _detectTransformChanges: 1
-  _positionAuthority: 3
+  _positionAuthority: 2
   _latitude: 50.82192518147184
   _longitude: 5.885131980517391
   _height: 250.00000000149277
   _ecefX: 4016284.469539569
   _ecefY: 413989.314768268
   _ecefZ: 4921247.541592468
-  _unityX: 0
-  _unityY: 50
-  _unityZ: 0
+  _unityX: -0.00000000005820739196667419
+  _unityY: 50.00000000093132
+  _unityZ: 0.0000000004656612873077393
 --- !u!1 &1507450555
 GameObject:
   m_ObjectHideFlags: 0
@@ -1407,7 +1427,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 263266685}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1939116918
 MonoBehaviour:
