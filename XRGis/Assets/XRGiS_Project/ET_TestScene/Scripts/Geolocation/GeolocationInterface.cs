@@ -27,22 +27,17 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Geolocation
             return d;
         }
 
-        public static float GetScale(GameObject go, IReadOnlyList<float> longitudeList, IReadOnlyList<float> latitudeList)
+        public static float GetScale(GameObject go, MeshFilter meshFilter, float lat1, float lat2, float lon1, float lon2)
         {
             // gets the scale of an gameObject go assuming that the scale is the same for all axis
             
             // Unity values
-            var meshFilter = go.GetComponent<MeshFilter>();
             var bounds = meshFilter.sharedMesh.bounds;
             var xMin = bounds.min.x;
             var xMax = bounds.max.x;
             var unityDistance = xMax - xMin;
             
             // real world values
-            var lon1 = longitudeList[0];
-            var lon2 = longitudeList[1];
-            var lat1 = latitudeList[0];
-            var lat2 = latitudeList[1];
             var realDistance = SphericalDistance(lat1, lat2, lon1, lon2);
             
             // scale
