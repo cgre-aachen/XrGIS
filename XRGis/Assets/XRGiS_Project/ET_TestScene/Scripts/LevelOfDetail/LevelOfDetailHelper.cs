@@ -54,8 +54,6 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
             // Gets all the game objects with LOD at Start
             _parentOfAllGameObjectsWithLevelOfDetail = GameObject.Find("LODParent");
             LevelOfDetailSwitches.AddRange(_parentOfAllGameObjectsWithLevelOfDetail.GetComponentsInChildren<LevelOfDetailSystemSwitch>());
-
-
         }
         
         private void Reset()

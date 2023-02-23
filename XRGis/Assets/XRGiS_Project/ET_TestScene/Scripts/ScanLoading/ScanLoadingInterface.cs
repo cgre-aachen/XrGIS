@@ -12,7 +12,10 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
         // Parent game object for all scans
         private static readonly GameObject ParentOfAllGameObjectsWithLevelOfDetail = new("LODParent");
         private static ScanLoadingHelper Helper => ScanLoadingHelper.Instance;
+        
         private static GeolocationHelper GeoHelper => GeolocationHelper.Instance;
+        
+        private static float _scale;
         
         internal static void InstantiateAllFromList()
         {
@@ -22,7 +25,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
                 ParentOfAllGameObjectsWithLevelOfDetail.transform.SetParent(Helper.cesiumParent.transform);
                 // Instantiate each scan
                 GameObject scanGameObject = Object.Instantiate(Helper.scanPrefabs[scanItem]);
-
+                
                 // Check if the data containing game object is set up as a child of an empty Go, this is necessary for unity mesh reducer
                 if (scanGameObject.transform.childCount != 1)
                 {
@@ -60,6 +63,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
                 GameObject child0 = scanGameObject.transform.GetChild(1).gameObject; // _UMS_LODs_
                 GameObject grandChild0 = child0.transform.GetChild(0).gameObject; // Level00
                 GameObject greatGrandchild0 = grandChild0.transform.GetChild(0).gameObject; // 000_static_default
+                MeshFilter meshFilterLOD0 = greatGrandchild0.GetComponent<MeshFilter>();
                 
                 greatGrandchild0.transform.localPosition = Vector3.zero;
                 greatGrandchild0.transform.localScale = Vector3.one;
@@ -88,18 +92,22 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
                 // Geo reference the scan if wanted
                 if (Helper.geoReference)
                 {
-                    /*
-                    //Adjust the location 
-                    var globalAnchor = scanGameObject.GetComponent<CesiumGlobeAnchor>();
-                    globalAnchor.longitude = GeoHelper.longitudeCenter;
-                    globalAnchor.latitude = GeoHelper.latitudeCenter;
-                    */
                     
-                    // Adjust the scale
-                    var scale = GeolocationInterface.GetScale(scanGameObject, GeoHelper.longitudeScale, GeoHelper.latitudeScale);
-                    scanGameObject.transform.localScale = new Vector3(scale, scale, scale);
+                    //Adjust the location, location is set to be at the center of the scan
+                    var globalAnchor = scanGameObject.GetComponent<CesiumGlobeAnchor>();
+                    globalAnchor.longitude = GeoHelper.longitudeCenter[0];
+                    globalAnchor.latitude = GeoHelper.latitudeCenter[0];
+                    
+                    // Adjust the scale, same scale for all objects
+                    if (scanItem == 0)
+                    { 
+                        _scale = GeolocationInterface.GetScale(scanGameObject, meshFilterLOD0, GeoHelper.longitudeScale[0],GeoHelper.longitudeScale[1], GeoHelper.latitudeScale[0], GeoHelper.latitudeScale[1]);
+                    }
+                    
+                    scanGameObject.transform.localScale = new Vector3(_scale, _scale, _scale);
 
                 }
+                
                 else
                 {
                     // Adjust the scale

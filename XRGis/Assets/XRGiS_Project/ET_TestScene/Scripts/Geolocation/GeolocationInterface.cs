@@ -43,7 +43,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Geolocation
             // scale
             var scalex =  realDistance / (unityDistance);
 
-            return scalex;
+                return scalex;
         }
     }
 }

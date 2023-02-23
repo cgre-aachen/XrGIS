@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,19 +7,33 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
 {
     public class ScanLoadingHelper : MonoBehaviour
     {
-        public static ScanLoadingHelper Instance { get; private set; }
-        
+        #region Singleton component pattern
+        private static ScanLoadingHelper _instance;
+        public static ScanLoadingHelper Instance
+        {
+            get
+            {
+                _instance ??= FindInstance();
+                return _instance;
+            }
+        }
+        private static ScanLoadingHelper FindInstance()
+        {
+            var instances = FindObjectsOfType<ScanLoadingHelper>();
+            if (instances.Length == 1)
+            {
+                return instances[0];
+            }
+            throw new Exception("There should only be once instance of a Singleton!");
+        }
+        #endregion
+
         public List<GameObject> scanPrefabs;
         
         public int modelScale = 1;
         
         public GameObject cesiumParent;
         
-        public bool geoReference = false;
-        
-        void Awake()
-        {
-            Instance = this;
-        }
+        public bool geoReference;
     }
 }
