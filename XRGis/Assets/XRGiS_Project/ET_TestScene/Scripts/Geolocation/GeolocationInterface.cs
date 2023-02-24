@@ -1,15 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using CesiumForUnity;
 using UnityEngine;
 
 namespace XRGiS_Project.ET_TestScene.Scripts.Geolocation
 {
-    public class GeolocationInterface
+    public static class GeolocationInterface
     {
+        
+        private static GeolocationHelper Helper => GeolocationHelper.Instance;
+        
+        
         private static float SphericalDistance(float lat1, float lat2, float lon1, float lon2)
         {
             //Convert degree to radians
-            var radians = Math.PI / 180;
+            const double radians = Math.PI / 180;
             
             var lat1Rad = lat1 * radians;
             var lat2Rad = lat2 * radians;
@@ -27,7 +33,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Geolocation
             return d;
         }
 
-        public static float GetScale(GameObject go, MeshFilter meshFilter, float lat1, float lat2, float lon1, float lon2)
+        private static float GetScale(GameObject go, MeshFilter meshFilter, float lat1, float lat2, float lon1, float lon2)
         {
             // gets the scale of an gameObject go assuming that the scale is the same for all axis
             
@@ -44,6 +50,41 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Geolocation
             var scalex =  realDistance / (unityDistance);
 
                 return scalex;
+        }
+        
+        public static List<GameObject> GeoReference(List<GameObject> gameObjects)
+        {
+            var goList = new List<GameObject>();
+            var scale = new float();
+            
+            // Looping over all scans
+            foreach (GameObject go in gameObjects)
+            {
+                go.AddComponent<CesiumOriginShift>();
+                go.AddComponent<CesiumGlobeAnchor>();
+                
+                //Getting the scale of the first scan, apply the same scale to all
+                if (gameObjects.First() == go)
+                {
+                    GameObject child0 = go.transform.GetChild(1).gameObject; // _UMS_LODs_
+                    GameObject grandChild0 = child0.transform.GetChild(0).gameObject; // Level00
+                    GameObject greatGrandchild0 = grandChild0.transform.GetChild(0).gameObject; // 000_static_default
+                    MeshFilter meshFilterLOD0 = greatGrandchild0.GetComponent<MeshFilter>();
+                    
+                    scale = GetScale(go, meshFilterLOD0, Helper.longitudeScale[0],Helper.longitudeScale[1], Helper.latitudeScale[0], Helper.latitudeScale[1]);
+                }
+                
+                
+                // Set the lon lat according to a single center
+                var globalAnchor = go.GetComponent<CesiumGlobeAnchor>();
+                globalAnchor.longitude = Helper.longitudeCenter[0];
+                globalAnchor.latitude = Helper.latitudeCenter[0];
+                
+                go.transform.localScale = new Vector3(scale, scale, scale);
+                go.transform.rotation = Quaternion.Euler(0, 0, 0);
+                goList.Add(go);
+            }
+            return goList;
         }
     }
 }

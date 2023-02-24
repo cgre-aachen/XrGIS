@@ -29,11 +29,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.ScanLoading
         #endregion
 
         public List<GameObject> scanPrefabs;
-        
-        public int modelScale = 1;
-        
+
         public GameObject cesiumParent;
-        
-        public bool geoReference;
     }
 }
