@@ -13,6 +13,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts
         public bool instantiateScans = true;
         public bool generateLevelOfDetail = true;
         public bool geoReference = true;
+        public static bool questMarker = true;
         
         private void Awake()
         {
