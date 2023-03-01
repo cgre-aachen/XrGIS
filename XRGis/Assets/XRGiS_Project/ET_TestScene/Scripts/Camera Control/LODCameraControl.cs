@@ -75,10 +75,12 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
             return _lastInputEvent;
         }
 
+        /*
         private void Start()
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
+        */
 
         private void Update() {
             // The wanted velocity is the current input scaled by the sensitivity
