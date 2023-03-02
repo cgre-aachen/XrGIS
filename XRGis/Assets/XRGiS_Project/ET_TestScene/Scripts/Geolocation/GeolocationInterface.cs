@@ -52,11 +52,9 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Geolocation
                 return scalex;
         }
         
-        public static List<GameObject> GeoReference(List<GameObject> gameObjects)
+        public static void GeoReference(List<GameObject> gameObjects)
         {
-            var goList = new List<GameObject>();
             var scale = new float();
-            
             // Looping over all scans
             foreach (GameObject go in gameObjects)
             {
@@ -82,9 +80,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.Geolocation
                 
                 go.transform.localScale = new Vector3(scale, scale, scale);
                 go.transform.rotation = Quaternion.Euler(0, 0, 0);
-                goList.Add(go);
             }
-            return goList;
         }
     }
 }
