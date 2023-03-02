@@ -28,7 +28,6 @@ namespace XRGiS_Project.ET_TestScene.Scripts
             }
             
             
-            
             if (instantiateScans)
             {
                 _goList = InstantiateFromList.InstantiateAllFromList();
@@ -36,12 +35,12 @@ namespace XRGiS_Project.ET_TestScene.Scripts
             
             if (generateLevelOfDetail)
             {
-                _goList = LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
+                LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
             }
             
             if (geoReference)
             {
-                _goList = GeolocationInterface.GeoReference(_goList);
+                GeolocationInterface.GeoReference(_goList);
             }
         }
     }
