@@ -12,11 +12,8 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
         private static LevelOfDetailHelper Helper => LevelOfDetailHelper.Instance;
         
         
-        public static List<GameObject> GenerateLevelOfDetail(List<GameObject> gameObject)
+        public static void GenerateLevelOfDetail(List<GameObject> gameObject)
         {
-            var goList = new List<GameObject>();
-            if (goList == null) throw new ArgumentNullException(nameof(goList));
-
             foreach (var go in gameObject)
             {
                 LODGenerator.GenerateLODs(go, Helper.levels, Helper.autoCollectRenderers, Helper.simplificationOptions, Helper.saveAssetPath);
@@ -59,10 +56,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
                 
                 // Recalculate the LOD bounds
                 go.GetComponent<LODGroup>().RecalculateBounds();
-                
-                goList.Add(go);
-                
-            }  return goList;
+            } 
         }
     } 
 }
