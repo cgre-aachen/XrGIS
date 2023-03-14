@@ -1,20 +1,20 @@
 using System.Collections.Generic;
+using LODCesium.Terranigma.Runtime.Geolocation;
+using LODCesium.Terranigma.Runtime.LevelOfDetail;
+using LODCesium.Terranigma.Runtime.ScanLoading;
 using UnityEngine;
-using XRGiS_Project.ET_TestScene.Scripts.Geolocation;
-using XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail;
-using XRGiS_Project.ET_TestScene.Scripts.ScanLoading;
 
-namespace XRGiS_Project.ET_TestScene.Scripts
+namespace LODCesium.Terranigma.Runtime
 {
     public class Main : MonoBehaviour
     {
         private List<GameObject> _goList;
         
-        public bool instantiateScans = true;
-        public bool generateLevelOfDetail = true;
-        public bool geoReference = true;
-        public static bool questMarker = true;
-        
+        public bool instantiateScans;
+        public bool generateLevelOfDetail;
+        public bool reuseScans;
+        public bool geoReference;
+
         private void Awake()
         {
             if (generateLevelOfDetail)
@@ -35,9 +35,14 @@ namespace XRGiS_Project.ET_TestScene.Scripts
             
             if (generateLevelOfDetail)
             {
-                LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
+                _goList = LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
             }
-            
+
+            if (reuseScans)
+            {
+                _goList = ScanLoadingMultiplication.InstantiateMultiplication(_goList);
+            }
+
             if (geoReference)
             {
                 GeolocationInterface.GeoReference(_goList);

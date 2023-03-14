@@ -82,6 +82,16 @@ crashlytics-build.properties
 
 .idea/
 
+# XRGIS Specific gitignore entries
+*.mat.meta
+*.prefab.meta
+*.asset
+*.meta
+/Assets/XRGiS_Project/ET_TestScene/Data/Single Meshes/
+/Assets/XRGiS_Project/ET_TestScene/Data/Original Data/
+/Assets/XRGiS_Project/Data/
+
+
 #
 # Packages
 #
@@ -173,4 +183,5 @@ Builds/*
 #
 TestReports/*
 
-# XRGIS Specific gitignore entries
+
+

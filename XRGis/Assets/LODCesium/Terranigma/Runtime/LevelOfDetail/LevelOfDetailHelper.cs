@@ -3,7 +3,7 @@ using System.IO;
 using UnityEngine;
 using UnityMeshSimplifier;
 
-namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
+namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
     public class LevelOfDetailHelper : MonoBehaviour
     {
@@ -110,11 +110,12 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
                     // Switch to custom system0
                     case LevelOfDetailSystem.UnityBuiltIn:
                         ActiveLevelOfDetailSystemHelper = LevelOfDetailSystem.CustomSystem0;
-                        
-                        
                         break;
                     // Switch to unity built in system
                     case LevelOfDetailSystem.CustomSystem0:
+                        ActiveLevelOfDetailSystemHelper = LevelOfDetailSystem.UnityBuiltIn;
+                        break;
+                    case LevelOfDetailSystem.NoLod:
                         ActiveLevelOfDetailSystemHelper = LevelOfDetailSystem.UnityBuiltIn;
                         break;
                 }

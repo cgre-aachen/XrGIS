@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
+namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
     public class LevelOfDetailCustomSystem : MonoBehaviour
     {

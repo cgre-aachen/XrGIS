@@ -1,19 +1,20 @@
 // Collects inputs from LevelOfDetailHelper, class generates LODs
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityMeshSimplifier;
 
-namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
+namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
     public static class LevelOfDetailInterface
     {
         private static LevelOfDetailHelper Helper => LevelOfDetailHelper.Instance;
         
         
-        public static void GenerateLevelOfDetail(List<GameObject> gameObject)
+        public static List<GameObject> GenerateLevelOfDetail(List<GameObject> gameObject)
         {
+            List<GameObject> goList = new List<GameObject>();
+            
             foreach (var go in gameObject)
             {
                 LODGenerator.GenerateLODs(go, Helper.levels, Helper.autoCollectRenderers, Helper.simplificationOptions, Helper.saveAssetPath);
@@ -56,7 +57,9 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
                 
                 // Recalculate the LOD bounds
                 go.GetComponent<LODGroup>().RecalculateBounds();
+                goList.Add(go);
             } 
+            return goList;
         }
     } 
 }

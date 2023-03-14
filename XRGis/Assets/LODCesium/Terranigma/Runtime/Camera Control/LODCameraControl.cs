@@ -1,7 +1,6 @@
-using UnityEditor.UIElements;
 using UnityEngine;
 
-namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
+namespace LODCesium.Terranigma.Runtime.Camera_Control
 {
     public class LODCameraControl : MonoBehaviour {
         

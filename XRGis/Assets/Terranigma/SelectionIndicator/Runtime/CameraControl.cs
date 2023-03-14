@@ -1,9 +1,8 @@
-using UnityEditor.UIElements;
 using UnityEngine;
 
-namespace XRGiS_Project.ET_TestScene.Scripts.Camera_Control
+namespace Terranigma.SelectionIndicator.Runtime
 {
-    public class LODCameraControl : MonoBehaviour {
+    public class CameraControl : MonoBehaviour {
         
         [Tooltip("The rotation acceleration, in degrees / second")]
         [SerializeField] private Vector2 acceleration = new Vector2(1000f, 1000f);

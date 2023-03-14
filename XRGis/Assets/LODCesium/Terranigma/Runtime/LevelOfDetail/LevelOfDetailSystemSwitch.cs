@@ -2,12 +2,13 @@
 
 using UnityEngine;
 
-namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
+namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
     public enum LevelOfDetailSystem
     {
         UnityBuiltIn,
-        CustomSystem0
+        CustomSystem0,
+        NoLod,
     }
     
     public class LevelOfDetailSystemSwitch : MonoBehaviour
@@ -15,7 +16,7 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
         // Instances of the two level of detail systems
         public LevelOfDetailCustomSystem levelOfDetailCustomSystem0;
         public LevelOfDetailUnityBuiltInSystem levelOfDetailBuiltInSystem;
-        
+
         private MeshCollider _meshCollider;
         private LODGroup _lodGroup;
         private Camera _camera;
@@ -95,7 +96,23 @@ namespace XRGiS_Project.ET_TestScene.Scripts.LevelOfDetail
                             _grandChild2.SetActive(true);
                             levelOfDetailCustomSystem0.ActiveLevel = 2;
                         }
+                        break;
+                    
+                    case LevelOfDetailSystem.NoLod:
+                        _meshCollider ??= GetComponent<MeshCollider>();
+                        _meshCollider.enabled = false;
                         
+                        _lodGroup ??= GetComponent<LODGroup>();
+                        _lodGroup.enabled = false;
+
+                        _child0 ??= transform.GetChild(1).gameObject;
+                        _grandChild0 ??= _child0.transform.GetChild(0).gameObject;
+                        _grandChild1 ??= _child0.transform.GetChild(1).gameObject;
+                        _grandChild2 ??= _child0.transform.GetChild(2).gameObject;
+                        
+                        _grandChild0.SetActive(true);
+                        _grandChild1.SetActive(false);
+                        _grandChild2.SetActive(false);
                         break;
                 }
             }
