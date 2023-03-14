@@ -375,7 +375,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanPrefabs:
-  - {fileID: 919132149155446097, guid: 39412f0150cfff4419bd8492f0984a99, type: 3}
+  - {fileID: 1529751335620469481, guid: 3b1b6a0ed6127b540b7d67622a3813ee, type: 3}
   parentGameObject: {fileID: 636667640}
   scanCount: 01000000
   xStart: 0
@@ -396,7 +396,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   instantiateScans: 1
   generateLevelOfDetail: 1
-  reuseScans: 1
+  reuseScans: 0
   geoReference: 0
 --- !u!4 &233548268
 Transform:
@@ -421,7 +421,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 233548263}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 039c225d9b5147a28278cdae06af41e3, type: 3}
   m_Name: 

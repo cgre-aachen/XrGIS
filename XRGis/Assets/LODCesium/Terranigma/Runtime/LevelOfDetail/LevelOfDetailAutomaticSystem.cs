@@ -12,16 +12,14 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         public static List<Bounds> bounds;
         public bool isInBounds;
         
-        private void Awake()
+        private void Start()
         {
             _camera = Camera.main;
-            bounds = new List<Bounds>();
         }
         
         private void Update()
         {
             _cameraPosition = _camera.transform.position;
-            
             //loop over all bounds and update bool
             foreach (Bounds bound in bounds)
             {

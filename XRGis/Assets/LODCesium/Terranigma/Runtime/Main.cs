@@ -18,6 +18,8 @@ namespace LODCesium.Terranigma.Runtime
 
         private void Awake()
         {
+            LevelOfDetailAutomaticSystem.bounds = new List<Bounds>();
+            
             if (generateLevelOfDetail)
             {
                 instantiateScans = true;
@@ -27,7 +29,6 @@ namespace LODCesium.Terranigma.Runtime
             {
                 instantiateScans = true;
             }
-            
             
             if (instantiateScans)
             {
