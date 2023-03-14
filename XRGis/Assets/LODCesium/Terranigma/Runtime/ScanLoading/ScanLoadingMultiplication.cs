@@ -28,7 +28,7 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
                 for (var i = 1; i < Helper.scanCount[scanItem]; i++)
                 {
                     // Instantiates a copy of the scan prefab
-                    var go = Object.Instantiate(goList[scanItem], new Vector3(x, 0, z), Quaternion.identity);
+                    var go = Object.Instantiate(goList[scanItem], new Vector3(x+Helper.xDistance, 0, z), Quaternion.identity);
                     go.transform.SetParent(Helper.parentGameObject.transform);
                     go.name = $"{goList[scanItem].name}_" + i;
                     
