@@ -306,6 +306,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07eac1bd26f634749b304107221f4eb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activeLevelOfDetailSystem: 0
   simplificationOptions:
     PreserveBorderEdges: 0
     PreserveUVSeamEdges: 0
@@ -373,7 +374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanPrefabs:
-  - {fileID: 919132149155446097, guid: 28c7493003dc7fc489191cf40ed554a2, type: 3}
+  - {fileID: 919132149155446097, guid: 39412f0150cfff4419bd8492f0984a99, type: 3}
   parentGameObject: {fileID: 636667640}
   scanCount: 04000000
   xStart: 0
@@ -606,7 +607,7 @@ MonoBehaviour:
   maxVerticalAngleFromHorizon: 90
   inputLagPeriod: 0.005
   sensitivity: 0.05
-  speed: 3
+  speed: 1
 --- !u!114 &538458779
 MonoBehaviour:
   m_ObjectHideFlags: 0
