@@ -13,6 +13,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 
         [SerializeField] private LevelOfDetailSystem activeLevelOfDetailSystem = LevelOfDetailSystem.NoLod;
         private LevelOfDetailSystem _previousActiveLevelOfDetailSystem;
+        private LevelOfDetailAutomaticSystem _levelOfDetailAutomaticSystem;
         
         public static LevelOfDetailSystem ActiveLevelOfDetailSystem
         {
@@ -55,6 +56,8 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 
             Instance.activeLevelOfDetailSystem = activeLevelOfDetailSystem;
             ActiveLevelOfDetailSystem = Instance.activeLevelOfDetailSystem;
+            
+            _levelOfDetailAutomaticSystem = GetComponent<LevelOfDetailAutomaticSystem>();
         }
 
         private void Update()
@@ -64,6 +67,20 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                 _previousActiveLevelOfDetailSystem = ActiveLevelOfDetailSystem;
                 ActiveLevelOfDetailSystem = Instance.activeLevelOfDetailSystem;
             }
+
+            if (_levelOfDetailAutomaticSystem.isActiveAndEnabled)
+            {
+                if (_levelOfDetailAutomaticSystem.isInBounds) // if it is in bounds we need to activate the customLOD system
+                {
+                    Instance.activeLevelOfDetailSystem = LevelOfDetailSystem.CustomSystem0;
+                }
+                else
+                {
+                    Instance.activeLevelOfDetailSystem = LevelOfDetailSystem.UnityBuiltIn;
+                }
+            }
+
+
         }
         
         private void Reset()
