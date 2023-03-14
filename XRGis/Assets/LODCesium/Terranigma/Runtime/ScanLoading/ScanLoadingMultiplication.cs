@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LODCesium.Terranigma.Runtime.LevelOfDetail;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -84,6 +85,8 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
                     var collider = go.GetComponent<MeshCollider>();
                     collider.sharedMesh = meshLod2Clone;
                     
+                    // Add Bounds to LevelOfDetailAutomaticSystem
+                    LevelOfDetailAutomaticSystem.bounds.Add(meshFilter2.mesh.bounds); 
                     
                     // Update the position of the next scan
                     x += Helper.xDistance;
