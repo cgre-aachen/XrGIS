@@ -10,22 +10,20 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         // Helper for system switch
         private static GameObject _parentOfAllGameObjectsWithLevelOfDetail;
         public static readonly List<LevelOfDetailSystemSwitch> LevelOfDetailSwitches = new ();
+
+        [SerializeField] private LevelOfDetailSystem activeLevelOfDetailSystem = LevelOfDetailSystem.NoLod;
+        private LevelOfDetailSystem _previousActiveLevelOfDetailSystem;
         
-        private static LevelOfDetailSystem _activeLevelOfDetailSystemHelper = LevelOfDetailSystem.CustomSystem0;
-        public static LevelOfDetailSystem ActiveLevelOfDetailSystemHelper
+        public static LevelOfDetailSystem ActiveLevelOfDetailSystem
         {
-            get => _activeLevelOfDetailSystemHelper;
-            set
-            {
-                if (_activeLevelOfDetailSystemHelper != value) // * Check if System is already active
+            get => Instance.activeLevelOfDetailSystem;
+            private set
+            {;
+                Instance.activeLevelOfDetailSystem = value; // * If not update the active system
+                // Loop all the game objects
+                foreach (var lod in LevelOfDetailSwitches)
                 {
-                    _activeLevelOfDetailSystemHelper = value; // * If not update the active system
-                    
-                    // Loop all the game objects
-                    foreach (var lod in LevelOfDetailSwitches)
-                    {
-                        lod.ActiveLevelOfDetailSystemPerGameObject = value;
-                    }
+                    lod.ActiveLevelOfDetailSystemPerGameObject = value;
                 }
             }
         }
@@ -51,9 +49,21 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         
         private void Start()
         {
-            // Gets all the game objects with LOD at Start
             _parentOfAllGameObjectsWithLevelOfDetail = GameObject.Find("LODParent");
             LevelOfDetailSwitches.AddRange(_parentOfAllGameObjectsWithLevelOfDetail.GetComponentsInChildren<LevelOfDetailSystemSwitch>());
+            _previousActiveLevelOfDetailSystem = Instance.activeLevelOfDetailSystem;
+
+            Instance.activeLevelOfDetailSystem = activeLevelOfDetailSystem;
+            ActiveLevelOfDetailSystem = Instance.activeLevelOfDetailSystem;
+        }
+
+        private void Update()
+        {
+            if (Instance.activeLevelOfDetailSystem != _previousActiveLevelOfDetailSystem)
+            {
+                _previousActiveLevelOfDetailSystem = ActiveLevelOfDetailSystem;
+                ActiveLevelOfDetailSystem = Instance.activeLevelOfDetailSystem;
+            }
         }
         
         private void Reset()
@@ -98,29 +108,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                 },
             };
         }
-
-        // Toggle the keystroke to switch between LODs
-        private void Update()
-        {
-            // Use the keystroke E to toggle the collision systems
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                switch (ActiveLevelOfDetailSystemHelper)
-                {
-                    // Switch to custom system0
-                    case LevelOfDetailSystem.UnityBuiltIn:
-                        ActiveLevelOfDetailSystemHelper = LevelOfDetailSystem.CustomSystem0;
-                        break;
-                    // Switch to unity built in system
-                    case LevelOfDetailSystem.CustomSystem0:
-                        ActiveLevelOfDetailSystemHelper = LevelOfDetailSystem.UnityBuiltIn;
-                        break;
-                    case LevelOfDetailSystem.NoLod:
-                        ActiveLevelOfDetailSystemHelper = LevelOfDetailSystem.UnityBuiltIn;
-                        break;
-                }
-            }    
-        }
+        
 
         // Deletes the files in the LOD folder
         private void OnDestroy()

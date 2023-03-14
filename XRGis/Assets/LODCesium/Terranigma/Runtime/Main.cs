@@ -14,6 +14,7 @@ namespace LODCesium.Terranigma.Runtime
         public bool generateLevelOfDetail;
         public bool reuseScans;
         public bool geoReference;
+        
 
         private void Awake()
         {

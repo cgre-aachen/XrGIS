@@ -6,10 +6,11 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
     public enum LevelOfDetailSystem
     {
+        NoLod,
         UnityBuiltIn,
         CustomSystem0,
-        NoLod,
-    }
+        Automatic,
+    } 
     
     public class LevelOfDetailSystemSwitch : MonoBehaviour
     {
@@ -116,13 +117,6 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                         break;
                 }
             }
-        }
-        
-        private void Start()
-        {
-            // Set Default LOD System and LOD Level
-            _lodGroup = GetComponent<LODGroup>();
-            _lodGroup.enabled = false;
         }
     }
 }

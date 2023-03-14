@@ -12,7 +12,7 @@ namespace LODCesium.Terranigma.Runtime.GUI
 
         private void Update()
         {
-            enabledSystemGUILabel.text = $"Collision System: {LevelOfDetailHelper.ActiveLevelOfDetailSystemHelper}";
+            enabledSystemGUILabel.text = $"Collision System: {LevelOfDetailHelper.ActiveLevelOfDetailSystem}";
         }
     }
 }
