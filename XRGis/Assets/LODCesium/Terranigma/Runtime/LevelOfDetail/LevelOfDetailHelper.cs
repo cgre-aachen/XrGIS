@@ -77,7 +77,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 
             if (_levelOfDetailAutomaticSystem.isActiveAndEnabled)
             {
-                if (_levelOfDetailAutomaticSystem.isInBounds) // if it is in bounds we need to activate the customLOD system
+                if (_levelOfDetailAutomaticSystem.IsInBounds()) // if it is in bounds we need to activate the customLOD system
                 {
                     Instance.activeLevelOfDetailSystem = LevelOfDetailSystem.CustomSystem0;
                 }
