@@ -46,7 +46,11 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                 MeshFilter meshFilterLOD2 = greatGrandchild2.GetComponent<MeshFilter>();
                 
                 // Add the bounds of the lowest level LOD mesh to the LevelOfDetailAutomaticSystem
-                LevelOfDetailAutomaticSystem.bounds.Add(meshFilterLOD2.mesh.bounds); 
+                // Get the bounds of the LOD2 meshrenderer
+                MeshRenderer meshRenderer2 = greatGrandchild2.GetComponent<MeshRenderer>();
+                Bounds bounds = meshRenderer2.bounds;
+                // Add Bounds to LevelOfDetailAutomaticSystem
+                LevelOfDetailAutomaticSystem.bounds.Add(bounds);
 
                 greatGrandchild2.transform.localPosition = Vector3.zero;
                 greatGrandchild2.transform.localScale = Vector3.one;
