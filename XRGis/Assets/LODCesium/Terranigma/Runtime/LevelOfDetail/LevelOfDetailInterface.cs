@@ -1,8 +1,9 @@
 // Collects inputs from LevelOfDetailHelper, class generates LODs
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
-using UnityMeshSimplifier;
+using UnityMeshSimplifier.Plugins.leHighPerformanceMeshSimplifier.MeshSimplifierSingle;
 
 namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
@@ -10,22 +11,22 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
     {
         private static LevelOfDetailHelper Helper => LevelOfDetailHelper.Instance;
         
-        
-        public static List<GameObject> GenerateLevelOfDetail(List<GameObject> gameObject)
+        public static async Task<List<GameObject>> GenerateLevelOfDetail(List<GameObject> gameObject)
         {
             List<GameObject> goList = new List<GameObject>();
             
             foreach (var go in gameObject)
             {
-                LODGenerator.GenerateLODs(go, Helper.levels, Helper.autoCollectRenderers, Helper.simplificationOptions, Helper.saveAssetPath);
+                await LODGenerator.GenerateLODs(go, Helper.levels, Helper.autoCollectRenderers, Helper.simplificationOptions, Helper.saveAssetPath);
                 
                 // Attach various components to the scan
                 var lodSystemSwitch = go.AddComponent<LevelOfDetailSystemSwitch>();
+                
                 var lodBuiltinSystem = go.AddComponent<LevelOfDetailUnityBuiltInSystem>();
                 lodSystemSwitch.levelOfDetailBuiltInSystem = lodBuiltinSystem;
                 var lodCustomSystem0 = go.AddComponent<LevelOfDetailCustomSystem>();
                 lodSystemSwitch.levelOfDetailCustomSystem0 = lodCustomSystem0;
-                
+
                 // Format the different LOD levels to be in the same position and scale
                 GameObject child0 = go.transform.GetChild(1).gameObject; // _UMS_LODs_
                 GameObject grandChild0 = child0.transform.GetChild(0).gameObject; // Level00
@@ -43,6 +44,9 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                 GameObject grandChild2 = child0.transform.GetChild(2).gameObject; // Level02
                 GameObject greatGrandchild2 = grandChild2.transform.GetChild(0).gameObject; // 000_static_default
                 MeshFilter meshFilterLOD2 = greatGrandchild2.GetComponent<MeshFilter>();
+                
+                // Add the bounds of the lowest level LOD mesh to the LevelOfDetailAutomaticSystem
+                LevelOfDetailAutomaticSystem.bounds.Add(meshFilterLOD2.mesh.bounds); 
 
                 greatGrandchild2.transform.localPosition = Vector3.zero;
                 greatGrandchild2.transform.localScale = Vector3.one;

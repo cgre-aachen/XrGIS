@@ -269,6 +269,7 @@ GameObject:
   - component: {fileID: 233548268}
   - component: {fileID: 233548267}
   - component: {fileID: 233548266}
+  - component: {fileID: 233548269}
   - component: {fileID: 233548265}
   - component: {fileID: 233548264}
   m_Layer: 0
@@ -291,9 +292,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loDs: 3
-  radius:
+  radii:
   - 1.5
-  - 10
+  - 3
 --- !u!114 &233548265
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -306,6 +307,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07eac1bd26f634749b304107221f4eb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activeLevelOfDetailSystem: 0
   simplificationOptions:
     PreserveBorderEdges: 0
     PreserveUVSeamEdges: 0
@@ -321,7 +323,7 @@ MonoBehaviour:
   defaultSaveAssetPath: D:/sof/Unity/RiderProjects/XRGis/XRGis/Assets/XRGiS_Project/ET_TestScene/Data/TempLOD
   saveAssetPath: XRGiS_Project/ET_TestScene/Data/TempLOD
   levels:
-  - screenRelativeTransitionHeight: 0.99
+  - screenRelativeTransitionHeight: 0.8
     fadeTransitionWidth: 0
     quality: 1
     combineMeshes: 0
@@ -334,7 +336,7 @@ MonoBehaviour:
     skinnedMotionVectors: 0
     lightProbeUsage: 1
     reflectionProbeUsage: 0
-  - screenRelativeTransitionHeight: 0.95
+  - screenRelativeTransitionHeight: 0.6
     fadeTransitionWidth: 0
     quality: 0.5
     combineMeshes: 0
@@ -347,7 +349,7 @@ MonoBehaviour:
     skinnedMotionVectors: 0
     lightProbeUsage: 1
     reflectionProbeUsage: 0
-  - screenRelativeTransitionHeight: 0.8
+  - screenRelativeTransitionHeight: 0.2
     fadeTransitionWidth: 0
     quality: 0.1
     combineMeshes: 0
@@ -373,9 +375,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scanPrefabs:
-  - {fileID: 919132149155446097, guid: 28c7493003dc7fc489191cf40ed554a2, type: 3}
+  - {fileID: 1529751335620469481, guid: 3b1b6a0ed6127b540b7d67622a3813ee, type: 3}
   parentGameObject: {fileID: 636667640}
-  scanCount: 04000000
+  scanCount: 03000000
   xStart: 0
   zStart: 0
   xDistance: -10
@@ -394,8 +396,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   instantiateScans: 1
   generateLevelOfDetail: 1
-  reuseScans: 1
+  reuseScans: 0
   geoReference: 0
+  useOptimizedMeshSimplifier: 1
 --- !u!4 &233548268
 Transform:
   m_ObjectHideFlags: 0
@@ -410,8 +413,21 @@ Transform:
   m_Children:
   - {fileID: 748048251}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &233548269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233548263}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 039c225d9b5147a28278cdae06af41e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isInBounds: 0
 --- !u!1 &285569158
 GameObject:
   m_ObjectHideFlags: 0
@@ -505,7 +521,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!114 &285569161
 MonoBehaviour:
@@ -606,7 +622,7 @@ MonoBehaviour:
   maxVerticalAngleFromHorizon: 90
   inputLagPeriod: 0.005
   sensitivity: 0.05
-  speed: 3
+  speed: 1
 --- !u!114 &538458779
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,15 +663,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 538458776}
-  m_LocalRotation: {x: 0.00000011527064, y: 0.0000000057141474, z: 0.0000000052856377,
-    w: 1}
-  m_LocalPosition: {x: -10, y: -0, z: 0}
+  m_LocalRotation: {x: 0.00000011169501, y: -0.29516593, z: -0.000000028973824, w: 0.955446}
+  m_LocalPosition: {x: 10, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: -34.335, z: 0}
 --- !u!1 &636667640
 GameObject:
   m_ObjectHideFlags: 0
@@ -685,7 +700,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &748048250
 GameObject:

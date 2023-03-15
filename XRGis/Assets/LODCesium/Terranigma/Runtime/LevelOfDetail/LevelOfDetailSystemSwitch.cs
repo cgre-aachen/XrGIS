@@ -6,10 +6,10 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
     public enum LevelOfDetailSystem
     {
+        NoLod,
         UnityBuiltIn,
         CustomSystem0,
-        NoLod,
-    }
+    } 
     
     public class LevelOfDetailSystemSwitch : MonoBehaviour
     {
@@ -27,8 +27,8 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         private GameObject _grandChild0;
         private GameObject _grandChild1;
         private GameObject _grandChild2;
-        
-        
+
+
         public LevelOfDetailSystem ActiveLevelOfDetailSystemPerGameObject
         {
             set
@@ -39,7 +39,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                         // Disable custom system and enable Unity System
                         _meshCollider ??= GetComponent<MeshCollider>();
                         _meshCollider.enabled = false;
-                        
+
                         _lodGroup ??= GetComponent<LODGroup>();
                         _lodGroup.enabled = true;
 
@@ -101,7 +101,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                     case LevelOfDetailSystem.NoLod:
                         _meshCollider ??= GetComponent<MeshCollider>();
                         _meshCollider.enabled = false;
-                        
+
                         _lodGroup ??= GetComponent<LODGroup>();
                         _lodGroup.enabled = false;
 
@@ -116,13 +116,6 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                         break;
                 }
             }
-        }
-        
-        private void Start()
-        {
-            // Set Default LOD System and LOD Level
-            _lodGroup = GetComponent<LODGroup>();
-            _lodGroup.enabled = false;
         }
     }
 }

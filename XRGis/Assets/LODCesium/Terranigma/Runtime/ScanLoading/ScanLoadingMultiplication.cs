@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LODCesium.Terranigma.Runtime.LevelOfDetail;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -28,7 +29,7 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
                 for (var i = 1; i < Helper.scanCount[scanItem]; i++)
                 {
                     // Instantiates a copy of the scan prefab
-                    var go = Object.Instantiate(goList[scanItem], new Vector3(x, 0, z), Quaternion.identity);
+                    var go = Object.Instantiate(goList[scanItem], new Vector3(x+Helper.xDistance, 0, z), Quaternion.identity);
                     go.transform.SetParent(Helper.parentGameObject.transform);
                     go.name = $"{goList[scanItem].name}_" + i;
                     
@@ -84,6 +85,8 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
                     var collider = go.GetComponent<MeshCollider>();
                     collider.sharedMesh = meshLod2Clone;
                     
+                    // Add Bounds to LevelOfDetailAutomaticSystem
+                    LevelOfDetailAutomaticSystem.bounds.Add(meshFilter2.mesh.bounds); 
                     
                     // Update the position of the next scan
                     x += Helper.xDistance;

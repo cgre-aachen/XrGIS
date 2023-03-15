@@ -26,15 +26,17 @@ namespace LODCesium.Terranigma.Runtime.GUI
             _lod1Count = 0;
             _lod2Count = 0;
 
+            if (LevelOfDetailHelper.LevelOfDetailSwitches == null) return;
             // Find the gameObjects that are scanPrefabs
             foreach (var lodSwitch in LevelOfDetailHelper.LevelOfDetailSwitches)
             {
                 // ActiveLOD system helper can be either UnityBuiltIn or Custom
-                var level = LevelOfDetailHelper.ActiveLevelOfDetailSystemHelper switch
+                var level = LevelOfDetailHelper.ActiveLevelOfDetailSystem switch
                 {
                     // lodSwitch is all prefabs in the scene, checks which system is in use and returns the level
                     LevelOfDetailSystem.UnityBuiltIn => lodSwitch.levelOfDetailBuiltInSystem.ActiveLevel,
                     LevelOfDetailSystem.CustomSystem0 => lodSwitch.levelOfDetailCustomSystem0.ActiveLevel,
+                    LevelOfDetailSystem.NoLod => 0,
                     _ => throw new NotImplementedException("Hey you made a new system, eh?")
                 };
 
