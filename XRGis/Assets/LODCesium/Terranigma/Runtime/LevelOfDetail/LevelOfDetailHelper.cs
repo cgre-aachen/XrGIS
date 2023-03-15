@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityMeshSimplifier;
+using UnityMeshSimplifier.Plugins.leHighPerformanceMeshSimplifier.MeshSimplifierSingle;
 
 namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
     public class LevelOfDetailHelper : MonoBehaviour
     {
         // Helper for system switch
-        private static GameObject _parentOfAllGameObjectsWithLevelOfDetail;
+        public static GameObject parentOfAllGameObjectsWithLevelOfDetail;
         public static readonly List<LevelOfDetailSystemSwitch> LevelOfDetailSwitches = new ();
 
         [SerializeField] private LevelOfDetailSystem activeLevelOfDetailSystem = LevelOfDetailSystem.NoLod;
@@ -41,7 +41,11 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         public string saveAssetPath = "MaxLOD/Data/TempLOD";
 
         public LODLevel[] levels;
-        
+
+        public void SetInitialSwitchState()
+        {
+            ActiveLevelOfDetailSystem = activeLevelOfDetailSystem;
+        }
 
         private void Awake()
         {
@@ -50,8 +54,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         
         private void Start()
         {
-            _parentOfAllGameObjectsWithLevelOfDetail = GameObject.Find("LODParent");
-            LevelOfDetailSwitches.AddRange(_parentOfAllGameObjectsWithLevelOfDetail.GetComponentsInChildren<LevelOfDetailSystemSwitch>());
+            
             _previousActiveLevelOfDetailSystem = Instance.activeLevelOfDetailSystem;
 
             Instance.activeLevelOfDetailSystem = activeLevelOfDetailSystem;
@@ -60,6 +63,10 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
             _levelOfDetailAutomaticSystem = GetComponent<LevelOfDetailAutomaticSystem>();
         }
 
+        public void PopulateLodList()
+        {
+            LevelOfDetailSwitches.AddRange(parentOfAllGameObjectsWithLevelOfDetail.GetComponentsInChildren<LevelOfDetailSystemSwitch>());
+        }
         private void Update()
         {
             if (Instance.activeLevelOfDetailSystem != _previousActiveLevelOfDetailSystem)

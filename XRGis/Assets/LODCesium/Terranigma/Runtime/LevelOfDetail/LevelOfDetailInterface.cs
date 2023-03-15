@@ -1,8 +1,9 @@
 // Collects inputs from LevelOfDetailHelper, class generates LODs
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
-using UnityMeshSimplifier;
+using UnityMeshSimplifier.Plugins.leHighPerformanceMeshSimplifier.MeshSimplifierSingle;
 
 namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 {
@@ -10,13 +11,13 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
     {
         private static LevelOfDetailHelper Helper => LevelOfDetailHelper.Instance;
         
-        public static List<GameObject> GenerateLevelOfDetail(List<GameObject> gameObject)
+        public static async Task<List<GameObject>> GenerateLevelOfDetail(List<GameObject> gameObject)
         {
             List<GameObject> goList = new List<GameObject>();
             
             foreach (var go in gameObject)
             {
-                LODGenerator.GenerateLODs(go, Helper.levels, Helper.autoCollectRenderers, Helper.simplificationOptions, Helper.saveAssetPath);
+                await LODGenerator.GenerateLODs(go, Helper.levels, Helper.autoCollectRenderers, Helper.simplificationOptions, Helper.saveAssetPath);
                 
                 // Attach various components to the scan
                 var lodSystemSwitch = go.AddComponent<LevelOfDetailSystemSwitch>();
