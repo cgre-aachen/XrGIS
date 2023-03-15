@@ -13,6 +13,7 @@ namespace LODCesium.Terranigma.Runtime
         
         public bool instantiateScans;
         public bool generateLevelOfDetail;
+        public static bool generateLevelOfDetailInformation;
         public bool reuseScans;
         public bool geoReference;
 
@@ -21,6 +22,7 @@ namespace LODCesium.Terranigma.Runtime
 
         private async void Awake()
         {
+            generateLevelOfDetailInformation = generateLevelOfDetail;
             LevelOfDetailAutomaticSystem.bounds = new List<Bounds>();
             
             LevelOfDetailHelper.parentOfAllGameObjectsWithLevelOfDetail = GameObject.Find("LODParent");
@@ -52,15 +54,15 @@ namespace LODCesium.Terranigma.Runtime
                 }
                 _goList = await LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
             }
-
-            if (reuseScans) // Reuses scans
-            {
-                _goList = ScanLoadingMultiplication.InstantiateMultiplication(_goList);
-            }
             
             if (geoReference) // Spatial reference is set
             {
                 GeolocationInterface.GeoReference(_goList);
+            }
+
+            if (reuseScans) // Reuses scans
+            {
+                _goList = ScanLoadingMultiplication.InstantiateMultiplication(_goList);
             }
             
             if (generateLevelOfDetail) // Populates the LOD list and sets the initial switch state
