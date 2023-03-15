@@ -62,7 +62,6 @@ namespace LODCesium.Terranigma.Runtime
             {
                 instantiateScans = true;
             }
-            
             if (geoReference) // Check if instantiateScans is true when we Georeference
             {
                 instantiateScans = true;
@@ -71,6 +70,11 @@ namespace LODCesium.Terranigma.Runtime
             if (instantiateScans) // Instantiates scans
             {
                 _goList = InstantiateFromList.InstantiateAllFromList();
+            }
+            
+            if (geoReference) // Spatial reference is set
+            {
+                GeolocationInterface.GeoReference(_goList);
             }
             
             if (generateLevelOfDetail) // Generates LOD
@@ -91,10 +95,6 @@ namespace LODCesium.Terranigma.Runtime
                 timeToLoadLOD = endTime - startTime;
             }
             
-            if (geoReference) // Spatial reference is set
-            {
-                GeolocationInterface.GeoReference(_goList);
-            }
 
             if (reuseScans) // Reuses scans
             {
