@@ -779,6 +779,8 @@ MonoBehaviour:
   zStart: 0
   xDistance: -10
   zDistance: -10
+  savePath: Assets/LODCesium/Terranigma/Ressources/meshes/
+  saveMeshes: 0
 --- !u!114 &937989201
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -795,6 +797,7 @@ MonoBehaviour:
   generateLevelOfDetail: 1
   reuseScans: 0
   geoReference: 1
+  usePreGeneratedLod: 0
   useOptimizedMeshSimplifier: 1
   timeToLoadLOD: 0
   LODGenerationFinished: 0
@@ -1646,7 +1649,7 @@ Transform:
   m_GameObject: {fileID: 1436246454}
   m_LocalRotation: {x: 0.00000011527064, y: 0.0000000057141474, z: 0.0000000052856377,
     w: 1}
-  m_LocalPosition: {x: -5.820739e-11, y: 50, z: 4.656613e-10}
+  m_LocalPosition: {x: -0, y: 118.3, z: 0}
   m_LocalScale: {x: 1.0000007, y: 1.0000006, z: 1.0000006}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -1730,16 +1733,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _adjustOrientationForGlobeWhenMoving: 1
   _detectTransformChanges: 1
-  _positionAuthority: 2
-  _latitude: 50.82192518147184
-  _longitude: 5.885131980517391
-  _height: 250.00000000149277
-  _ecefX: 4016284.469539569
-  _ecefY: 413989.314768268
-  _ecefZ: 4921247.541592468
-  _unityX: -0.00000000005820739196667419
-  _unityY: 50.00000000093132
-  _unityZ: 0.0000000004656612873077393
+  _positionAuthority: 3
+  _latitude: 50.821925181535235
+  _longitude: 5.885131980517393
+  _height: 318.300003051327
+  _ecefX: 4016327.389470315
+  _ecefY: 413993.73885546956
+  _ecefZ: 4921300.486822791
+  _unityX: -0
+  _unityY: 118.30000305175781
+  _unityZ: 0
 --- !u!1 &1490490657
 GameObject:
   m_ObjectHideFlags: 0
@@ -2058,7 +2061,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1939116917
 Transform:
   m_ObjectHideFlags: 0
