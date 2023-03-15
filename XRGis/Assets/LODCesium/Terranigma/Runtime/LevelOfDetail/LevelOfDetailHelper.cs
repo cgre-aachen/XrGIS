@@ -135,6 +135,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         
 
         // Deletes the files in the LOD folder
+        /*
         private void OnDestroy()
         {
             string[] filePaths = Directory.GetFiles(defaultSaveAssetPath);
@@ -143,5 +144,6 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
                 File.Delete(filePath);
             }
         }
+        */
     }
 }

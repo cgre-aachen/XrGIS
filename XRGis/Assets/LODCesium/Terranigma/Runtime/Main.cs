@@ -19,6 +19,10 @@ namespace LODCesium.Terranigma.Runtime
 
         public bool useOptimizedMeshSimplifier;
         
+        [HideInInspector]
+        public float timeToLoadLOD;
+        [HideInInspector]
+        public bool LODGenerationFinished;
 
         private async void Awake()
         {
@@ -44,6 +48,7 @@ namespace LODCesium.Terranigma.Runtime
             
             if (generateLevelOfDetail) // Generates LOD
             {
+                var startTime = Time.time;
                 if (useOptimizedMeshSimplifier) // Check if we use the optimized mesh simplifier
                 {
                     LODGenerator.useOptimizedMeshSimplifier = true;
@@ -53,6 +58,10 @@ namespace LODCesium.Terranigma.Runtime
                     LODGenerator.useOptimizedMeshSimplifier = false;
                 }
                 _goList = await LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
+                LODGenerationFinished = true;
+                
+                var endTime = Time.time;
+                timeToLoadLOD = endTime - startTime;
             }
             
             if (geoReference) // Spatial reference is set
