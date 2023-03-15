@@ -35,7 +35,7 @@ namespace LODCesium.Terranigma.Runtime
                 MeshRenderer meshRenderer2 = greatGrandchild2.GetComponent<MeshRenderer>();
                 Bounds bounds = meshRenderer2.bounds;
                 LevelOfDetailAutomaticSystem.bounds.Add(bounds);
-            };
+            }
         }
         
         private List<GameObject> _addGameObjects(List<LevelOfDetailSystemSwitch> lodSystemSwitches)
