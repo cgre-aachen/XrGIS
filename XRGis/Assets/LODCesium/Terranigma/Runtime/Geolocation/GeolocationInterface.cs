@@ -65,6 +65,7 @@ namespace LODCesium.Terranigma.Runtime.Geolocation
                 //Getting the scale of the first scan, apply the same scale to all
                 if (gameObjects.First() == go)
                 {
+                    
                     GameObject child0 = go.transform.GetChild(1).gameObject; // _UMS_LODs_
                     GameObject grandChild0 = child0.transform.GetChild(0).gameObject; // Level00
                     GameObject greatGrandchild0 = grandChild0.transform.GetChild(0).gameObject; // 000_static_default
