@@ -26,6 +26,7 @@ namespace LODCesium.Terranigma.Runtime.GUI
             _lod1Count = 0;
             _lod2Count = 0;
 
+            if (LevelOfDetailHelper.LevelOfDetailSwitches == null) return;
             // Find the gameObjects that are scanPrefabs
             foreach (var lodSwitch in LevelOfDetailHelper.LevelOfDetailSwitches)
             {
