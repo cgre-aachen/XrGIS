@@ -819,6 +819,7 @@ MonoBehaviour:
   generateLevelOfDetail: 1
   reuseScans: 0
   geoReference: 1
+  useOptimizedMeshSimplifier: 1
 --- !u!114 &937989202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -832,9 +833,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loDs: 3
-  radius:
-  - 10000
-  - 20000
+  radii:
+  - 1000
+  - 5000
 --- !u!114 &937989203
 MonoBehaviour:
   m_ObjectHideFlags: 0
