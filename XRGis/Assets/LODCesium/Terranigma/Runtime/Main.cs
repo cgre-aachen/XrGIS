@@ -16,7 +16,7 @@ namespace LODCesium.Terranigma.Runtime
         public static bool generateLevelOfDetailInformation;
         public bool reuseScans;
         public bool geoReference;
-
+        public bool usePreGeneratedLod;
         public bool useOptimizedMeshSimplifier;
         
         [HideInInspector]
@@ -24,10 +24,37 @@ namespace LODCesium.Terranigma.Runtime
         [HideInInspector]
         public bool LODGenerationFinished;
 
+        private void _addbounds(List<GameObject> goList)
+        {
+            foreach (var go in goList)
+            {
+                // Format the different LOD levels to be in the same position and scale
+                GameObject child0 = go.transform.GetChild(1).gameObject; // _UMS_LODs_
+                GameObject grandChild2 = child0.transform.GetChild(2).gameObject; // Level02
+                GameObject greatGrandchild2 = grandChild2.transform.GetChild(0).gameObject; // 000_static_default
+                MeshRenderer meshRenderer2 = greatGrandchild2.GetComponent<MeshRenderer>();
+                Bounds bounds = meshRenderer2.bounds;
+                LevelOfDetailAutomaticSystem.bounds.Add(bounds);
+            };
+        }
+        
+        private List<GameObject> _addGameObjects(List<LevelOfDetailSystemSwitch> lodSystemSwitches)
+        {
+            List<GameObject> goList = new List<GameObject>();
+            foreach (var lodSystemSwitch in lodSystemSwitches)
+            {
+                goList.Add(lodSystemSwitch.gameObject);
+            }
+            return goList;
+        }
+
+        private List<GameObject> _allLodContainer;
+
         private async void Awake()
         {
             generateLevelOfDetailInformation = generateLevelOfDetail;
             LevelOfDetailAutomaticSystem.bounds = new List<Bounds>();
+            _allLodContainer = new List<GameObject>();
             
             LevelOfDetailHelper.parentOfAllGameObjectsWithLevelOfDetail = GameObject.Find("LODParent");
 
@@ -74,11 +101,14 @@ namespace LODCesium.Terranigma.Runtime
                 _goList = ScanLoadingMultiplication.InstantiateMultiplication(_goList);
             }
             
-            if (generateLevelOfDetail) // Populates the LOD list and sets the initial switch state
+            var helper=gameObject.GetComponent<LevelOfDetailHelper>();
+            helper.PopulateLodList();
+            helper.SetInitialSwitchState();
+
+            if (usePreGeneratedLod)
             {
-                var helper=gameObject.GetComponent<LevelOfDetailHelper>();
-                helper.PopulateLodList();
-                helper.SetInitialSwitchState();
+                _allLodContainer = _addGameObjects(LevelOfDetailHelper.LevelOfDetailSwitches);
+                _addbounds(_allLodContainer);
             }
         }
     }
