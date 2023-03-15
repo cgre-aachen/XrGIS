@@ -3,6 +3,7 @@ using LODCesium.Terranigma.Runtime.Geolocation;
 using LODCesium.Terranigma.Runtime.LevelOfDetail;
 using LODCesium.Terranigma.Runtime.ScanLoading;
 using UnityEngine;
+using UnityMeshSimplifier.Plugins.leHighPerformanceMeshSimplifier.MeshSimplifierSingle;
 
 namespace LODCesium.Terranigma.Runtime
 {
@@ -14,40 +15,59 @@ namespace LODCesium.Terranigma.Runtime
         public bool generateLevelOfDetail;
         public bool reuseScans;
         public bool geoReference;
+
+        public bool useOptimizedMeshSimplifier;
         
 
-        private void Awake()
+        private async void Awake()
         {
             LevelOfDetailAutomaticSystem.bounds = new List<Bounds>();
             
-            if (generateLevelOfDetail)
+            LevelOfDetailHelper.parentOfAllGameObjectsWithLevelOfDetail = GameObject.Find("LODParent");
+
+            if (generateLevelOfDetail) // Check if instantiateScans is true when we generate LOD
             {
                 instantiateScans = true;
             }
             
-            if (geoReference)
+            if (geoReference) // Check if instantiateScans is true when we Georeference
             {
                 instantiateScans = true;
             }
             
-            if (instantiateScans)
+            if (instantiateScans) // Instantiates scans
             {
                 _goList = InstantiateFromList.InstantiateAllFromList();
             }
             
-            if (generateLevelOfDetail)
+            if (generateLevelOfDetail) // Generates LOD
             {
-                _goList = LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
+                if (useOptimizedMeshSimplifier) // Check if we use the optimized mesh simplifier
+                {
+                    LODGenerator.useOptimizedMeshSimplifier = true;
+                }
+                else
+                {
+                    LODGenerator.useOptimizedMeshSimplifier = false;
+                }
+                _goList = await LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
             }
 
-            if (reuseScans)
+            if (reuseScans) // Reuses scans
             {
                 _goList = ScanLoadingMultiplication.InstantiateMultiplication(_goList);
             }
-
-            if (geoReference)
+            
+            if (geoReference) // Spatial reference is set
             {
                 GeolocationInterface.GeoReference(_goList);
+            }
+            
+            if (generateLevelOfDetail) // Populates the LOD list and sets the initial switch state
+            {
+                var helper=gameObject.GetComponent<LevelOfDetailHelper>();
+                helper.PopulateLodList();
+                helper.SetInitialSwitchState();
             }
         }
     }
