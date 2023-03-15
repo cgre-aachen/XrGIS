@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LODCesium.Terranigma.Runtime.LevelOfDetail;
+using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -35,6 +36,7 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
                     
                     if (Main.generateLevelOfDetailInformation)
                     {
+                        var path = Helper.savePath;
                         // Find mesh of LOD0 in nested game objects of scan prefab
                         GameObject child0 = goList[scanItem].transform.GetChild(1).gameObject; // _UMS_LODs_
                         GameObject grandChild0 = child0.transform.GetChild(0).gameObject; // Level00
@@ -56,13 +58,16 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
                         Mesh meshLod0Clone = Object.Instantiate(meshLod0);
                         meshLod0Clone.name = $"{go.name}_lod0";
                         
+                        
                         // Clone LOD1 mesh and rename it
                         Mesh meshLod1Clone = Object.Instantiate(meshLod1);
                         meshLod1Clone.name = $"{go.name}_lod1";
                         
+                        
                         // Clone LOD2 mesh and rename it
                         Mesh meshLod2Clone = Object.Instantiate(meshLod2);
                         meshLod2Clone.name = $"{go.name}_lod2";
+                        
                         
                         // Find LOD0 child and assign mesh
                         GameObject child0Copy = go.transform.GetChild(1).gameObject;
@@ -87,11 +92,22 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
                         MeshRenderer meshRenderer2 = greatGrandchild2Copy.GetComponent<MeshRenderer>();
                         Bounds bounds = meshRenderer2.bounds;
                         // Add Bounds to LevelOfDetailAutomaticSystem
-                        LevelOfDetailAutomaticSystem.bounds.Add(bounds); 
-                        
+                        LevelOfDetailAutomaticSystem.bounds.Add(bounds);
                         // Add Collider System to GameObject
                         var collider = go.GetComponent<MeshCollider>();
                         collider.sharedMesh = meshLod2Clone;
+                        
+                        // save the meshes as assets
+
+                        if (Helper.saveMeshes)
+                        {
+                            AssetDatabase.CreateAsset( meshLod0Clone, path + meshLod0Clone.name + ".mesh");
+                            AssetDatabase.CreateAsset( meshLod1Clone, path + meshLod1Clone.name + ".mesh");
+                            AssetDatabase.CreateAsset( meshLod2Clone, path + meshLod2Clone.name + ".mesh");
+                            AssetDatabase.SaveAssets();
+                        }
+
+                       
                         
                         
                     }
