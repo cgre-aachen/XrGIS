@@ -73,13 +73,15 @@ namespace LODCesium.Terranigma.Runtime.Camera_Control
             
             return _lastInputEvent;
         }
-
-        /*
+        
         private void Start()
         {
             Cursor.lockState = CursorLockMode.Locked;
+            
+            acceleration=Vector2.zero;
+            _savedSpeed = speed;
+            speed = 0;
         }
-        */
 
         private void Update() {
             // The wanted velocity is the current input scaled by the sensitivity
