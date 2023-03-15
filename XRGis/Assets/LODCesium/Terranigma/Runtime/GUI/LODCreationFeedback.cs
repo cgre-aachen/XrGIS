@@ -1,5 +1,4 @@
 ﻿using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityMeshSimplifier.Plugins.leHighPerformanceMeshSimplifier.MeshSimplifierSingle;
 
