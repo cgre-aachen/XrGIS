@@ -795,7 +795,6 @@ GameObject:
   - component: {fileID: 748048251}
   - component: {fileID: 748048253}
   - component: {fileID: 748048252}
-  - component: {fileID: 748048254}
   m_Layer: 0
   m_Name: LevelOfDetailFeedback
   m_TagString: Untagged
@@ -847,23 +846,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enabledSystemGUILabel: {fileID: 1877102600}
---- !u!114 &748048254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 748048250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ead68f187dc4400bcf8dc210d2c7514, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  loadedLODText: {fileID: 0}
-  timeToLoadLODText: {fileID: 0}
-  reductionText: {fileID: 0}
-  totalReductionTimeText: {fileID: 0}
-  main: {fileID: 233548267}
 --- !u!1001 &833086835
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -872,6 +854,11 @@ PrefabInstance:
     m_TransformParent: {fileID: 636667641}
     m_Modifications:
     - target: {fileID: 4587329282761974239, guid: 33747d255f120064595f2021280b7793,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d9ae0619e6e348141ad203f0dc396ded, type: 2}
+    - target: {fileID: 6856893298506605302, guid: 33747d255f120064595f2021280b7793,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -936,6 +923,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8083727970766656414, guid: 33747d255f120064595f2021280b7793,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d9ae0619e6e348141ad203f0dc396ded, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 33747d255f120064595f2021280b7793, type: 3}
 --- !u!4 &833086836 stripped

@@ -798,7 +798,7 @@ MonoBehaviour:
   reuseScans: 0
   geoReference: 1
   usePreGeneratedLod: 0
-  useOptimizedMeshSimplifier: 1
+  useOptimizedMeshSimplifier: 0
   timeToLoadLOD: 0
   LODGenerationFinished: 0
 --- !u!114 &937989202
