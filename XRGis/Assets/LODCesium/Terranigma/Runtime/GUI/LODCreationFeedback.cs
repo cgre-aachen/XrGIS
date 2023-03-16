@@ -11,72 +11,64 @@ namespace LODCesium.Terranigma.Runtime.GUI
         public TextMeshProUGUI reductionText;
         public TextMeshProUGUI totalReductionTimeText;
         public Main main;
-        
-        private int _lodLastCount;
+
         private int _lodDisplayCount;
-        private float _totalTimeToLoadLOD;
+        private float _totalTimeToLoadAllLoDs;
         private int _totalReductionCount;
-
         private int _reduction;
-        
+        private int _meshCount;
 
-        private void Start()
-        {
-            _lodLastCount = 1;
-        }
-        
+        private bool _meshCountSwitchLOD1 = true;
+        private bool _meshCountSwitchLOD2 = true;
+
         private void Update()
         {
             if (main.useOptimizedMeshSimplifier)
             {
-                if (_lodLastCount != LODGenerator.count) //Used for LOD1
+                
+                if (LODGenerator.count % 2 == 1 && LODGenerator.count < 20) // LOD1
                 {
-                    _lodLastCount+=1;
-                    _lodDisplayCount += 1;
-                    _totalReductionCount += 1;
-
-                }
-
-                if (main.LODGenerationFinished) // Used for LOD2
-                {
-                    _lodDisplayCount += 1;
-                    main.LODGenerationFinished = false;
-                    _totalTimeToLoadLOD += LODGenerator.timeElapsed;
-                    _totalReductionCount += 1;
-                }
-            
-                if (_lodDisplayCount == 2) // Used after LOD2
-                {
-                    _lodDisplayCount = 0;
-                    _totalTimeToLoadLOD += LODGenerator.timeElapsed;
-                    _totalReductionCount += 1;
-                }
-            
-                if (_lodDisplayCount == 1) // logic to display the reduction
-                {
-                    _reduction = 50;
-                }
-                else
-                {
+                    _lodDisplayCount = 1;
                     _reduction = 20;
-                }
-
-                if (_totalReductionCount < 30) // Used to exit
-                {
-                    loadedLODText.text = $"LOD {_lodDisplayCount+1} finished loading";
-                    timeToLoadLODText.text = $"Time needed (s): {Mathf.Abs(Mathf.Round(LODGenerator.timeElapsed * 100f) / 100f)}";
+                    _totalTimeToLoadAllLoDs += LODGenerator.timetoLoadSingleLod;
+                    
+                    
+                    if (_meshCountSwitchLOD1)
+                    {
+                        _meshCount++;
+                        _meshCountSwitchLOD1 = false;
+                    }
+                    
+                    
+                    loadedLODText.text = $"Loading: Mesh {_meshCount}, LOD{_lodDisplayCount}";
                     reductionText.text = $"Reduction: { _reduction}%";
+                    timeToLoadLODText.text = $"Time needed (s): {Mathf.Abs(Mathf.Round(LODGenerator.timetoLoadSingleLod * 100f) / 100f)}";
+                    totalReductionTimeText.text = $"Total reduction time (s): {Mathf.Abs(Mathf.Round(_totalTimeToLoadAllLoDs * 1f) / 100f)}";
                 }
-                else
+                
+                if (LODGenerator.count % 2 == 0 && LODGenerator.count < 20) // LOD2
+                {
+                    _lodDisplayCount = 2;
+                    _reduction = 50;
+                    _totalTimeToLoadAllLoDs += LODGenerator.timetoLoadSingleLod;
+                    _meshCountSwitchLOD1 = true;
+
+                    loadedLODText.text = $"Loading: Mesh {_meshCount}, LOD{_lodDisplayCount}";
+                    reductionText.text = $"Reduction: { _reduction}%";
+                    timeToLoadLODText.text = $"Time needed (s): {Mathf.Abs(Mathf.Round(LODGenerator.timetoLoadSingleLod * 100f) / 100f)}";
+                    totalReductionTimeText.text = $"Total reduction time (s): {Mathf.Abs(Mathf.Round(_totalTimeToLoadAllLoDs * 1f) / 100f)}";
+                }
+                
+                if (LODGenerator.count == 20) // LOD loading finished
                 {
                     loadedLODText.text = "All LODs finished loading";
-                    timeToLoadLODText.text = $"Time needed (s): {Mathf.Abs(Mathf.Round(LODGenerator.timeElapsed * 100f) / 100f)}";
+                    Destroy(timeToLoadLODText);
                     reductionText.text = "All meshes reduced by: LOD1: 20%, LOD2: 50%";
+                    totalReductionTimeText.text = $"Total reduction time (s): {Mathf.Abs(Mathf.Round(_totalTimeToLoadAllLoDs * 1f) / 100f)}";
                 }
-                totalReductionTimeText.text = $"Total reduction time (s): {Mathf.Abs(Mathf.Round(_totalTimeToLoadLOD * 100f) / 100f)}";
             }
 
-            else
+            else // Used when we are not reducing in runtime
             {
                 loadedLODText.text = "All LODs finished loading";
                 Destroy(timeToLoadLODText);
