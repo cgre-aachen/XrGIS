@@ -42,6 +42,9 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
         public int xDistance = -10;
         [Tooltip("The distance (z-coordinate) between each new scan")]
         public int zDistance = -10;
+        
+        public string savePath = "Assets/LODCesium/Terranigma/Ressources/meshes/";
+        public bool saveMeshes;
 
     }
 }

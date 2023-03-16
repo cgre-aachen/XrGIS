@@ -38,7 +38,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         
         public string defaultSaveAssetPath = "D:/sof/Unity/RiderProjects/XRGis/XRGis/Assets/XRGiS_Project/ET_TestScene/Data/TempLOD";
         
-        public string saveAssetPath = "MaxLOD/Data/TempLOD";
+        public string saveAssetPath = "XRGiS_Project/ET_TestScene/Data/TempLOD"; //MaxLOD/Data/TempLOD
 
         public LODLevel[] levels;
 
@@ -77,7 +77,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
 
             if (_levelOfDetailAutomaticSystem.isActiveAndEnabled)
             {
-                if (_levelOfDetailAutomaticSystem.isInBounds) // if it is in bounds we need to activate the customLOD system
+                if (_levelOfDetailAutomaticSystem.IsInBounds()) // if it is in bounds we need to activate the customLOD system
                 {
                     Instance.activeLevelOfDetailSystem = LevelOfDetailSystem.CustomSystem0;
                 }
@@ -94,7 +94,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
         {
             simplificationOptions = SimplificationOptions.Default;
             autoCollectRenderers = true;
-            saveAssetPath = "MaxLOD/Data/TempLOD";
+            saveAssetPath = "XRGiS_Project/ET_TestScene/Data/TempLOD";
             levels = new []
             {
                 new LODLevel(0.3f, 1f)
@@ -133,7 +133,7 @@ namespace LODCesium.Terranigma.Runtime.LevelOfDetail
             };
         }
         
-
+        
         // Deletes the files in the LOD folder
         private void OnDestroy()
         {
