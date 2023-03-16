@@ -79,6 +79,7 @@ namespace LODCesium.Terranigma.Runtime.GUI
             else
             {
                 loadedLODText.text = "All LODs finished loading";
+                Destroy(timeToLoadLODText);
                 reductionText.text = "All meshes reduced by: LOD1: 20%, LOD2: 50%";
                 totalReductionTimeText.text = $"Total reduction time (s): {Mathf.Abs(Mathf.Round(main.timeToLoadLOD * 100f) / 100f)}";
             }
