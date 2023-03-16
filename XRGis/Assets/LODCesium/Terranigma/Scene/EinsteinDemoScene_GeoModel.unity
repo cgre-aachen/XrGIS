@@ -1135,12 +1135,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfc49b4f545e41b468d5bf548863ab72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  instantiateScans: 0
-  generateLevelOfDetail: 0
+  instantiateScans: 1
+  generateLevelOfDetail: 1
   reuseScans: 0
-  geoReference: 0
+  geoReference: 1
   usePreGeneratedLod: 0
-  useOptimizedMeshSimplifier: 0
+  useOptimizedMeshSimplifier: 1
   timeToLoadLOD: 0
   LODGenerationFinished: 0
 --- !u!114 &937989202
@@ -1157,8 +1157,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loDs: 3
   radii:
-  - 1000
   - 5000
+  - 7000
 --- !u!114 &937989203
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2330,7 +2330,7 @@ MonoBehaviour:
   maxVerticalAngleFromHorizon: 90
   inputLagPeriod: 0.005
   sensitivity: 0.05
-  speed: 2000
+  speed: 3000
 --- !u!114 &1436246464
 MonoBehaviour:
   m_ObjectHideFlags: 0
