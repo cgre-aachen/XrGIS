@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using LODCesium.Terranigma.Runtime.Geolocation;
 using LODCesium.Terranigma.Runtime.LevelOfDetail;
 using LODCesium.Terranigma.Runtime.ScanLoading;
@@ -18,6 +19,9 @@ namespace LODCesium.Terranigma.Runtime
         public bool geoReference;
         public bool usePreGeneratedLod;
         public bool useOptimizedMeshSimplifier;
+
+        private bool _firstFrame = false;
+        private float _startTime;
         
         [HideInInspector]
         public float timeToLoadLOD;
@@ -79,23 +83,24 @@ namespace LODCesium.Terranigma.Runtime
             
             if (generateLevelOfDetail) // Generates LOD
             {
-                var startTime = Time.time;
                 if (useOptimizedMeshSimplifier) // Check if we use the optimized mesh simplifier
                 {
                     LODGenerator.useOptimizedMeshSimplifier = true;
+                    _goList = await LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
+                    LODGenerationFinished = true;
                 }
+
                 else
                 {
+                    _startTime = Time.time;
                     LODGenerator.useOptimizedMeshSimplifier = false;
+                    _goList = await LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
+                    LODGenerationFinished = true;
+                    //await Task.Yield();
                 }
-                _goList = await LevelOfDetailInterface.GenerateLevelOfDetail(_goList);
-                LODGenerationFinished = true;
                 
-                var endTime = Time.time;
-                timeToLoadLOD = endTime - startTime;
             }
             
-
             if (reuseScans) // Reuses scans
             {
                 _goList = ScanLoadingMultiplication.InstantiateMultiplication(_goList);
@@ -109,6 +114,18 @@ namespace LODCesium.Terranigma.Runtime
             {
                 _allLodContainer = _addGameObjects(LevelOfDetailHelper.LevelOfDetailSwitches);
                 _addbounds(_allLodContainer);
+            }
+            
+        
+        }
+        
+        private void Update()
+        {
+            if (_firstFrame == false)
+            {
+                var endTime = Time.time;
+                timeToLoadLOD = endTime - _startTime;
+                _firstFrame = true;
             }
         }
     }
