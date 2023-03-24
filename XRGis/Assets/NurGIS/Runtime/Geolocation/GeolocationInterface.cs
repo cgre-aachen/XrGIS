@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using CesiumForUnity;
 using UnityEngine;
-using XRGiS_Project.ET_TestScene.Scripts.Geolocation;
 
-namespace LODCesium.Terranigma.Runtime.Geolocation
+namespace NurGIS.Runtime.Geolocation
 {
     public static class GeolocationInterface
     {

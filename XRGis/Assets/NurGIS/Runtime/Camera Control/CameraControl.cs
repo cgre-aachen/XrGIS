@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace Terranigma.SelectionIndicator.Runtime
+namespace NurGIS.Runtime.Camera_Control
 {
-    public class CameraControl : MonoBehaviour {
+    public class LODCameraControl : MonoBehaviour {
         
         [Tooltip("The rotation acceleration, in degrees / second")]
         [SerializeField] private Vector2 acceleration = new Vector2(1000f, 1000f);
@@ -73,13 +73,15 @@ namespace Terranigma.SelectionIndicator.Runtime
             
             return _lastInputEvent;
         }
-
-        /*
+        
         private void Start()
         {
             Cursor.lockState = CursorLockMode.Locked;
+            
+            acceleration=Vector2.zero;
+            _savedSpeed = speed;
+            speed = 0;
         }
-        */
 
         private void Update() {
             // The wanted velocity is the current input scaled by the sensitivity

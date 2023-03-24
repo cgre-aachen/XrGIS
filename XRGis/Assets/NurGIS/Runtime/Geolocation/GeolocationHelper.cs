@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace XRGiS_Project.ET_TestScene.Scripts.Geolocation
+namespace NurGIS.Runtime.Geolocation
 {
     public class GeolocationHelper : MonoBehaviour
     {

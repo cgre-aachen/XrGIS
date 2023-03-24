@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// MonoBehaviour to define the amount and number of scans which should be instantiated
-namespace LODCesium.Terranigma.Runtime.ScanLoading
+namespace NurGIS.Runtime.ScanLoading // MonoBehaviour to define the amount and number of scans which should be instantiated
 {
     public class ScanLoadingHelper : MonoBehaviour
     {
@@ -42,9 +41,5 @@ namespace LODCesium.Terranigma.Runtime.ScanLoading
         public int xDistance = -10;
         [Tooltip("The distance (z-coordinate) between each new scan")]
         public int zDistance = -10;
-        
-        public string savePath = "Assets/LODCesium/Terranigma/Ressources/meshes/";
-        public bool saveMeshes;
-
     }
 }

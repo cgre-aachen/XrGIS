@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace LODCesium.Terranigma.Runtime.GUI
+namespace NurGIS.Runtime.GUI
 {
     public class BillboardScript : MonoBehaviour
     {
