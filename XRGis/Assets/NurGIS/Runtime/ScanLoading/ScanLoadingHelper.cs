@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// MonoBehaviour to define the amount and number of scans which should be instantiated
-namespace LODCesium.Terranigma.Runtime.ScanLoading
+namespace NurGIS.Runtime.ScanLoading // MonoBehaviour to define the amount and number of scans which should be instantiated
 {
     public class ScanLoadingHelper : MonoBehaviour
     {

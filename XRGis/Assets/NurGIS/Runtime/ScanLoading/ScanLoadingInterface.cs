@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-// Instantiates scans for LOD test from List  
-namespace LODCesium.Terranigma.Runtime.ScanLoading
+namespace NurGIS.Runtime.ScanLoading // Instantiates scans for LOD test from List  
 {
     public static class InstantiateFromList
     {

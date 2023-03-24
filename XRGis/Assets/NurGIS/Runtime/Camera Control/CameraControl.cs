@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace LODCesium.Terranigma.Runtime.Camera_Control
+namespace NurGIS.Runtime.Camera_Control
 {
     public class LODCameraControl : MonoBehaviour {
         

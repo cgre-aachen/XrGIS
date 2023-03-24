@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using LODCesium.Terranigma.Runtime.Geolocation;
-using LODCesium.Terranigma.Runtime.ScanLoading;
+using NurGIS.Runtime.Geolocation;
+using NurGIS.Runtime.ScanLoading;
 using UnityEngine;
 
-namespace LODCesium.Terranigma.Runtime
+namespace NurGIS.Runtime
 {
     public class Main : MonoBehaviour
     {
@@ -13,7 +13,7 @@ namespace LODCesium.Terranigma.Runtime
         public bool geoReference;
 
 
-        private async void Awake()
+        private void Awake()
         {
             if (instantiateScans) // Instantiates scans
             {

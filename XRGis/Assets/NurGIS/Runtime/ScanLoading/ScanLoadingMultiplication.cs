@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace LODCesium.Terranigma.Runtime.ScanLoading
+namespace NurGIS.Runtime.ScanLoading
 {
-    public static class ScanLoadingMultiplication
+    public static class ScanLoadingMultiplication // Instantiate additional scans if a scan should be reused
     {
-        // Instantiate additional scans if a scan should be reused
         private static ScanLoadingHelper Helper => ScanLoadingHelper.Instance;
 
         internal static List<GameObject> InstantiateMultiplication(List<GameObject> goList)
