@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace NurGIS.Runtime.Camera_Control
 {
-    public class LODCameraControl : MonoBehaviour {
+    public class CameraControl : MonoBehaviour {
         
         [Tooltip("The rotation acceleration, in degrees / second")]
         [SerializeField] private Vector2 acceleration = new Vector2(1000f, 1000f);
