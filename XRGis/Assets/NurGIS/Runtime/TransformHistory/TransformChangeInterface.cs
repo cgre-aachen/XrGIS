@@ -8,7 +8,7 @@ namespace NurGIS.Runtime.TransformHistory
         public List<GameObject> transformGoList;
         public bool globalUndoCallParameter;
 
-        private void RevertlastState()
+        private void IdentifyLastChangedGo()
         {
             GameObject go = transformGoList[^1];
             TransformChangeHelper helper = go.GetComponent<TransformChangeHelper>();
@@ -20,11 +20,10 @@ namespace NurGIS.Runtime.TransformHistory
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Z))
+            if (Input.GetKeyDown(KeyCode.Z) && transformGoList.Count > 0)
             {
-                RevertlastState();
+                IdentifyLastChangedGo();
             }  
         }
     }
-    
 }
