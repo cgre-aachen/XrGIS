@@ -1,12 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 namespace NurGIS.Runtime.TransformHistory
 {
+ 
+    
     public class TransformChangeInterface : MonoBehaviour
     {
         public List<GameObject> transformGoList;
         public bool globalUndoCallParameter;
+        public bool useTransformTracker = true;
 
         private void IdentifyLastChangedGo()
         {
@@ -23,7 +27,7 @@ namespace NurGIS.Runtime.TransformHistory
             if (Input.GetKeyDown(KeyCode.Z) && transformGoList.Count > 0)
             {
                 IdentifyLastChangedGo();
-            }  
+            }
         }
     }
 }
