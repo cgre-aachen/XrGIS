@@ -1,18 +1,17 @@
-using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UIElements;
 
 namespace NurGIS.Runtime.TransformHistory
 {
     public class TransformChangeHelper : MonoBehaviour
     {
         #region GUI
+        #if false
+        
         [CustomEditor(typeof(TransformChangeHelper))]
         public class CustomTransformUI : Editor
         {
+            #region GUIProperties
             private SerializedProperty _absTranslationList;
             private SerializedProperty _absRotationList;
             private SerializedProperty _absScaleList;
@@ -21,15 +20,22 @@ namespace NurGIS.Runtime.TransformHistory
             private SerializedProperty _relRotationList;
             private SerializedProperty _relScaleList;
 
-            private bool _showTranslation = true;
+            private bool _showTranslation;
             private bool _showRotation;
             private bool _showScale;
+            private bool _detailedInformation;
+            private bool _showTransform = true;
+            
             private TransformChangeHelper _transformChangeHelper;
+            private Vector3 _translationVector;
+            private Vector3 _scaleVector;
+            private Vector3 _eulerAngles;
+            private MyTransform _myTransform;
+            #endregion
             
             private void OnEnable()
             {
                 _transformChangeHelper = (TransformChangeHelper)target;
-                
                 _absTranslationList = serializedObject.FindProperty("positionList");
                 _absRotationList = serializedObject.FindProperty("rotationList");
                 _absScaleList = serializedObject.FindProperty("scaleList");
@@ -37,365 +43,397 @@ namespace NurGIS.Runtime.TransformHistory
                 _relTranslationList = serializedObject.FindProperty("relativePositionList");
                 _relRotationList = serializedObject.FindProperty("relativeRotationList");
                 _relScaleList = serializedObject.FindProperty("relativeScaleList");
+
             }
             
             public override void OnInspectorGUI()
             {
-                #region rotationscalepositionGUI
+                // Transform Lists
                 serializedObject.Update();
                 
-                _showTranslation = EditorGUILayout.Foldout(_showTranslation, "Translation");
-                if (_showTranslation)
+                _showTransform = EditorGUILayout.Foldout(_showTransform, "Transforms");
+                if (_showTransform)
                 {
-                    EditorGUILayout.LabelField("Absolute Transforms", EditorStyles.boldLabel);
-                    for (int i = 0; i < _absTranslationList.arraySize; i++)
+                    foreach (var t in _transformChangeHelper.transformTypeList)
                     {
-                        EditorGUILayout.PropertyField(_absTranslationList.GetArrayElementAtIndex(i));
-                    }
-                    
-                    EditorGUILayout.Space();
-                    
-                    EditorGUILayout.LabelField("Relative Transforms", EditorStyles.boldLabel);
-                    for (int i = 0; i < _relTranslationList.arraySize; i++)
-                    {
-                        EditorGUILayout.PropertyField(_relTranslationList.GetArrayElementAtIndex(i));
+                        EditorGUILayout.LabelField(t);
                     }
                 }
                 
-                _showRotation = EditorGUILayout.Foldout(_showRotation, "Rotation");
-                
-                if (_showRotation)
-                {
-                    EditorGUILayout.LabelField("Absolute Transforms", EditorStyles.boldLabel);
-                    for (int i = 0; i < _absRotationList.arraySize; i++)
+                _detailedInformation = EditorGUILayout.Foldout(_detailedInformation, "Detailed Information");
+                if (_detailedInformation)
+                { 
+                    _showTranslation = EditorGUILayout.Foldout(_showTranslation, "Translation");
+                    if (_showTranslation)
                     {
-                        EditorGUILayout.PropertyField(_absRotationList.GetArrayElementAtIndex(i));
+                        EditorGUILayout.LabelField("Absolute Transforms", EditorStyles.boldLabel);
+                        foreach (Vector3 i in _transformChangeHelper.positionList)
+                        {
+                            EditorGUILayout.LabelField(i.ToString());
+                        }
+                        
+                        EditorGUILayout.Space();
+                        
+                        EditorGUILayout.LabelField("Relative Transforms", EditorStyles.boldLabel);
+                        for (int i = 0; i < _relTranslationList.arraySize; i++)
+                        {
+                            EditorGUILayout.PropertyField(_relTranslationList.GetArrayElementAtIndex(i));
+                        }
                     }
-                    
-                    EditorGUILayout.Space();
-                    
-                    EditorGUILayout.LabelField("Relative Transforms", EditorStyles.boldLabel);
-                    for (int i = 0; i < _relRotationList.arraySize; i++)
+
+                    _showRotation = EditorGUILayout.Foldout(_showRotation, "Rotation");
+                    if (_showRotation)
                     {
-                        EditorGUILayout.PropertyField(_relRotationList.GetArrayElementAtIndex(i));
+                        EditorGUILayout.LabelField("Absolute Transforms", EditorStyles.boldLabel);
+                        for (int i = 0; i < _absRotationList.arraySize; i++)
+                        {
+                            EditorGUILayout.PropertyField(_absRotationList.GetArrayElementAtIndex(i));
+                        }
+                        
+                        EditorGUILayout.Space();
+                        
+                        EditorGUILayout.LabelField("Relative Transforms", EditorStyles.boldLabel);
+                        for (int i = 0; i < _relRotationList.arraySize; i++)
+                        {
+                            EditorGUILayout.PropertyField(_relRotationList.GetArrayElementAtIndex(i));
+                        }
                     }
-                }
                 
-                _showScale = EditorGUILayout.Foldout(_showScale, "Scale");
-                
-                if (_showScale)
-                {
-                    EditorGUILayout.LabelField("Absolute Transforms", EditorStyles.boldLabel);
-                    for (int i = 0; i < _absScaleList.arraySize; i++)
+                    _showScale = EditorGUILayout.Foldout(_showScale, "Scale");
+                    if (_showScale)
                     {
-                        EditorGUILayout.PropertyField(_absScaleList.GetArrayElementAtIndex(i));
-                    }
-                    
-                    EditorGUILayout.Space();
-                    
-                    EditorGUILayout.LabelField("Relative Transforms", EditorStyles.boldLabel);
-                    for (int i = 0; i < _relScaleList.arraySize; i++)
-                    {
-                        EditorGUILayout.PropertyField(_relScaleList.GetArrayElementAtIndex(i));
+                        EditorGUILayout.LabelField("Absolute Transforms", EditorStyles.boldLabel);
+                        for (int i = 0; i < _absScaleList.arraySize; i++)
+                        {
+                            EditorGUILayout.PropertyField(_absScaleList.GetArrayElementAtIndex(i));
+                        }
+                        
+                        EditorGUILayout.Space();
+                        
+                        EditorGUILayout.LabelField("Relative Transforms", EditorStyles.boldLabel);
+                        for (int i = 0; i < _relScaleList.arraySize; i++)
+                        {
+                            EditorGUILayout.PropertyField(_relScaleList.GetArrayElementAtIndex(i));
+                        }
                     }
                 }
                 
                 serializedObject.ApplyModifiedProperties();
+                
+                EditorGUILayout.Space();
+                EditorGUILayout.Space();
+                EditorGUILayout.Space();
+                
+                #region Slider
+                EditorGUILayout.LabelField("Transform Slider", EditorStyles.boldLabel);
+                _transformChangeHelper.sliderPosition = EditorGUILayout.IntSlider(_transformChangeHelper.sliderPosition,1, _transformChangeHelper.relativePositionList.Count);
+
+                EditorGUILayout.Space();
+                EditorGUILayout.Space();
+                EditorGUILayout.Space();
                 #endregion
                 
-                // Slider in Inspector
-                _transformChangeHelper.sliderPosition = EditorGUILayout.IntSlider(_transformChangeHelper.sliderPosition,1, _transformChangeHelper.positionList.Count);
+                #region InputFields and Buttons
+                EditorGUILayout.LabelField("Transform Input", EditorStyles.boldLabel);
+                // Translation
+                _translationVector = EditorGUILayout.Vector3Field("Position:", _translationVector);
+                bool applyTranslationButton = GUILayout.Button("Apply Translation");
+                if (applyTranslationButton)
+                {
+                    _myTransform = new MyTransform
+                    {
+                        transformType = TransformTypes.Relative,
+                        transformSpecifier = TransformSpecifier.Translation,
+                        IsActive = true,
+                        position = _translationVector,
+                        rotation = Quaternion.identity,
+                        scale = Vector3.zero
+                    };
+
+                    _transformChangeHelper.transformList.Add(_myTransform);
+                    _transformChangeHelper.transformListChanged = true;
+                    
+                    _transformChangeHelper.relativePositionList.Add(_translationVector);
+                    _translationVector = Vector3.zero;
+                }
+                
+                // Rotation
+                _eulerAngles = EditorGUILayout.Vector3Field("Rotation:", _eulerAngles);
+                bool applyRotationButton = GUILayout.Button("Apply Rotation");
+                if (applyRotationButton)
+                {
+                    _myTransform = new MyTransform
+                    {
+                        transformType = TransformTypes.Relative,
+                        transformSpecifier = TransformSpecifier.Rotation,
+                        IsActive = true,
+                        position = Vector3.zero,
+                        rotation = Quaternion.Euler(_eulerAngles),
+                        scale = Vector3.zero
+                    };
+                    
+                    _transformChangeHelper.transformList.Add(_myTransform);
+                    _transformChangeHelper.transformListChanged = true;
+                    
+                    Quaternion quaternion = Quaternion.Euler(_eulerAngles);
+                    _transformChangeHelper.relativeRotationList.Add(quaternion);
+                    _eulerAngles = Vector3.zero;
+                }
+                // Scale 
+                _scaleVector = EditorGUILayout.Vector3Field("Scale:", _scaleVector);
+                bool applyScaleButton = GUILayout.Button("Apply Scaling");
+                if (applyScaleButton)
+                {
+                    _myTransform = new MyTransform
+                    {
+                        transformType = TransformTypes.Relative,
+                        transformSpecifier = TransformSpecifier.Scale,
+                        IsActive = true,
+                        position = Vector3.zero,
+                        rotation = Quaternion.identity,
+                        scale = _scaleVector
+                    };
+                    
+                    _transformChangeHelper.transformList.Add(_myTransform);
+                    _transformChangeHelper.transformListChanged = true;
+                    
+
+                    _transformChangeHelper.relativeScaleList.Add(_scaleVector);
+                    _scaleVector = Vector3.zero;
+                }
+                
+                // Reset Button
+                bool resetTransformButton = GUILayout.Button("Reset Transform");
+                if (resetTransformButton)
+                {
+                }
+                #endregion
+                
             }
         }
+        
+        #endif
         #endregion
-        
+
         #region Properties
-        private Main _mainComponent;
-        private TransformChangeInterface _transformChangeInterface;
-        private bool _initialState;
-        
-        private readonly double _translationThreshold = 1;
-        private readonly double _rotationThreshold = 1;
-        private readonly double _scaleThreshold = 0.1;
+        public enum TransformTypes
+        {
+            Absolute,
+            Relative
+        }
 
-        private int _positionOfContinuousTransformStart;
-        private int _positionOfContinuousTransformGoListStart;
-        private bool _continuousTransform;
-        private bool _continuousTransformEnded;
-        private bool _sliderPositionChanged;
+        public enum TransformSpecifier
+        {
+            Translation,
+            Rotation,
+            Scale,
+            AbsoluteTransform,
+            NoTransform
+        }
 
-        public bool undoSingleTransform;
-        public int sliderPosition;
+        public struct MyTransform
+        {
+            public Vector3 position;
+            public Quaternion rotation;
+            public Vector3 scale;
+            public TransformTypes transformType;
+            public TransformSpecifier transformSpecifier;
+            public bool IsActive;
+        }
         
-        public List<Vector3> positionList;
-        public List<Vector3> relativePositionList;
-        private Vector3 _relativePositionChange;
+        public List<MyTransform> transformList;
+        public List<string> transformNameList;
         
-        public List<Quaternion> rotationList;
-        public List<Quaternion> relativeRotationList;
-        private Quaternion _relativeRotationChange;
+        public Vector3 translationInput;
+        public Vector3 rotationInput;
+        public Vector3 scaleInput = Vector3.one;
+
+        public bool noEntry;
         
-        public List<Vector3> scaleList;
-        public List<Vector3> relativeScaleList;
-        private Vector3 _relativeScaleChange;
+        private bool _initialStateLoaded;
         #endregion
         
         #region Methods
-        private void SaveTransform(GameObject go)
+        public void SaveRelativeTransformFromGui()
         {
-            _transformChangeInterface.transformGoList.Add(go);
-            _transformChangeInterface.sliderPosition = _transformChangeInterface.transformGoList.Count;
-            var localPosition = go.transform.localPosition;
-            var localScale = go.transform.localScale;
-            var localRotation = go.transform.localRotation;
-            
-            positionList.Add(localPosition);
-            _relativePositionChange = localPosition - positionList[^2];
-            relativePositionList.Add(_relativePositionChange);
+            MyTransform myTransform = new MyTransform();
+            if (translationInput != Vector3.zero)
+            {
+                myTransform.transformType = TransformTypes.Relative;
+                myTransform.transformSpecifier = TransformSpecifier.Translation;
+                myTransform.IsActive = true;
+                myTransform.position = translationInput;
+                myTransform.rotation = Quaternion.identity;
+                myTransform.scale = Vector3.one;
+                transformList.Add(myTransform);
+                translationInput = Vector3.zero;
+                noEntry = false;
+            }
+            else if (rotationInput != Vector3.zero)
+            {
+                myTransform.transformType = TransformTypes.Relative;
+                myTransform.transformSpecifier = TransformSpecifier.Rotation;
+                myTransform.IsActive = true;
+                myTransform.position = Vector3.zero;
+                myTransform.rotation = Quaternion.Euler(rotationInput);
+                myTransform.scale = Vector3.one;
+                transformList.Add(myTransform);
+                rotationInput = Vector3.zero;
+                noEntry = false;
+            }
+            else if (scaleInput != Vector3.one)
+            {
+                myTransform.transformType = TransformTypes.Relative;
+                myTransform.transformSpecifier = TransformSpecifier.Scale;
+                myTransform.IsActive = true;
+                myTransform.position = Vector3.zero;
+                myTransform.rotation = Quaternion.identity;
+                myTransform.scale = scaleInput;
+                transformList.Add(myTransform);
+                scaleInput = Vector3.one;
+                noEntry = false;
+            }
+            else
+            {
+                noEntry = true;
+                Debug.Log("Enter a value");
+            }
+        }
 
-            
-            scaleList.Add(localScale);
-            _relativeScaleChange = localScale - scaleList[^2];
-            relativeScaleList.Add(_relativeScaleChange);
-            
-            rotationList.Add(localRotation);
-            _relativeRotationChange = localRotation * Quaternion.Inverse(rotationList[^2]);
-            relativeRotationList.Add(_relativeRotationChange);
-        }
-        
-        private void DetectContinuousAbsTransform()
+        public void SaveAbsoluteTransform(List<Vector3> list)
         {
-            if (positionList.Count > 1 && _continuousTransform == false && _continuousTransformEnded == false)
+            MyTransform absoluteTransform = new MyTransform()
             {
-                if (Math.Abs(positionList[^1].x - positionList[^2].x) < _translationThreshold && Math.Abs(positionList[^1].x - positionList[^2].x) > 0 ||
-                Math.Abs(positionList[^1].y - positionList[^2].y) < _translationThreshold && Math.Abs(positionList[^1].y - positionList[^2].y) > 0 ||
-                Math.Abs(positionList[^1].z - positionList[^2].z) < _translationThreshold && Math.Abs(positionList[^1].z - positionList[^2].z) > 0)
-                {
-                    _positionOfContinuousTransformStart = positionList.Count - 1;
-                    _positionOfContinuousTransformGoListStart = _transformChangeInterface.transformGoList.Count - 1;
-                    _continuousTransform = true;
-                }
-                
-                else if (Math.Abs(scaleList[^1].x - scaleList[^2].x) < _scaleThreshold && Math.Abs(scaleList[^1].x - scaleList[^2].x) > 0 ||
-                         Math.Abs(scaleList[^1].y - scaleList[^2].y) < _scaleThreshold && Math.Abs(scaleList[^1].y - scaleList[^2].y) > 0 ||
-                         Math.Abs(scaleList[^1].z - scaleList[^2].z) < _scaleThreshold && Math.Abs(scaleList[^1].z - scaleList[^2].z) > 0)
-                {
-                    _positionOfContinuousTransformStart = scaleList.Count - 1;
-                    _positionOfContinuousTransformGoListStart = _transformChangeInterface.transformGoList.Count - 1;
-                    _continuousTransform = true;
-                }
-                
-                else if (Math.Abs(rotationList[^1].x - rotationList[^2].x) < _rotationThreshold && Math.Abs(rotationList[^1].x - rotationList[^2].x) > 0 ||
-                         Math.Abs(rotationList[^1].y - rotationList[^2].y) < _rotationThreshold && Math.Abs(rotationList[^1].y - rotationList[^2].y) > 0 ||
-                         Math.Abs(rotationList[^1].z - rotationList[^2].z) < _rotationThreshold && Math.Abs(rotationList[^1].z - rotationList[^2].z) > 0)
-                {
-                    _positionOfContinuousTransformStart = rotationList.Count - 1;
-                    _positionOfContinuousTransformGoListStart = _transformChangeInterface.transformGoList.Count - 1;
-                    _continuousTransform = true;
-                }
-            }
+                position = list[0],
+                rotation = Quaternion.Euler(list[1]),
+                scale = list[2],
+                transformType = TransformTypes.Absolute,
+                transformSpecifier = TransformSpecifier.AbsoluteTransform,
+                IsActive = true
+            };
             
-            else
-            {
-                _continuousTransformEnded = false;
-            }
+            this.transformList.Add(absoluteTransform);
         }
-        
-        
-        private void SetAbsTransform(int position = 1)
+
+        public List<Vector3> CalculateTransform(int savePointIndex, int lastIndex)
         {
-            var go = gameObject;
-            go.transform.localPosition = positionList[^position];
-            go.transform.localScale = scaleList[^position];
-            go.transform.localRotation = rotationList[^position];
-        }
-        
-        
-        private void RemoveRelTransformInList(int count = 1, int position = 1)
-        {
-            relativePositionList.RemoveRange(relativePositionList.Count - position, count);
-            relativeScaleList.RemoveRange(relativeScaleList.Count - position, count);
-            relativeRotationList.RemoveRange(relativeRotationList.Count - position, count);
-            
-            positionList.RemoveRange(positionList.Count - position, count);
-            scaleList.RemoveRange(scaleList.Count - position, count);
-            rotationList.RemoveRange(rotationList.Count - position, count);
-        }
-        
-        private void RemoveEmptyRelTransform()
-        {
-            if (relativePositionList.Count > 1)
-            {
-                if (relativePositionList[^1].x == 0 && relativePositionList[^1].y == 0 && relativePositionList[^1].z == 0 &&
-                    relativeScaleList[^1].x == 0 && relativeScaleList[^1].y == 0 && relativeScaleList[^1].z == 0 &&
-                    relativeRotationList[^1].x == 0 && relativeRotationList[^1].y == 0 && relativeRotationList[^1].z == 0)
-                {
-                    if (_continuousTransform == false)
-                    {
-                        RemoveRelTransformInList();
-                        _transformChangeInterface.transformGoList.RemoveAt(_transformChangeInterface.transformGoList.Count - 1);
-                        _transformChangeInterface.sliderPosition = _transformChangeInterface.transformGoList.Count;
-                    }
-                    else if (_continuousTransform)
-                    {
-                        positionList.RemoveRange(_positionOfContinuousTransformStart, positionList.Count - _positionOfContinuousTransformStart -1);
-                        scaleList.RemoveRange(_positionOfContinuousTransformStart, scaleList.Count - _positionOfContinuousTransformStart -1);
-                        rotationList.RemoveRange(_positionOfContinuousTransformStart, rotationList.Count - _positionOfContinuousTransformStart -1);
-                    
-                        relativePositionList.RemoveRange(_positionOfContinuousTransformStart, relativePositionList.Count - _positionOfContinuousTransformStart -1);
-                        relativeScaleList.RemoveRange(_positionOfContinuousTransformStart, relativeScaleList.Count - _positionOfContinuousTransformStart -1);
-                        relativeRotationList.RemoveRange(_positionOfContinuousTransformStart, relativeRotationList.Count - _positionOfContinuousTransformStart -1);
-                    
-                        _transformChangeInterface.transformGoList.RemoveRange(_positionOfContinuousTransformGoListStart, _transformChangeInterface.transformGoList.Count - _positionOfContinuousTransformGoListStart -1);
-                        _transformChangeInterface.sliderPosition = _transformChangeInterface.transformGoList.Count;
-                
-                        _continuousTransform = false;
-                        transform.hasChanged = false;
-                        _continuousTransformEnded = true;
-                    }
-                }
-            }
-        }
-        
-        private void DetectContinuousRelTransform()
-        {
-            if (relativePositionList.Count > 1 && _continuousTransform == false && _continuousTransformEnded == false)
-            {
-                if (Math.Abs(relativePositionList[^1].x) < _translationThreshold && Math.Abs(relativePositionList[^1].x) > 0 ||
-                    Math.Abs(relativePositionList[^1].y) < _translationThreshold && Math.Abs(relativePositionList[^1].y) > 0 ||
-                    Math.Abs(relativePositionList[^1].z) < _translationThreshold && Math.Abs(relativePositionList[^1].z) > 0)
-                {
-                    _positionOfContinuousTransformStart = relativePositionList.Count - 1;
-                    _positionOfContinuousTransformGoListStart = _transformChangeInterface.transformGoList.Count - 1;
-                    _continuousTransform = true;
-                }
-                
-                else if (Math.Abs(relativeScaleList[^1].x) < _scaleThreshold && Math.Abs(relativeScaleList[^1].x) > 0 ||
-                         Math.Abs(relativeScaleList[^1].y) < _scaleThreshold && Math.Abs(relativeScaleList[^1].y) > 0 ||
-                         Math.Abs(relativeScaleList[^1].z) < _scaleThreshold && Math.Abs(relativeScaleList[^1].z) > 0)
-                {
-                    _positionOfContinuousTransformStart = relativeScaleList.Count - 1;
-                    _positionOfContinuousTransformGoListStart = _transformChangeInterface.transformGoList.Count - 1;
-                    _continuousTransform = true;
-                }
-                
-                else if (Math.Abs(relativeRotationList[^1].x) < _rotationThreshold && Math.Abs(relativeRotationList[^1].x) > 0 ||
-                         Math.Abs(relativeRotationList[^1].y) < _rotationThreshold && Math.Abs(relativeRotationList[^1].y) > 0 ||
-                         Math.Abs(relativeRotationList[^1].z) < _rotationThreshold && Math.Abs(relativeRotationList[^1].z) > 0 )
-                {
-                    _positionOfContinuousTransformStart = relativeRotationList.Count - 1;
-                    _positionOfContinuousTransformGoListStart = _transformChangeInterface.transformGoList.Count - 1;
-                    _continuousTransform = true;
-                }
-            }
-            
-            else
-            {
-                _continuousTransformEnded = false;
-            }
-        }
-        
-        private void SetRelTransform()
-        {
-            var go = gameObject;
-            Vector3 positionVector = Vector3.zero;
-            foreach (Vector3 relPosition in relativePositionList)
-            {
-                positionVector += relPosition;
-            }
-            
-            Vector3 scaleVector = Vector3.zero;
-            foreach (Vector3 relScale in relativeScaleList)
-            {
-                scaleVector += relScale;
-            }
-            
             Quaternion rotationQuaternion = Quaternion.identity;
-            foreach (Quaternion relRotation in relativeRotationList)
+            Vector3 positionVector = Vector3.zero;
+            Vector3 scaleVector = Vector3.one;
+            
+            List<Vector3> list = new List<Vector3>();
+
+            for (int i = savePointIndex; i <= lastIndex; i++)
             {
-                rotationQuaternion *= relRotation;
+                MyTransform myTransform = this.transformList[i];
+                if (myTransform.IsActive == false)
+                {
+                    rotationQuaternion *= Quaternion.identity;
+                    positionVector += Vector3.zero;
+                    scaleVector = Vector3.Scale(scaleVector, Vector3.one);
+                }
+                else
+                {
+                    rotationQuaternion *= myTransform.rotation;
+                    positionVector += myTransform.position;
+                    scaleVector = Vector3.Scale(scaleVector, myTransform.scale);
+                }
             }
             
-            go.transform.localPosition = positionVector;
-            go.transform.localScale = scaleVector;
-            go.transform.localRotation = rotationQuaternion;
+            list.Add(positionVector);
+            list.Add(rotationQuaternion.eulerAngles);
+            list.Add(scaleVector);
+
+            return list;
+        }
+
+        public void ApplyTransformToGo(List<Vector3> list)
+        {
+            GameObject go = gameObject;
+            go.transform.localPosition = list[0];
+            go.transform.localRotation = Quaternion.Euler(list[1]);
+            go.transform.localScale = list[2];
+        }
+
+        public string SetTransformName()
+        {
+            string listValue = "";
+            MyTransform myTransform = transformList[^1];
+
+            switch (myTransform.transformSpecifier)
+            {
+                case TransformSpecifier.Translation:
+                    listValue += "Position changed";
+                    break;    
+                case TransformSpecifier.Rotation:
+                    listValue += "Rotation changed";
+                    break;
+                case TransformSpecifier.Scale:
+                    listValue += "Scale changed";
+                    break;
+                case TransformSpecifier.AbsoluteTransform:
+                    listValue += "Position Saved";
+                    break;
+                default:
+                    listValue += "Unknown Transform Type";
+                    break;
+            }
+            transformNameList.Add(listValue);
+            return listValue;
         }
         
-        #endregion
+        public int FindLastActiveTransformIndex(int startIndex)
+        {
+            int lastIndex = 0;
+            for (int i = startIndex; i >= 0; i--)
+            {
+                if (transformList[i].transformType == TransformTypes.Absolute)
+                {
+                    lastIndex = i;
+                    break;
+                }
+            }
+            return lastIndex;
+        }
 
+        public void ResetTransforms()
+        {
+            transformList.RemoveRange(1, transformList.Count - 1);
+            transformNameList.RemoveRange(1, transformNameList.Count - 1);
+            CalculateTransform(0,0);
+        }
+        #endregion
+        
         private void Start()
         {
-            _mainComponent = GameObject.Find("Main").GetComponent<Main>();
-            _transformChangeInterface = GameObject.Find("Main").GetComponent<TransformChangeInterface>();
-            transform.hasChanged = false;
+            transformList = new List<MyTransform>();
+            transformNameList = new List<string>();
         }
         
         private void Update()
         {
-            if (_mainComponent.isInitialized) // Look if the initial state was set in main()
+            if (Main.isInitialized) // Look if the initial state was set in main()
             {
-                if (_initialState == false) // Add the initial state to the lists
+                if (_initialStateLoaded == false) // Add the initial state to the lists
                 {
-                    _initialState = true;
                     var go = gameObject;
-                    
                     var localScale = go.transform.localScale;
                     var localPosition = go.transform.localPosition;
                     var localRotation = go.transform.localRotation;
-                    
-                    positionList.Add(localPosition);
-                    scaleList.Add(localScale);
-                    rotationList.Add(localRotation);
-                    
-                    relativePositionList.Add(localPosition);
-                    relativeScaleList.Add(localScale);
-                    relativeRotationList.Add(localRotation);
-                    sliderPosition = positionList.Count;
-                }
-                else
-                {
-                    if (transform.hasChanged && 
-                        _transformChangeInterface.globalUndoCallParameter == false &&
-                        _transformChangeInterface.useTransformTracker &&
-                        _sliderPositionChanged == false) // Track transform change state
-                    {
-                        SaveTransform(gameObject);
-                        RemoveEmptyRelTransform(); 
-                        DetectContinuousRelTransform(); 
-                        SetRelTransform();
 
-                        sliderPosition = positionList.Count;
-                        
-                        if (_continuousTransform == false)
-                        {
-                            transform.hasChanged = false;
-                        }
-                    }
-
-                    if (undoSingleTransform) // Undo transforms
+                    var initialTransform = new MyTransform
                     {
-                        RemoveRelTransformInList(1,1);
-                        SetRelTransform();
-                        undoSingleTransform = false;
-                        _transformChangeInterface.globalUndoCallParameter = false;
-                        transform.hasChanged = false;
-                        sliderPosition = positionList.Count;
-                    }
+                        position = localPosition,
+                        rotation = localRotation,
+                        scale = localScale,
+                        transformType = TransformTypes.Absolute,
+                        transformSpecifier = TransformSpecifier.NoTransform,
+                        IsActive = true
+                    };
                     
-                    if (sliderPosition != positionList.Count) // Use Slider to change transform
-                    {
-                        _sliderPositionChanged = true;
-                        var go = gameObject;
-                        go.transform.localPosition = positionList[sliderPosition-1];
-                        go.transform.localScale = scaleList[sliderPosition-1];
-                        go.transform.localRotation = rotationList[sliderPosition-1];
-                    }
-                    else if (sliderPosition == positionList.Count && _sliderPositionChanged)
-                    {
-                        SetRelTransform();
-                        _sliderPositionChanged = false;
-                        transform.hasChanged = false;
-                    }
+                    transformList.Add(initialTransform);
+                    transformNameList.Add("Start Position");
+                    _initialStateLoaded = true;
                 }
             }
         }
