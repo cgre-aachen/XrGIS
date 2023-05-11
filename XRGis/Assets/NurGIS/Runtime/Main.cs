@@ -8,7 +8,7 @@ namespace NurGIS.Runtime
 {
     public class Main : MonoBehaviour
     {
-        public bool isInitialized;
+        public static bool isInitialized;
         private List<GameObject> _goList;
         public bool instantiateScans;
         public bool reuseScans;
