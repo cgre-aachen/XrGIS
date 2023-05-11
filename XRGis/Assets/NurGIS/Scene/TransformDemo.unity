@@ -150,7 +150,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 142864225}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5, y: 3, z: 4}
+  m_LocalPosition: {x: 0, y: 1.98, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -169,11 +169,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33d1eae986489fd48bf2de80917de802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  privateUndoTransform: 0
-  positionList: []
-  rotationList: []
-  scaleList: []
-  sliderPosition: 0
+  transformNameList: []
+  translationInput: {x: 0, y: 0, z: 0}
+  rotationInput: {x: 0, y: 0, z: 0}
+  scaleInput: {x: 1, y: 1, z: 1}
 --- !u!23 &142864228
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -310,7 +309,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 281908939}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 2.41, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -390,7 +389,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfc49b4f545e41b468d5bf548863ab72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isInitialized: 0
   instantiateScans: 0
   reuseScans: 0
   geoReference: 0
@@ -422,8 +420,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transformGoList: []
-  globalUndoCallParameter: 0
-  useTransformTracker: 1
 --- !u!1 &1368310504
 GameObject:
   m_ObjectHideFlags: 0
@@ -628,7 +624,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2066962234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -641,11 +637,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33d1eae986489fd48bf2de80917de802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  privateUndoTransform: 0
-  positionList: []
-  rotationList: []
-  scaleList: []
-  sliderPosition: 0
+  transformNameList: []
+  translationInput: {x: 0, y: 0, z: 0}
+  rotationInput: {x: 0, y: 0, z: 0}
+  scaleInput: {x: 0, y: 0, z: 0}
 --- !u!23 &2066962235
 MeshRenderer:
   m_ObjectHideFlags: 0
