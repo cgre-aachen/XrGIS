@@ -1,5 +1,7 @@
 ﻿using System;
+using Unity.VisualScripting;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 using Color = UnityEngine.Color;
 
@@ -20,7 +22,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             var uxmlApplyTransform = root.Q<Button>("ApplyTransform");
             var uxmlSavePosition = root.Q<Button>("SavePosition");
             var uxmlResetTransform = root.Q<Button>("ResetButton");
-            
+
             var uxmlSlider = root.Q<SliderInt>("Slider");
             uxmlSlider.lowValue = 0;
             uxmlSlider.highValue = helper.transformNameList.Count;
@@ -35,30 +37,40 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 helper.SaveRelativeTransformFromGui();
                 if (!helper.noEntry)
                 {
-                    var lastActiveTransform = helper.FindLastActiveTransformIndex(helper.transformNameList.Count - 1);
-                    var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformNameList.Count - 1);
-                    helper.ApplyTransformToGo(transformList);
+                    var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1);
+                    var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformList.Count - 1);
+                    
+                    if (helper.applyToVertices)
+                    {
+                        helper.ApplyTransformToVertices(transformList);
+                    }
+                    else if (!helper.applyToVertices)
+                    {
+                        helper.ApplyTransformToGo(transformList);
+                    }
+                    
                     helper.SetTransformName();
-                    uxmlSlider.highValue = helper.transformNameList.Count - 1;
-                    uxmlSlider.value = helper.transformNameList.Count - 1;
+                    uxmlSlider.highValue = helper.transformList.Count - 1;
+                    uxmlSlider.value = helper.transformList.Count - 1;
                 }
             };
             
             Action resetTransformAction = () =>
             {
                 helper.ResetTransforms();
-                uxmlSlider.highValue = helper.transformNameList.Count -1;
-                uxmlSlider.value = helper.transformNameList.Count -1;
+                uxmlSlider.highValue = helper.transformList.Count -1;
+                uxmlSlider.value = helper.transformList.Count -1;
             };
             
             Action savePositionAction = () =>
             {
-                int lastActiveTransform = helper.FindLastActiveTransformIndex(helper.transformNameList.Count - 1);
-                var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformNameList.Count - 1);
+                int lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1);
+                var transformList = helper.CalculateTransform(lastAbsoluteTransform, helper.transformList.Count - 1);
                 helper.SaveAbsoluteTransform(transformList);
                 helper.SetTransformName();
-                uxmlSlider.highValue = helper.transformNameList.Count - 1;
-                uxmlSlider.value = helper.transformNameList.Count - 1;
+                helper.DeactivateTransforms(lastAbsoluteTransform);
+                uxmlSlider.highValue = helper.transformList.Count - 1;
+                uxmlSlider.value = helper.transformList.Count - 1;
             };
             
             Action updateListEntry = () =>
@@ -73,36 +85,63 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 uxmlListEntryBackground.style.paddingRight = 5;
                 uxmlFoldout.Add(uxmlListEntryBackground);
                 
-                for (int i = 0; i < helper.transformNameList.Count; i++)
+                for (int i = 0; i < helper.transformList.Count; i++)
                 {
-                    var uxmlListEntry = new VisualElement();
-                    uxmlListEntry.AddToClassList("listEntry");
-                    uxmlListEntry.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
-                    uxmlListEntry.style.backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray);
+                    var transform = helper.transformList[i];
+                    var index = i;
+                    var lastAbsoluteTransformIndex = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1);
                     
-                    var uxmlListEntryLabel = new Label(helper.transformNameList[i]);
-                    uxmlListEntryLabel.AddToClassList("listEntryLabel");
-                    uxmlListEntryLabel.style.color = new StyleColor(Color.white);
+                    var listEntry = new VisualElement();
+                    listEntry.AddToClassList("listEntry");
+                    listEntry.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
+                    listEntry.style.backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray);
+                    
+                    var label = new Label(helper.transformNameList[i]);
+                    label.AddToClassList("listEntryLabel");
+                    label.style.color = new StyleColor(Color.white);
                     
                     // Add a toggle next to the label
-                    var uxmlListEntryToggle = new Toggle();
-                    uxmlListEntryToggle.style.paddingRight = 5;
-                    uxmlListEntryToggle.AddToClassList("listEntryToggle");
-                    uxmlListEntryToggle.value = helper.transformList[i].IsActive;
+                    var toggle = new Toggle();
+                    { // Binding
+                        toggle.value = transform.IsActive;
+                        toggle.RegisterValueChangedCallback(evt =>
+                        {
+                            if (index < lastAbsoluteTransformIndex && uxmlSlider.value >= lastAbsoluteTransformIndex)
+                            {
+                                toggle.value = false;
+                                return;
+                            }
+
+                            var oldValue = transform.IsActive;
+                            if (oldValue != evt.newValue)
+                            {
+                                transform.IsActive = evt.newValue;
+                                var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1);
+                                var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformList.Count - 1);
+                                helper.ApplyTransformToGo(transformList);
+                            }
+                        });
+                    }
+                    toggle.style.paddingRight = 5;
+                    toggle.AddToClassList("listEntryToggle");
+                    toggle.value = helper.transformList[i].IsActive;
                     
-                    uxmlListEntry.Add(uxmlListEntryToggle);
-                    uxmlListEntry.Add(uxmlListEntryLabel);
-                    uxmlListEntryBackground.Add(uxmlListEntry);
+                    listEntry.Add(toggle);
+                    listEntry.Add(label);
+                    uxmlListEntryBackground.Add(listEntry);
                 }
             };
             #endregion
-            
+
             #region Events 
             uxmlSlider.RegisterValueChangedCallback(evt =>
             {
-                var lastActiveTransform = helper.FindLastActiveTransformIndex(evt.newValue);
-                var transformList = helper.CalculateTransform(lastActiveTransform, evt.newValue);
-                helper.ApplyTransformToGo(transformList);
+                var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue);
+                var nextActiveTransform = helper.FindNextAbsoluteTransformIndex(evt.newValue);
+                helper.SetActiveNotActiveOfTransforms(lastActiveTransform, nextActiveTransform, evt.newValue);
+                var updatedTransform = helper.CalculateTransform(lastActiveTransform, evt.newValue);
+                helper.ApplyTransformToGo(updatedTransform);
+                updateListEntry();
             });
             
             uxmlApplyTransform.clicked += applyTransformAction;

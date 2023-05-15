@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 
@@ -9,7 +8,7 @@ namespace NurGIS.Runtime.TransformHistory
     {
         public List<GameObject> transformGoList;
         
-        private void IdentifyLastChangedGogo()
+        private void IdentifyLastChangedGo()
         {
             GameObject go = transformGoList[^1];
             TransformChangeHelper helper = go.GetComponent<TransformChangeHelper>();
@@ -20,7 +19,7 @@ namespace NurGIS.Runtime.TransformHistory
         {
             if (Input.GetKeyDown(KeyCode.Z) && transformGoList.Count > 0)
             {
-                IdentifyLastChangedGogo();
+                IdentifyLastChangedGo();
             }
         }
     }
