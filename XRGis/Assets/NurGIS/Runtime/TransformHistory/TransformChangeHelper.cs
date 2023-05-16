@@ -179,7 +179,7 @@ namespace NurGIS.Runtime.TransformHistory
                     listValue += "Scale changed";
                     break;
                 case TransformSpecifier.MultipleTransforms:
-                    listValue += "Transforms";
+                    listValue += "Transform changed";
                     break;
                 case TransformSpecifier.AbsoluteTransform:
                     listValue += "Transform Saved";
@@ -198,30 +198,51 @@ namespace NurGIS.Runtime.TransformHistory
             return listValue;
         }
         
-        public int FindLastAbsoluteTransformIndex(int startIndex)
+        public int FindLastAbsoluteTransformIndex(int startIndex, bool onlyActiveTransforms)
         {
             int lastIndex = 0;
             for (int i = startIndex; i >= 0; i--)
             {
-                if (transformList[i].transformType == TransformTypes.Absolute)
+                if (onlyActiveTransforms)
                 {
-                    lastIndex = i;
-                    break;
+                    if (transformList[i].transformType == TransformTypes.Absolute && transformList[i].IsActive)
+                    {
+                        lastIndex = i;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (transformList[i].transformType == TransformTypes.Absolute)
+                    {
+                        lastIndex = i;
+                        break;
+                    }
                 }
             }
-
             return lastIndex;
         }
         
-        public int FindNextAbsoluteTransformIndex(int startIndex)
+        public int FindNextAbsoluteTransformIndex(int startIndex, bool onlyActiveTransforms)
         {
             int nextIndex = 0;
             for (int i = startIndex; i < transformList.Count; i++)
             {
-                if (transformList[i].transformType == TransformTypes.Absolute && transformList[i].IsActive)
+                if (onlyActiveTransforms)
                 {
-                    nextIndex = i;
-                    break;
+                    if (transformList[i].transformType == TransformTypes.Absolute && transformList[i].IsActive)
+                    {
+                        nextIndex = i;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (transformList[i].transformType == TransformTypes.Absolute)
+                    {
+                        nextIndex = i;
+                        break;
+                    }
                 }
             }
             
@@ -256,6 +277,15 @@ namespace NurGIS.Runtime.TransformHistory
             for (int i = startIndex - 1; i >= 0; i--)
             {
                 transformList[i].IsActive = false;
+            }
+
+            if (transformList[position].transformType == TransformTypes.Absolute)
+            {
+                for (int i = 0; i < transformList.Count - 1; i++)
+                {
+                    transformList[i].IsActive = false;
+                }
+                transformList[position].IsActive = true;
             }
         }
 

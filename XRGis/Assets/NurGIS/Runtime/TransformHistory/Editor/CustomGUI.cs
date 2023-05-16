@@ -25,9 +25,18 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
             var uxmlSlider = root.Q<SliderInt>("Slider");
             uxmlSlider.lowValue = 0;
-            uxmlSlider.highValue = helper.transformNameList.Count;
-            uxmlSlider.value = helper.transformNameList.Count;
             
+            if (helper.transformList.Count > 0)
+            {
+                uxmlSlider.highValue = helper.transformList.Count - 1;
+                uxmlSlider.value = helper.transformList.Count - 1;
+            }
+            else
+            {
+                uxmlSlider.highValue = 0;
+                uxmlSlider.value = 0;
+            }
+
             var uxmlFoldout = root.Q<Foldout>("transformListFoldout");
             #endregion
             
@@ -37,7 +46,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 helper.SaveRelativeTransformFromGui();
                 if (!helper.noEntry)
                 {
-                    var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1);
+                    var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
                     var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformList.Count - 1);
                     
                     if (helper.applyToVertices)
@@ -64,7 +73,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             Action savePositionAction = () =>
             {
-                int lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1);
+                int lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
                 var transformList = helper.CalculateTransform(lastAbsoluteTransform, helper.transformList.Count - 1);
                 helper.SaveAbsoluteTransform(transformList);
                 helper.SetTransformName();
@@ -77,19 +86,19 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             {
                 uxmlFoldout.Clear();
                 // create a background box
-                var uxmlListEntryBackground = new VisualElement();
-                uxmlListEntryBackground.AddToClassList("listEntryBackground");
-                uxmlListEntryBackground.style.paddingBottom = 5;
-                uxmlListEntryBackground.style.paddingTop = 5;
-                uxmlListEntryBackground.style.paddingLeft = 5;
-                uxmlListEntryBackground.style.paddingRight = 5;
-                uxmlFoldout.Add(uxmlListEntryBackground);
+                var listRoot = new VisualElement();
+                listRoot.AddToClassList("listEntryBackground");
+                listRoot.style.paddingBottom = 5;
+                listRoot.style.paddingTop = 5;
+                listRoot.style.paddingLeft = 5;
+                listRoot.style.paddingRight = 5;
+                uxmlFoldout.Add(listRoot);
                 
                 for (int i = 0; i < helper.transformList.Count; i++)
                 {
                     var transform = helper.transformList[i];
                     var index = i;
-                    var lastAbsoluteTransformIndex = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1);
+                    var lastAbsoluteTransformIndex = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
                     
                     var listEntry = new VisualElement();
                     listEntry.AddToClassList("listEntry");
@@ -116,7 +125,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                             if (oldValue != evt.newValue)
                             {
                                 transform.IsActive = evt.newValue;
-                                var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1);
+                                var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
                                 var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformList.Count - 1);
                                 helper.ApplyTransformToGo(transformList);
                             }
@@ -128,7 +137,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     
                     listEntry.Add(toggle);
                     listEntry.Add(label);
-                    uxmlListEntryBackground.Add(listEntry);
+                    listRoot.Add(listEntry);
                 }
             };
             #endregion
@@ -136,8 +145,8 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             #region Events 
             uxmlSlider.RegisterValueChangedCallback(evt =>
             {
-                var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue);
-                var nextActiveTransform = helper.FindNextAbsoluteTransformIndex(evt.newValue);
+                var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
+                var nextActiveTransform = helper.FindNextAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
                 helper.SetActiveNotActiveOfTransforms(lastActiveTransform, nextActiveTransform, evt.newValue);
                 var updatedTransform = helper.CalculateTransform(lastActiveTransform, evt.newValue);
                 helper.ApplyTransformToGo(updatedTransform);
@@ -154,6 +163,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             uxmlSavePosition.clicked += updateListEntry;
             #endregion
             
+            updateListEntry();
             return root;
         }
     }
