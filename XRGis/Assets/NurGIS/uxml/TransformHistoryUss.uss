@@ -1,0 +1,11 @@
+.section {
+    background-color: rgba(130, 52, 52, 0);
+    display: flex;
+    visibility: visible;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    -unity-font: url('project://database/Assets/Graphy%20-%20Ultimate%20Stats%20Monitor/Font/Roboto/Roboto-Regular.ttf?fileID=12800000&guid=76ed11d84beb10846a746b4259e26d39&type=3#Roboto-Regular');
+    -unity-font-style: bold;
+}
