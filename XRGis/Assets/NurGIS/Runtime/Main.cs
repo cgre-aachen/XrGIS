@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using NurGIS.Runtime.Geolocation;
 using NurGIS.Runtime.ScanLoading;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace NurGIS.Runtime
 {
