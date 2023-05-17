@@ -35,22 +35,23 @@ namespace NurGIS.Runtime.TransformHistory
         public List<MyTransform> transformList = new();
         public List<string> transformNameList = new();
         
-        public Vector3 translationInput = Vector3.zero;
-        public Vector3 rotationInput = Vector3.zero;
-        public Vector3 scaleInput = Vector3.one;
-
         public bool noEntry;
         public bool applyToVertices;
-        
         private bool _initialStateLoaded;
+
+        public Vector3 positionInput = Vector3.zero;
+        public Vector3 rotationInput = Vector3.zero;
+        public Vector3 scaleInput = Vector3.one;
+        
+        
         #endregion
         
         #region Methods
-        public void SaveRelativeTransformFromGui()
+        public void SaveRelativeTransformFromGui(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
-            if (translationInput == Vector3.zero &&
-                rotationInput == Vector3.zero &&
-                scaleInput == Vector3.one)
+            if (translation == Vector3.zero &&
+                rotation == Vector3.zero &&
+                scale == Vector3.one)
             {
                 noEntry = true;
                 Debug.Log("Enter a value");
@@ -61,26 +62,26 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 transformType = TransformTypes.Relative,
                 IsActive = true,
-                position = translationInput,
-                rotation = Quaternion.Euler(rotationInput),
-                scale = scaleInput
+                position = translation,
+                rotation = Quaternion.Euler(rotation),
+                scale = scale
             };
             
-            if (translationInput != Vector3.zero &&
-                rotationInput == Vector3.zero &&
-                scaleInput == Vector3.one)
+            if (translation != Vector3.zero &&
+                rotation == Vector3.zero &&
+                scale == Vector3.one)
             {
                 myTransform.transformSpecifier = TransformSpecifier.Translation;
             }
-            else if (rotationInput != Vector3.zero &&
-                     translationInput == Vector3.zero &&
-                     scaleInput == Vector3.one)
+            else if (rotation != Vector3.zero &&
+                     translation == Vector3.zero &&
+                     scale == Vector3.one)
             {
                 myTransform.transformSpecifier = TransformSpecifier.Rotation;
             }
-            else if (scaleInput != Vector3.one &&
-                     translationInput == Vector3.zero &&
-                     rotationInput == Vector3.zero)
+            else if (scale != Vector3.one &&
+                     translation == Vector3.zero &&
+                     rotation == Vector3.zero)
             {
                 myTransform.transformSpecifier = TransformSpecifier.Scale;
             }
@@ -91,23 +92,19 @@ namespace NurGIS.Runtime.TransformHistory
 
             noEntry = false;
             transformList.Add(myTransform);
-            translationInput = Vector3.zero;
-            rotationInput = Vector3.zero;
-            scaleInput = Vector3.one;
         }
 
-        public void SaveAbsoluteTransform(List<Vector3> list)
+        public void SaveAbsoluteTransform(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             MyTransform absoluteTransform = new MyTransform()
             {
-                position = list[0],
-                rotation = Quaternion.Euler(list[1]),
-                scale = list[2],
+                position = translation,
+                rotation = Quaternion.Euler(rotation),
+                scale = scale,
                 transformType = TransformTypes.Absolute,
                 transformSpecifier = TransformSpecifier.AbsoluteTransform,
                 IsActive = true
             };
-            
             transformList.Add(absoluteTransform);
         }
 
@@ -143,19 +140,43 @@ namespace NurGIS.Runtime.TransformHistory
             return list;
         }
 
-        public void ApplyTransformToGo(List<Vector3> list)
+        public void ApplyTransformToGo(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             GameObject go = gameObject;
-            go.transform.localPosition = list[0];
-            go.transform.localRotation = Quaternion.Euler(list[1]);
-            go.transform.localScale = list[2];
+            go.transform.localPosition = translation;
+            go.transform.localRotation = Quaternion.Euler(rotation);
+            go.transform.localScale = scale;
         }
 
-        public void ApplyTransformToVertices(List<Vector3> list)
+        public void UpdateGameObjectTranslation(Vector3 translation, Vector3 lastTranslation)
+        {
+            GameObject go = gameObject;
+            var localPosition = lastTranslation;
+            localPosition += translation;
+            go.transform.localPosition = localPosition;
+        }
+        
+        public void UpdateGameObjectRotation(Vector3 rotation, Quaternion lastRotation)
+        {
+            GameObject go = gameObject;
+            var localRotation = lastRotation;
+            localRotation *= Quaternion.Euler(rotation);
+            go.transform.localRotation = localRotation;
+        }
+        
+        public void UpdateGameObjectScale(Vector3 scale, Vector3 lastScale)
+        {
+            GameObject go = gameObject;
+            var localScale = lastScale;
+            localScale = Vector3.Scale(localScale, scale);
+            go.transform.localScale = localScale;
+        }
+        
+        public void ApplyTransformToVertices(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             Mesh mesh = GetComponent<MeshFilter>().mesh;
             Vector3[] vertices = mesh.vertices;
-            Matrix4x4 matrix = Matrix4x4.TRS(list[0], Quaternion.Euler(list[1]), list[2]);
+            Matrix4x4 matrix = Matrix4x4.TRS(translation, Quaternion.Euler(rotation), scale);
             for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i] = matrix.MultiplyPoint3x4(vertices[i]);
@@ -295,6 +316,39 @@ namespace NurGIS.Runtime.TransformHistory
             transformNameList.RemoveRange(1, transformNameList.Count - 1);
             CalculateTransform(0,0);
         }
+
+        public void GetRelativeTransform()
+        {
+            GameObject go = gameObject;
+            var transform1 = go.transform;
+            Vector3 newPosition = transform1.localPosition;
+            Vector3 newRotation = transform1.localRotation.eulerAngles;
+            Vector3 newScale = transform1.localScale;
+            
+            Vector3 lastPosition = transformList[^1].position;
+            Vector3 lastRotation = transformList[^1].rotation.eulerAngles;
+            Vector3 lastScale = transformList[^1].scale;
+            
+            Vector3 relativePosition = newPosition - lastPosition;
+            Vector3 relativeRotation = newRotation - lastRotation;
+            
+            Vector3 relativeScale = new Vector3
+            {
+                x = newScale.x / lastScale.x,
+                y = newScale.y / lastScale.y,
+                z = newScale.z / lastScale.z
+            };
+
+            if (relativeScale == Vector3.zero)
+            {
+                relativeScale = Vector3.one;
+            }
+            
+            positionInput = relativePosition;
+            rotationInput = relativeRotation;
+            scaleInput = relativeScale;
+        }
+
         #endregion
         
         private void Update()
@@ -322,6 +376,12 @@ namespace NurGIS.Runtime.TransformHistory
                     transformNameList.Add("Start Position");
                     _initialStateLoaded = true;
                 }
+            }
+
+            if (transform.hasChanged)
+            {
+                GetRelativeTransform();
+                transform.hasChanged = false;
             }
         }
     }

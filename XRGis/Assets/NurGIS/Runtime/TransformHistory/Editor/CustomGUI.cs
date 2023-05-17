@@ -11,7 +11,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
     public class CustomTransformUI : UnityEditor.Editor
     {
         public VisualTreeAsset mUxml;
-        
+
         public override VisualElement CreateInspectorGUI()
         {
             #region Properties
@@ -19,22 +19,32 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             TransformChangeHelper helper = (TransformChangeHelper)target;
             mUxml.CloneTree(root);
             
-            var uxmlApplyTransform = root.Q<Button>("ApplyTransform");
-            var uxmlSavePosition = root.Q<Button>("SavePosition");
-            var uxmlResetTransform = root.Q<Button>("ResetButton");
+            var applyTransformButton = root.Q<Button>("applyTransformButton");
+            var resetInputButton = root.Q<Button>("resetInputButton");
+            var saveAbsolutePositionButton = root.Q<Button>("saveAbsolutePositionButton");
+            var resetTransformButton = root.Q<Button>("resetTransformButton");
+            
+            
+            var translationInput = root.Q<Vector3Field>("translationInput");
+            var rotationInput = root.Q<Vector3Field>("rotationInput");
+            var scaleInput = root.Q<Vector3Field>("scaleInput");
+            
+            translationInput.value = Vector3.zero;
+            rotationInput.value = Vector3.zero;
+            scaleInput.value = Vector3.one;
 
-            var uxmlSlider = root.Q<SliderInt>("Slider");
-            uxmlSlider.lowValue = 0;
+            var slider = root.Q<SliderInt>("slider");
+            slider.lowValue = 0;
             
             if (helper.transformList.Count > 0)
             {
-                uxmlSlider.highValue = helper.transformList.Count - 1;
-                uxmlSlider.value = helper.transformList.Count - 1;
+                slider.highValue = helper.transformList.Count - 1;
+                slider.value = helper.transformList.Count - 1;
             }
             else
             {
-                uxmlSlider.highValue = 0;
-                uxmlSlider.value = 0;
+                slider.highValue = 0;
+                slider.value = 0;
             }
 
             var uxmlFoldout = root.Q<Foldout>("transformListFoldout");
@@ -43,46 +53,50 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             #region Actions
             Action applyTransformAction = () =>
             {
-                helper.SaveRelativeTransformFromGui();
+                helper.SaveRelativeTransformFromGui(translationInput.value, rotationInput.value, scaleInput.value);
                 if (!helper.noEntry)
                 {
                     var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
                     var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformList.Count - 1);
-                    
+
                     if (helper.applyToVertices)
                     {
-                        helper.ApplyTransformToVertices(transformList);
+                        helper.ApplyTransformToVertices(transformList[0], transformList[1], transformList[2]);
                     }
                     else if (!helper.applyToVertices)
                     {
-                        helper.ApplyTransformToGo(transformList);
+                        helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
                     }
-                    
+
                     helper.SetTransformName();
-                    uxmlSlider.highValue = helper.transformList.Count - 1;
-                    uxmlSlider.value = helper.transformList.Count - 1;
+                    slider.highValue = helper.transformList.Count - 1;
+                    slider.value = helper.transformList.Count - 1;
+                    
+                    translationInput.value = Vector3.zero;
+                    rotationInput.value = Vector3.zero;
+                    scaleInput.value = Vector3.one;
                 }
             };
             
             Action resetTransformAction = () =>
             {
                 helper.ResetTransforms();
-                uxmlSlider.highValue = helper.transformList.Count -1;
-                uxmlSlider.value = helper.transformList.Count -1;
+                slider.highValue = helper.transformList.Count -1;
+                slider.value = helper.transformList.Count -1;
             };
             
-            Action savePositionAction = () =>
+            Action saveAbsolutePositionAction = () =>
             {
                 int lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
                 var transformList = helper.CalculateTransform(lastAbsoluteTransform, helper.transformList.Count - 1);
-                helper.SaveAbsoluteTransform(transformList);
+                helper.SaveAbsoluteTransform(transformList[0], transformList[1], transformList[2]);
                 helper.SetTransformName();
                 helper.DeactivateTransforms(lastAbsoluteTransform);
-                uxmlSlider.highValue = helper.transformList.Count - 1;
-                uxmlSlider.value = helper.transformList.Count - 1;
+                slider.highValue = helper.transformList.Count - 1;
+                slider.value = helper.transformList.Count - 1;
             };
             
-            Action updateListEntry = () =>
+            Action updateListEntryAction = () =>
             {
                 uxmlFoldout.Clear();
                 // create a background box
@@ -115,7 +129,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                         toggle.value = transform.IsActive;
                         toggle.RegisterValueChangedCallback(evt =>
                         {
-                            if (index < lastAbsoluteTransformIndex && uxmlSlider.value >= lastAbsoluteTransformIndex)
+                            if (index < lastAbsoluteTransformIndex && slider.value >= lastAbsoluteTransformIndex)
                             {
                                 toggle.value = false;
                                 return;
@@ -127,7 +141,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                                 transform.IsActive = evt.newValue;
                                 var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
                                 var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformList.Count - 1);
-                                helper.ApplyTransformToGo(transformList);
+                                helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
                             }
                         });
                     }
@@ -140,30 +154,78 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     listRoot.Add(listEntry);
                 }
             };
+            
+            Action resetInputButtonAction = () =>
+            {
+                translationInput.value = Vector3.zero;
+                rotationInput.value = Vector3.zero;
+                scaleInput.value = Vector3.one;
+            };
+            
             #endregion
 
             #region Events 
-            uxmlSlider.RegisterValueChangedCallback(evt =>
+            slider.RegisterValueChangedCallback(evt =>
             {
                 var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
                 var nextActiveTransform = helper.FindNextAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
                 helper.SetActiveNotActiveOfTransforms(lastActiveTransform, nextActiveTransform, evt.newValue);
-                var updatedTransform = helper.CalculateTransform(lastActiveTransform, evt.newValue);
-                helper.ApplyTransformToGo(updatedTransform);
-                updateListEntry();
+                var transformList = helper.CalculateTransform(lastActiveTransform, evt.newValue);
+                helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
+                updateListEntryAction();
             });
             
-            uxmlApplyTransform.clicked += applyTransformAction;
-            uxmlApplyTransform.clicked += updateListEntry;
+            translationInput.RegisterValueChangedCallback(evt =>
+            {
+                if (helper.transformList.Count == 0)
+                {
+                    return;
+                }
+                
+                Vector3 translation = helper.transformList[^1].position;
+                helper.UpdateGameObjectTranslation(evt.newValue, translation);
+            });
             
-            uxmlResetTransform.clicked += resetTransformAction;
-            uxmlResetTransform.clicked += updateListEntry;
+            rotationInput.RegisterValueChangedCallback(evt =>
+            {
+                if (helper.transformList.Count == 0)
+                {
+                    return;
+                }
+                
+                Quaternion rotation = helper.transformList[^1].rotation;
+                helper.UpdateGameObjectRotation(evt.newValue, rotation);
+            });
             
-            uxmlSavePosition.clicked += savePositionAction;
-            uxmlSavePosition.clicked += updateListEntry;
+            
+            scaleInput.RegisterValueChangedCallback(evt =>
+            {
+                if (helper.transformList.Count == 0)
+                {
+                    scaleInput.value = Vector3.one;
+                    return;
+                }
+                
+                Vector3 scale = helper.transformList[^1].scale;
+                helper.UpdateGameObjectScale(evt.newValue, scale);
+            });
+            
+            
+
+            applyTransformButton.clicked += applyTransformAction;
+            applyTransformButton.clicked += updateListEntryAction;
+            
+            resetTransformButton.clicked += resetTransformAction;
+            resetTransformButton.clicked += updateListEntryAction;
+            
+            saveAbsolutePositionButton.clicked += saveAbsolutePositionAction;
+            saveAbsolutePositionButton.clicked += updateListEntryAction;
+
+            resetInputButton.clicked += resetInputButtonAction;
+
             #endregion
             
-            updateListEntry();
+            updateListEntryAction();
             return root;
         }
     }
