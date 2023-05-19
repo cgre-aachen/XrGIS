@@ -20,7 +20,7 @@ namespace NurGIS.Runtime.TransformHistory
             AbsoluteTransform,
             NoTransform,
             MultipleTransforms
-        }
+        }     
         
         public class MyTransform
         {
@@ -110,8 +110,8 @@ namespace NurGIS.Runtime.TransformHistory
 
         public List<Vector3> CalculateTransform(int savePointIndex, int lastIndex)
         {
-            Quaternion rotationQuaternion = Quaternion.identity;
             Vector3 positionVector = Vector3.zero;
+            Quaternion rotationQuaternion = Quaternion.identity;
             Vector3 scaleVector = Vector3.one;
             
             List<Vector3> list = new List<Vector3>();
@@ -121,14 +121,14 @@ namespace NurGIS.Runtime.TransformHistory
                 MyTransform myTransform = transformList[i];
                 if (myTransform.IsActive == false)
                 {
-                    rotationQuaternion *= Quaternion.identity;
                     positionVector += Vector3.zero;
+                    rotationQuaternion *= Quaternion.identity;
                     scaleVector = Vector3.Scale(scaleVector, Vector3.one);
                 }
                 else
                 {
-                    rotationQuaternion *= myTransform.rotation;
                     positionVector += myTransform.position;
+                    rotationQuaternion *= myTransform.rotation;
                     scaleVector = Vector3.Scale(scaleVector, myTransform.scale);
                 }
             }
@@ -151,25 +151,25 @@ namespace NurGIS.Runtime.TransformHistory
         public void UpdateGameObjectTranslation(Vector3 translation, Vector3 lastTranslation)
         {
             GameObject go = gameObject;
-            var localPosition = lastTranslation;
-            localPosition += translation;
-            go.transform.localPosition = localPosition;
+            lastTranslation += translation;
+            go.transform.localPosition = lastTranslation;
+            transform.hasChanged = false;
         }
         
         public void UpdateGameObjectRotation(Vector3 rotation, Quaternion lastRotation)
         {
             GameObject go = gameObject;
-            var localRotation = lastRotation;
-            localRotation *= Quaternion.Euler(rotation);
-            go.transform.localRotation = localRotation;
+            lastRotation *= Quaternion.Euler(rotation);
+            go.transform.localRotation = lastRotation;
+            transform.hasChanged = false;
         }
         
         public void UpdateGameObjectScale(Vector3 scale, Vector3 lastScale)
         {
             GameObject go = gameObject;
-            var localScale = lastScale;
-            localScale = Vector3.Scale(localScale, scale);
-            go.transform.localScale = localScale;
+            lastScale = Vector3.Scale(lastScale, scale);
+            go.transform.localScale = lastScale;
+            transform.hasChanged = false;
         }
         
         public void ApplyTransformToVertices(Vector3 translation, Vector3 rotation, Vector3 scale)
@@ -183,7 +183,7 @@ namespace NurGIS.Runtime.TransformHistory
             }
         }
 
-        public string SetTransformName()
+        public void SetTransformName()
         {
             string listValue = "";
             MyTransform myTransform = transformList[^1];
@@ -216,7 +216,6 @@ namespace NurGIS.Runtime.TransformHistory
             }
 
             transformNameList.Add(listValue);
-            return listValue;
         }
         
         public int FindLastAbsoluteTransformIndex(int startIndex, bool onlyActiveTransforms)
@@ -317,7 +316,7 @@ namespace NurGIS.Runtime.TransformHistory
             CalculateTransform(0,0);
         }
 
-        public void GetRelativeTransform()
+        private void GetRelativeTransform() // Calculate the rel. transform, triggered by transform.hasChanged
         {
             GameObject go = gameObject;
             var transform1 = go.transform;
@@ -348,7 +347,7 @@ namespace NurGIS.Runtime.TransformHistory
             rotationInput = relativeRotation;
             scaleInput = relativeScale;
         }
-
+        
         #endregion
         
         private void Update()

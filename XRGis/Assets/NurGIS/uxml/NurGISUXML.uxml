@@ -1,19 +1,20 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <Style src="project://database/Assets/NurGIS/uxml/TransformHistoryUss.uss?fileID=7433441132597879392&amp;guid=e9ef29635c186424abe26c72753fd7d9&amp;type=3#TransformHistoryUss" />
-    <ui:VisualElement name="TransformInput" class="section" style="flex-grow: 1; background-color: rgba(255, 255, 255, 0); height: 182px; flex-direction: column; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-top: 20px; width: 334px;">
+    <ui:VisualElement name="TransformInput" class="section" style="flex-grow: 1; background-color: rgba(255, 255, 255, 0); height: 220px; flex-direction: column; margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-top: 20px; width: 324px;">
         <ui:Label tabindex="-1" text="Transform Input" display-tooltip-when-elided="true" name="Label" style="height: 31px; text-overflow: clip; font-size: 20px; -unity-font-style: bold; background-color: rgba(32, 32, 32, 0);" />
-        <ui:Vector3Field label="Translation" name="Translation" binding-path="translationInput" style="background-color: rgba(56, 56, 56, 0);" />
-        <ui:Vector3Field label="Rotation" name="Rotation" binding-path="rotationInput" />
-        <ui:Vector3Field label="Scale" name="Scale" binding-path="scaleInput" x="1" y="1" z="1" />
-        <ui:Button text="Apply Transform" display-tooltip-when-elided="true" name="ApplyTransform" style="height: 24px; width: 294px; white-space: nowrap; align-items: flex-end; align-self: auto;" />
-        <ui:Button text="Save Transform" display-tooltip-when-elided="true" name="SaveTransform" style="height: 26px; width: 294px; white-space: nowrap; align-items: flex-end; align-self: auto;" />
+        <ui:Vector3Field label="Translation" name="translationInput" binding-path="positionInput" style="background-color: rgba(56, 56, 56, 0);" />
+        <ui:Vector3Field label="Rotation" name="rotationInput" binding-path="rotationInput" />
+        <ui:Vector3Field label="Scale" name="scaleInput" x="1" y="1" z="1" binding-path="scaleInput" />
+        <ui:Button text="Save Transform" display-tooltip-when-elided="true" name="applyTransformButton" style="height: 24px; width: 294px; white-space: nowrap; align-items: flex-end; align-self: auto;" />
+        <ui:Button text="Reset" display-tooltip-when-elided="true" name="resetInputButton" style="width: 294px; height: 25px; -unity-background-scale-mode: stretch-to-fill;" />
         <ui:Toggle label="Apply To Vertices" name="VerticesToggle" binding-path="applyToVertices" style="height: 18px; width: 191px; flex-direction: row; justify-content: center; align-self: auto; align-items: auto;" />
     </ui:VisualElement>
-    <ui:VisualElement name="TransformTracker" class="section" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-bottom: 20px; padding-top: 20px;">
+    <ui:VisualElement name="resetTransformButton" class="section" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-left: 10px; margin-right: 10px; margin-top: 10px; margin-bottom: 10px; padding-bottom: 20px; padding-top: 20px;">
         <ui:Label tabindex="-1" text="Transform History" display-tooltip-when-elided="true" style="font-size: 20px; -unity-font-style: bold;" />
         <ui:Foldout text="Transform List" name="transformListFoldout" style="padding-bottom: 10px; -unity-font-style: bold; color: rgb(255, 255, 255);" />
-        <ui:SliderInt picking-mode="Ignore" label="Transform" value="42" high-value="100" show-input-field="true" name="Slider" style="padding-bottom: 10px;" />
-        <ui:Button text="Save Absolute Transform" display-tooltip-when-elided="true" name="SavePosition" />
-        <ui:Button text="Reset Transform" display-tooltip-when-elided="true" name="ResetButton" style="-unity-slice-bottom: 10;" />
+        <ui:SliderInt picking-mode="Ignore" label="Transform" value="42" high-value="100" show-input-field="true" name="slider" style="padding-bottom: 10px;" />
+        <ui:Button text="Set Absolute Transform" display-tooltip-when-elided="true" name="saveAbsolutePositionButton" />
+        <ui:Button text="Reset All Transforms" display-tooltip-when-elided="true" name="resetTransformButton" style="-unity-slice-bottom: 10;" />
+        <ui:Button text="Debug" display-tooltip-when-elided="true" name="debug" />
     </ui:VisualElement>
 </ui:UXML>
