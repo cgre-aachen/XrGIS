@@ -32,8 +32,8 @@ namespace NurGIS.Runtime.TransformHistory
             public bool IsActive;
         }
         
-        public List<MyTransform> transformList = new();
-        public List<string> transformNameList = new();
+        public readonly List<MyTransform> transformList = new();
+        public readonly List<string> transformNameList = new();
         
         public bool noEntry;
         public bool applyToVertices;
@@ -42,8 +42,6 @@ namespace NurGIS.Runtime.TransformHistory
         public Vector3 positionInput = Vector3.zero;
         public Vector3 rotationInput = Vector3.zero;
         public Vector3 scaleInput = Vector3.one;
-        
-        
         #endregion
         
         #region Methods
@@ -146,6 +144,19 @@ namespace NurGIS.Runtime.TransformHistory
             go.transform.localPosition = translation;
             go.transform.localRotation = Quaternion.Euler(rotation);
             go.transform.localScale = scale;
+            transform.hasChanged = false;
+        }
+        
+        public void ApplyTransformToVertices(Vector3 translation, Vector3 rotation, Vector3 scale)
+        {
+            Mesh mesh = GetComponent<MeshFilter>().mesh;
+            Vector3[] vertices = mesh.vertices;
+            Matrix4x4 matrix = Matrix4x4.TRS(translation, Quaternion.Euler(rotation), scale);
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i] = matrix.MultiplyPoint3x4(vertices[i]);
+            }
+            transform.hasChanged = false;
         }
 
         public void UpdateGameObjectTranslation(Vector3 translation, Vector3 lastTranslation)
@@ -172,17 +183,6 @@ namespace NurGIS.Runtime.TransformHistory
             transform.hasChanged = false;
         }
         
-        public void ApplyTransformToVertices(Vector3 translation, Vector3 rotation, Vector3 scale)
-        {
-            Mesh mesh = GetComponent<MeshFilter>().mesh;
-            Vector3[] vertices = mesh.vertices;
-            Matrix4x4 matrix = Matrix4x4.TRS(translation, Quaternion.Euler(rotation), scale);
-            for (int i = 0; i < vertices.Length; i++)
-            {
-                vertices[i] = matrix.MultiplyPoint3x4(vertices[i]);
-            }
-        }
-
         public void SetTransformName()
         {
             string listValue = "";

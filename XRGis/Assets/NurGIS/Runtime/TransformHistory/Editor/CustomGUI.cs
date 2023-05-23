@@ -67,8 +67,6 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                         helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
                     }
                     
-                    helper.SetTransformName();
-                    
                     slider.highValue = helper.transformList.Count - 1;
                     slider.value = helper.transformList.Count - 1;
                     
@@ -79,6 +77,8 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     helper.positionInput = Vector3.zero;
                     helper.rotationInput = Vector3.zero;
                     helper.scaleInput = Vector3.one;
+                    
+                    helper.SetTransformName();
                 }
             };
             
@@ -127,7 +127,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 {
                     var transform = helper.transformList[i];
                     var index = i;
-                    var lastAbsoluteTransformIndex = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
+                    
                     
                     var listEntry = new VisualElement();
                     listEntry.AddToClassList("listEntry");
@@ -144,20 +144,32 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                         toggle.value = transform.IsActive;
                         toggle.RegisterValueChangedCallback(evt =>
                         {
+                            bool isTransformAbsolute = false;
+                            
+                            if (transform.transformType == TransformChangeHelper.TransformTypes.Absolute)
+                            {
+                                isTransformAbsolute = true;
+                            }
+                            
+                            var lastAbsoluteTransformIndex = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
+                            
                             if (index < lastAbsoluteTransformIndex && slider.value >= lastAbsoluteTransformIndex)
                             {
                                 toggle.value = false;
                                 return;
                             }
-
-                            var oldValue = transform.IsActive;
-                            if (oldValue != evt.newValue)
-                            {
-                                transform.IsActive = evt.newValue;
-                                var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
-                                var transformList = helper.CalculateTransform(lastActiveTransform, helper.transformList.Count - 1);
-                                helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
-                            }
+                            
+                            
+                            
+                            transform.IsActive = evt.newValue;
+                            
+                            
+                            var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(index, isTransformAbsolute);
+                            var nextAbsoluteTransform = helper.FindNextAbsoluteTransformIndex(index, isTransformAbsolute);
+                            helper.SetActiveNotActiveOfTransforms(lastAbsoluteTransform, nextAbsoluteTransform, index);
+                            var transformList = helper.CalculateTransform(lastAbsoluteTransform, helper.transformList.Count - 1);
+                            helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
+                            
                         });
                     }
                     toggle.style.paddingRight = 5;
@@ -172,23 +184,27 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             Action debugAction = () =>
             {
-                //Debug.Log(helper.positionInput);
+                #if false
+                Debug.Log("Transform Name List: " + helper.transformNameList.Count);
+                Debug.Log("Last Transform Type is...: " + helper.transformNameList[^1]);
+                Debug.Log("First Transform is...: " + helper.transformNameList[0]);
+                #endif
             };
             
             #endregion
 
-            #region Events 
-            
+            #region Events
+            # if true
             slider.RegisterValueChangedCallback(evt =>
             {
-                var lastActiveTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
-                var nextActiveTransform = helper.FindNextAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
-                helper.SetActiveNotActiveOfTransforms(lastActiveTransform, nextActiveTransform, evt.newValue);
-                var transformList = helper.CalculateTransform(lastActiveTransform, evt.newValue);
+                var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
+                var nextAbsoluteTransform = helper.FindNextAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
+                helper.SetActiveNotActiveOfTransforms(lastAbsoluteTransform, nextAbsoluteTransform, evt.newValue);
+                var transformList = helper.CalculateTransform(lastAbsoluteTransform, evt.newValue);
                 helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
                 updateListEntryAction();
             });
-            
+            #endif
             
             translationInput.RegisterValueChangedCallback(evt =>
             {
@@ -229,9 +245,6 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 Vector3 scale = transformList[2];
                 helper.UpdateGameObjectScale(evt.newValue, scale);
             });
-            
-            
-            
             
             saveTransformButton.clicked += saveTransformAction;
             saveTransformButton.clicked += updateListEntryAction;
