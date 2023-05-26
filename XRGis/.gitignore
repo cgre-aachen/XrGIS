@@ -188,5 +188,8 @@ TestReports/*
 /Assets/XRGiS_Project/Data/
 /Assets/Plugins/leHighPerformanceMeshSimplifier/
 /Assets/Wireframe/
+/Assets/Settings/*.asset
+/ProjectSettings/
+/Packages/
 
 
