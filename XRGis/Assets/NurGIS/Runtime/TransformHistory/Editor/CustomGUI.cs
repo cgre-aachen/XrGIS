@@ -116,7 +116,6 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
                 uxmlFoldout.Clear();
                 var listRoot = new VisualElement();
-                listRoot.AddToClassList("listEntryBackground");
                 listRoot.style.paddingBottom = 5;
                 listRoot.style.paddingTop = 5;
                 listRoot.style.paddingLeft = 5;
@@ -128,54 +127,64 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     var transform = helper.transformList[i];
                     var index = i;
                     
-                    
-                    var listEntry = new VisualElement();
-                    listEntry.AddToClassList("listEntry");
+                    var listEntry = new VisualElement(); // Create a new list entry
                     listEntry.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
                     listEntry.style.backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray);
                     
-                    var label = new Label(helper.transformNameList[i]);
-                    label.AddToClassList("listEntryLabel");
-                    label.style.color = new StyleColor(Color.white);
                     
-                    // Add a toggle next to the label
-                    var toggle = new Toggle();
+                    var label = new Label(helper.transformNameList[i]); // Add a label for the transform name   
+                    label.style.color = transform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
+                    
+                    if (transform.transformType == TransformChangeHelper.TransformTypes.Absolute)
+                    {
+                        label.style.color = new StyleColor(Color.red);
+                    }
+                    
+                    var indexLabel = new Label("#" + i); // Add a readonly integer next to the label
+                    indexLabel.style.color = transform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
+                    
+                    var toggle = new Toggle(); // Add a toggle next to the label
                     {
                         toggle.value = transform.IsActive;
                         toggle.RegisterValueChangedCallback(evt =>
                         {
-                            bool isTransformAbsolute = false;
-                            
+                            transform.IsActive = evt.newValue;
+
+                            label.style.color = transform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
                             if (transform.transformType == TransformChangeHelper.TransformTypes.Absolute)
                             {
-                                isTransformAbsolute = true;
+                                label.style.color = new StyleColor(Color.red);
                             }
+                            indexLabel.style.color = transform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
+
+                            var nextAbsoluteTransform = helper.FindNextAbsoluteTransformIndex(index, onlyActiveTransforms:true);
+                            var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(index, onlyActiveTransforms:true);
                             
-                            var lastAbsoluteTransformIndex = helper.FindLastAbsoluteTransformIndex(helper.transformList.Count - 1, onlyActiveTransforms:true);
-                            
-                            if (index < lastAbsoluteTransformIndex && slider.value >= lastAbsoluteTransformIndex)
+                            if (lastAbsoluteTransform == 0  && index < nextAbsoluteTransform && transform.transformType != TransformChangeHelper.TransformTypes.Absolute && helper.transformList[nextAbsoluteTransform].transformType == TransformChangeHelper.TransformTypes.Absolute)
                             {
                                 toggle.value = false;
                                 return;
                             }
                             
+                            if (transform.transformType == TransformChangeHelper.TransformTypes.Absolute)
+                            {
+                                lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(index, onlyActiveTransforms:false);
+                                helper.ToggleAbsoluteTransform(index, lastAbsoluteTransform, transform);
+                            }
                             
-                            
-                            transform.IsActive = evt.newValue;
-                            
-                            
-                            var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(index, isTransformAbsolute);
-                            var nextAbsoluteTransform = helper.FindNextAbsoluteTransformIndex(index, isTransformAbsolute);
-                            helper.SetActiveNotActiveOfTransforms(lastAbsoluteTransform, nextAbsoluteTransform, index);
-                            var transformList = helper.CalculateTransform(lastAbsoluteTransform, helper.transformList.Count - 1);
+                            var transformList = helper.CalculateTransform(lastAbsoluteTransform, nextAbsoluteTransform);
                             helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
-                            
                         });
                     }
-                    toggle.style.paddingRight = 5;
-                    toggle.AddToClassList("listEntryToggle");
-                    toggle.value = helper.transformList[i].IsActive;
                     
+                    toggle.schedule.Execute(() => // Update the toggle value every 100ms
+                    {
+                        toggle.SetValueWithoutNotify(transform.IsActive);
+                    }).Every(100);
+                    
+                    toggle.style.paddingRight = 5;
+
+                    listEntry.Add(indexLabel);
                     listEntry.Add(toggle);
                     listEntry.Add(label);
                     listRoot.Add(listEntry);
@@ -190,22 +199,19 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 Debug.Log("First Transform is...: " + helper.transformNameList[0]);
                 #endif
             };
-            
             #endregion
 
             #region Events
-            # if true
             slider.RegisterValueChangedCallback(evt =>
             {
-                var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
-                var nextAbsoluteTransform = helper.FindNextAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
-                helper.SetActiveNotActiveOfTransforms(lastAbsoluteTransform, nextAbsoluteTransform, evt.newValue);
-                var transformList = helper.CalculateTransform(lastAbsoluteTransform, evt.newValue);
+                var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false); // Commented out code reactivates old slider functionality
+                //var nextAbsoluteTransform = helper.FindNextAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false);
+                //helper.SetActiveNotActiveOfTransforms(evt.newValue, nextAbsoluteTransform, lastAbsoluteTransform);
+                var transformList = helper.CalculateSliderTransform(lastAbsoluteTransform, evt.newValue);
                 helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
-                updateListEntryAction();
+                //updateListEntryAction();
             });
-            #endif
-            
+
             translationInput.RegisterValueChangedCallback(evt =>
             {
                 if (helper.transformList.Count == 0)
@@ -218,7 +224,6 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 Vector3 translation = transformList[0];
                 helper.UpdateGameObjectTranslation(evt.newValue, translation);
             });
-            
             
             rotationInput.RegisterValueChangedCallback(evt =>
             {
