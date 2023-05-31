@@ -1,4 +1,6 @@
-/*
+#if false
+
+
 
 using System;
 using System.Collections.Generic;
@@ -496,5 +498,5 @@ namespace NurGIS.Runtime.TransformHistory
         }
     }
 }
+#endif
 
-*/

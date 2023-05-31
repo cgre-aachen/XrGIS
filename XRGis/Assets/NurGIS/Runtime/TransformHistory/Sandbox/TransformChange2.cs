@@ -1,4 +1,4 @@
-﻿/*
+﻿#if false
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -451,4 +451,7 @@ namespace NurGIS.Runtime.TransformHistory
         }
     }
 }
-*/
+#endif
+
+
+
