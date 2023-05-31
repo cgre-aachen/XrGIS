@@ -265,6 +265,8 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = helper.CalculateSliderTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
                 helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
+                
+                helper.activeRadioButton = evt.newValue;
             });
 
             translationInput.RegisterValueChangedCallback(evt =>
@@ -344,9 +346,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             resetAllTransformsButton.clicked += updateTransformListAction;
 
             debugButton.clicked += debugAction;
-            debugButton.clicked += updateRadioButtonDisplay;
             #endregion
-            
             
             resetInputAction();
             updateTransformListAction();

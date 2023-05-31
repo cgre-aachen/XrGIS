@@ -58,6 +58,7 @@ namespace NurGIS.Runtime.TransformHistory
 
         public bool noEntry;
         public bool applyToVertices;
+        public int activeRadioButton;
 
         public Vector3 positionInput = Vector3.zero;
         public Vector3 scaleInput = Vector3.one;
@@ -464,17 +465,24 @@ namespace NurGIS.Runtime.TransformHistory
             transformListContainer.Add(transformListEntry);
         }
 
-        private void GetRelativeTransform(List<CustomTransform> activeTransformListInput) // Calculate the rel. transform, triggered by transform.hasChanged
+        private void GetRelativeTransform(int selectedRadioButton) // Calculate the rel. transform, triggered by transform.hasChanged
         {
+            if (selectedRadioButton == -1)
+            {
+                return;
+            }
+            
             GameObject go = gameObject;
             var transform1 = go.transform;
             Vector3 newPosition = transform1.localPosition;
             Vector3 newRotation = transform1.localRotation.eulerAngles;
             Vector3 newScale = transform1.localScale;
             
-            Vector3 lastPosition = activeTransformListInput[^1].position;
-            Vector3 lastRotation = activeTransformListInput[^1].rotation;
-            Vector3 lastScale = activeTransformListInput[^1].scale;
+           List<CustomTransform> activeTransformList = transformListContainer[selectedRadioButton].singleTransformList;
+            
+            Vector3 lastPosition = activeTransformList[^1].position;
+            Vector3 lastRotation = activeTransformList[^1].rotation;
+            Vector3 lastScale = activeTransformList[^1].scale;
             
             Vector3 relativePosition = newPosition - lastPosition;
             Vector3 relativeRotation = newRotation - lastRotation;
@@ -506,7 +514,7 @@ namespace NurGIS.Runtime.TransformHistory
         {
             if (transform.hasChanged)
             {
-                //GetRelativeTransform();
+                GetRelativeTransform(activeRadioButton);
                 transform.hasChanged = false;
             }
         }
