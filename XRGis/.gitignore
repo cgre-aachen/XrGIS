@@ -191,5 +191,6 @@ TestReports/*
 /Assets/Settings/*.asset
 /ProjectSettings/
 /Packages/
-
+*.xsd
+*.tss
 
