@@ -158,11 +158,16 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 }
 
                 uxmlFoldout.Clear();
-                var listRoot = new VisualElement();
-                listRoot.style.paddingBottom = 5;
-                listRoot.style.paddingTop = 5;
-                listRoot.style.paddingLeft = 5;
-                listRoot.style.paddingRight = 5;
+                var listRoot = new VisualElement
+                {
+                    style =
+                    {
+                        paddingBottom = 5,
+                        paddingTop = 5,
+                        paddingLeft = 5,
+                        paddingRight = 5
+                    }
+                };
                 uxmlFoldout.Add(listRoot);
 
                 var activeTransformList = helper.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
@@ -171,17 +176,42 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     var selectedTransform = activeTransformList[i];
                     var index = i;
                     
-                    var listEntry = new VisualElement(); // Create a new list entry
-                    listEntry.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
-                    listEntry.style.backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray);
-
-                    var label = new Label(selectedTransform.transformName); // Add a label for the transform name   
-                    label.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
+                    var listEntry = new VisualElement
+                    {
+                        style =
+                        {
+                            flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row),
+                            backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray)
+                        }
+                    }; // Create a new list entry
                     
+                    listEntry.RegisterCallback<MouseDownEvent>(evt =>
+                    {
+                        if (evt.button == 0)
+                        {
+                            Debug.Log("Clicked on list entry #" + index);///////////////Continue here for more functionality
+                        }
+                    });
+                    
+                    var textField = new TextField()
+                    {
+                        style =
+                        {
+                            color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white)
+                        }
+                    }; // Add a label for the transform name   
+
                     if (selectedTransform.transformType == TransformChangeHelper.TransformTypes.Absolute)
                     {
-                        label.style.color = new StyleColor(Color.red);
+                        textField.style.color = new StyleColor(Color.red);
                     }
+                    
+                    textField.value = selectedTransform.transformName;
+                    
+                    textField.RegisterValueChangedCallback(evt => // Callback logic when a label is changed
+                    {
+                        selectedTransform.transformName = evt.newValue;
+                    });
                     
                     var indexLabel = new Label("#" + i); // Add a readonly integer next to the label
                     indexLabel.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
@@ -193,10 +223,10 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                         {
                             selectedTransform.IsActive = evt.newValue;
 
-                            label.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
+                            textField.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
                             if (selectedTransform.transformType == TransformChangeHelper.TransformTypes.Absolute)
                             {
-                                label.style.color = new StyleColor(Color.red);
+                                textField.style.color = new StyleColor(Color.red);
                             }
                             indexLabel.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
 
@@ -233,7 +263,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
                     listEntry.Add(indexLabel);
                     listEntry.Add(toggle);
-                    listEntry.Add(label);
+                    listEntry.Add(textField);
                     listRoot.Add(listEntry);
                 }
             };

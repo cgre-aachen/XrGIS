@@ -171,6 +171,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noEntry: 0
   applyToVertices: 0
+  activeRadioButton: 0
   positionInput: {x: 0, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
   rotationInput: {x: 0, y: 0, z: 0}
@@ -645,7 +646,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noEntry: 0
   applyToVertices: 0
-  positionInput: {x: 0, y: 0, z: 0}
+  activeRadioButton: 0
+  positionInput: {x: 1, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
   rotationInput: {x: 0, y: 0, z: 0}
 --- !u!1 &1594583640
@@ -763,6 +765,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noEntry: 0
   applyToVertices: 0
+  activeRadioButton: 0
   positionInput: {x: 0, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
   rotationInput: {x: 0, y: 0, z: 0}
@@ -799,7 +802,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noEntry: 0
   applyToVertices: 0
-  positionInput: {x: 0, y: 0, z: 0}
+  activeRadioButton: 0
+  positionInput: {x: 1, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
   rotationInput: {x: 0, y: 0, z: 0}
 --- !u!23 &2066962235
