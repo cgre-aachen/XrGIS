@@ -172,8 +172,8 @@ MonoBehaviour:
   noEntry: 0
   applyToVertices: 0
   positionInput: {x: 0, y: 0, z: 0}
-  rotationInput: {x: 0, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
+  rotationInput: {x: 0, y: 0, z: 0}
 --- !u!23 &142864228
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -646,8 +646,8 @@ MonoBehaviour:
   noEntry: 0
   applyToVertices: 0
   positionInput: {x: 0, y: 0, z: 0}
-  rotationInput: {x: 0, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
+  rotationInput: {x: 0, y: 0, z: 0}
 --- !u!1 &1594583640
 GameObject:
   m_ObjectHideFlags: 0
@@ -747,7 +747,7 @@ Transform:
   m_Children:
   - {fileID: 142864226}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1784867493
 MonoBehaviour:
@@ -764,8 +764,8 @@ MonoBehaviour:
   noEntry: 0
   applyToVertices: 0
   positionInput: {x: 0, y: 0, z: 0}
-  rotationInput: {x: 0, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
+  rotationInput: {x: 0, y: 0, z: 0}
 --- !u!1 &2066962233
 GameObject:
   m_ObjectHideFlags: 0
@@ -779,7 +779,7 @@ GameObject:
   - component: {fileID: 2066962235}
   - component: {fileID: 2066962234}
   m_Layer: 0
-  m_Name: Cube_2
+  m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -799,9 +799,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   noEntry: 0
   applyToVertices: 0
-  positionInput: {x: 1, y: 0, z: 0}
-  rotationInput: {x: 0, y: 0, z: 0}
+  positionInput: {x: 0, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
+  rotationInput: {x: 0, y: 0, z: 0}
 --- !u!23 &2066962235
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -865,5 +865,5 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
