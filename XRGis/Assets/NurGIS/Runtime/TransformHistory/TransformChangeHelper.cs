@@ -154,8 +154,8 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 CustomTransform customTransform = activeTransformListInput[i];
                 if (!customTransform.IsActive) continue;
-                positionVector += customTransform.position;
                 rotationQuaternion += customTransform.rotation;
+                positionVector += customTransform.position;
                 scaleVector = Vector3.Scale(scaleVector, customTransform.scale);
             }
             
@@ -177,6 +177,7 @@ namespace NurGIS.Runtime.TransformHistory
             for (int i = previousAbsolute; i <= position; i++)
             {
                 CustomTransform customTransform = activeTransformListInput[i];
+                if (!customTransform.IsActive) continue;
                 positionVector += customTransform.position;
                 rotationVector += customTransform.rotation;
                 scaleVector = Vector3.Scale(scaleVector, customTransform.scale);
@@ -290,6 +291,7 @@ namespace NurGIS.Runtime.TransformHistory
                     }
                 }
             }
+            
             return lastIndex;
         }
         
@@ -407,13 +409,7 @@ namespace NurGIS.Runtime.TransformHistory
                 }
             }
         }
-
-        public void ResetTransforms(List<CustomTransform> activeTransformListInput)
-        {
-            activeTransformListInput.RemoveRange(1, activeTransformListInput.Count - 1);
-            CalculateTransform(0,0, activeTransformListInput);
-        }
-
+        
         public void CreateNewTransformListEntry()
         {
             var newTransform = new CustomTransform

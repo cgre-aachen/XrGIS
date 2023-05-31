@@ -127,7 +127,13 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             Action resetAllTransformsAction = () =>
             {
                 var activeTransformList = helper.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
-                helper.ResetTransforms(activeTransformList);
+                activeTransformList.RemoveRange(1, activeTransformList.Count - 1);
+                activeTransformList[0].IsActive = true;
+                
+                var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
+                var transformList = helper.CalculateTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
+                helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
+                
                 slider.highValue = activeTransformList.Count -1;
                 slider.value = activeTransformList.Count -1;
             };
@@ -140,13 +146,12 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 {
                     transformListNames.Add(transformList.transformListName); 
                 }
-
                 transformListRadioButtonGroup.choices = transformListNames;
             };
 
             Action updateTransformListAction = () =>
             {
-                if (helper.noEntry)
+                if (helper.noEntry || transformListRadioButtonGroup.value == -1 || helper.transformListContainer.Count == 0)
                 {
                     return;
                 }
@@ -159,61 +164,58 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 listRoot.style.paddingRight = 5;
                 uxmlFoldout.Add(listRoot);
 
-                if (transformListRadioButtonGroup.value == -1 || helper.transformListContainer.Count == 0)
-                {
-                    return;
-                }
-
                 var activeTransformList = helper.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
-                
                 for (int i = 0; i < activeTransformList.Count; i++)
                 {
-                    var singleTransform = activeTransformList[i];
+                    var selectedTransform = activeTransformList[i];
                     var index = i;
                     
                     var listEntry = new VisualElement(); // Create a new list entry
                     listEntry.style.flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row);
                     listEntry.style.backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray);
+
+                    var label = new Label(selectedTransform.transformName); // Add a label for the transform name   
+                    label.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
                     
-                    
-                    var label = new Label(singleTransform.transformName); // Add a label for the transform name   
-                    label.style.color = singleTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
-                    
-                    if (singleTransform.transformType == TransformChangeHelper.TransformTypes.Absolute)
+                    if (selectedTransform.transformType == TransformChangeHelper.TransformTypes.Absolute)
                     {
                         label.style.color = new StyleColor(Color.red);
                     }
                     
                     var indexLabel = new Label("#" + i); // Add a readonly integer next to the label
-                    indexLabel.style.color = singleTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
+                    indexLabel.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
                     
                     var toggle = new Toggle(); // Add a toggle next to the label
                     {
-                        toggle.value = singleTransform.IsActive;
-                        toggle.RegisterValueChangedCallback(evt =>
+                        toggle.value = selectedTransform.IsActive;
+                        toggle.RegisterValueChangedCallback(evt => // Callback logic when a toggle is selected
                         {
-                            singleTransform.IsActive = evt.newValue;
+                            selectedTransform.IsActive = evt.newValue;
 
-                            label.style.color = singleTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
-                            if (singleTransform.transformType == TransformChangeHelper.TransformTypes.Absolute)
+                            label.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
+                            if (selectedTransform.transformType == TransformChangeHelper.TransformTypes.Absolute)
                             {
                                 label.style.color = new StyleColor(Color.red);
                             }
-                            indexLabel.style.color = singleTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
+                            indexLabel.style.color = selectedTransform.IsActive == false ? new StyleColor(Color.gray) : new StyleColor(Color.white);
 
                             var nextAbsoluteTransform = helper.FindNextAbsoluteTransformIndex(index, onlyActiveTransforms:true, activeTransformList);
                             var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(index, onlyActiveTransforms:true, activeTransformList);
                             
-                            if (lastAbsoluteTransform == 0  && index < nextAbsoluteTransform && singleTransform.transformType != TransformChangeHelper.TransformTypes.Absolute && activeTransformList[nextAbsoluteTransform].transformType == TransformChangeHelper.TransformTypes.Absolute)
+                            if (lastAbsoluteTransform == 0  &&
+                                index < nextAbsoluteTransform && 
+                                selectedTransform.transformType != TransformChangeHelper.TransformTypes.Absolute &&
+                                activeTransformList[nextAbsoluteTransform].transformType == TransformChangeHelper.TransformTypes.Absolute &&
+                                activeTransformList[nextAbsoluteTransform].IsActive)
                             {
                                 toggle.value = false;
                                 return;
                             }
                             
-                            if (singleTransform.transformType == TransformChangeHelper.TransformTypes.Absolute)
+                            if (selectedTransform.transformType == TransformChangeHelper.TransformTypes.Absolute)
                             {
                                 lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(index, onlyActiveTransforms:false, activeTransformList);
-                                helper.ToggleAbsoluteTransform(index, lastAbsoluteTransform, singleTransform, activeTransformList);
+                                helper.ToggleAbsoluteTransform(index, lastAbsoluteTransform, selectedTransform, activeTransformList);
                             }
                             
                             var transformList = helper.CalculateTransform(lastAbsoluteTransform, nextAbsoluteTransform, activeTransformList);
@@ -223,7 +225,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     
                     toggle.schedule.Execute(() => // Update the toggle value every 100ms
                     {
-                        toggle.SetValueWithoutNotify(singleTransform.IsActive);
+                        toggle.SetValueWithoutNotify(selectedTransform.IsActive);
                     }).Every(100);
                     
                     toggle.style.paddingRight = 5;
@@ -247,9 +249,18 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             slider.RegisterValueChangedCallback(evt =>
             {
                 var activeTransformList = helper.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
-                var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:false, activeTransformList);
-                var transformList = helper.CalculateSliderTransform(lastAbsoluteTransform, evt.newValue, activeTransformList);
-                helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
+                
+                if(activeTransformList[evt.newValue].transformType != TransformChangeHelper.TransformTypes.Absolute)
+                {
+                    var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:true, activeTransformList);
+                    var transformList = helper.CalculateSliderTransform(lastAbsoluteTransform, evt.newValue, activeTransformList);
+                    helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
+                }
+
+                if (activeTransformList[evt.newValue].transformType == TransformChangeHelper.TransformTypes.Absolute && activeTransformList[evt.newValue].IsActive) // In case we are setting the slider to an absolute transform
+                {
+                    helper.ApplyTransformToGo(activeTransformList[evt.newValue].position, activeTransformList[evt.newValue].rotation, activeTransformList[evt.newValue].scale);
+                }
             });
             
             transformListRadioButtonGroup.RegisterValueChangedCallback(evt =>
@@ -264,6 +275,9 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 var lastAbsoluteTransform = helper.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = helper.CalculateTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
                 helper.ApplyTransformToGo(transformList[0], transformList[1], transformList[2]);
+                
+                slider.highValue = activeTransformList.Count - 1;
+                slider.value = activeTransformList.Count - 1;
                 
                 helper.activeRadioButton = evt.newValue;
             });
