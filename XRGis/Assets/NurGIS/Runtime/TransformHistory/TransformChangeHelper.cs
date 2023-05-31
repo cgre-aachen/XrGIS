@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace NurGIS.Runtime.TransformHistory
@@ -23,27 +22,47 @@ namespace NurGIS.Runtime.TransformHistory
             MultipleTransforms
         }     
         
-        public class MyTransform
+        public class CustomTransform
         {
             public Vector3 position;
-            public Quaternion rotation;
+            public Vector3 rotation;
             public Vector3 scale;
             public TransformTypes transformType;
             public TransformSpecifier transformSpecifier;
             public bool IsActive;
+            public string transformName;
+
+            public CustomTransform Clone()
+            {
+                CustomTransform clone = new CustomTransform
+                {
+                    position = position,
+                    rotation = rotation,
+                    scale = scale,
+                    transformType = transformType,
+                    transformSpecifier = transformSpecifier,
+                    IsActive = IsActive,
+                    transformName = transformName
+                };
+                return clone;
+            }
         }
         
-        public readonly List<MyTransform> transformList = new();
-        public readonly List<string> transformNameList = new();
+        public class CustomTransformContainer
+        {
+            public List<CustomTransform> singleTransformList;
+            public string transformListName;
+        }
         
+        public readonly List<CustomTransformContainer> transformListContainer = new();
+
         public bool noEntry;
         public bool applyToVertices;
-        private bool _initialStateLoaded;
 
         public Vector3 positionInput = Vector3.zero;
         public Vector3 scaleInput = Vector3.one;
-        public Vector3 rotationInput;
-        public Vector3 RotationInput // set to round to nearest 0.2 in GUI
+        public Vector3 rotationInput = Vector3.zero;
+        private Vector3 RotationInput // set to round to nearest 0.2 in GUI
         {
             set
             {
@@ -57,7 +76,7 @@ namespace NurGIS.Runtime.TransformHistory
         #endregion
         
         #region Methods
-        public void SaveRelativeTransformFromGui(Vector3 translation, Vector3 rotation, Vector3 scale)
+        public void SaveRelativeTransformFromGui(Vector3 translation, Vector3 rotation, Vector3 scale, List<CustomTransform> activeTransformListInput)
         {
             if (translation == Vector3.zero &&
                 rotation == Vector3.zero &&
@@ -68,106 +87,110 @@ namespace NurGIS.Runtime.TransformHistory
                 return;
             }
             
-            MyTransform myTransform = new MyTransform
+            CustomTransform customTransform = new CustomTransform
             {
                 transformType = TransformTypes.Relative,
                 IsActive = true,
                 position = translation,
-                rotation = Quaternion.Euler(rotation),
-                scale = scale
+                rotation = rotation,
+                scale = scale,
             };
             
             if (translation != Vector3.zero &&
                 rotation == Vector3.zero &&
                 scale == Vector3.one)
             {
-                myTransform.transformSpecifier = TransformSpecifier.Translation;
+                customTransform.transformSpecifier = TransformSpecifier.Translation;
             }
             else if (rotation != Vector3.zero &&
                      translation == Vector3.zero &&
                      scale == Vector3.one)
             {
-                myTransform.transformSpecifier = TransformSpecifier.Rotation;
+                customTransform.transformSpecifier = TransformSpecifier.Rotation;
             }
             else if (scale != Vector3.one &&
                      translation == Vector3.zero &&
                      rotation == Vector3.zero)
             {
-                myTransform.transformSpecifier = TransformSpecifier.Scale;
+                customTransform.transformSpecifier = TransformSpecifier.Scale;
             }
             else
             {
-                myTransform.transformSpecifier = TransformSpecifier.MultipleTransforms;
+                customTransform.transformSpecifier = TransformSpecifier.MultipleTransforms;
             }
 
+            string transformName = SetTransformName(customTransform);
+            customTransform.transformName = transformName;
             noEntry = false;
-            transformList.Add(myTransform);
+            activeTransformListInput.Add(customTransform);
         }
 
-        public void SaveAbsoluteTransform(Vector3 translation, Vector3 rotation, Vector3 scale)
+        public void SaveAbsoluteTransform(Vector3 translation, Vector3 rotation, Vector3 scale, List<CustomTransform> activeTransformListInput)
         {
-            MyTransform absoluteTransform = new MyTransform()
+            CustomTransform absoluteTransform = new CustomTransform()
             {
                 position = translation,
-                rotation = Quaternion.Euler(rotation),
+                rotation = rotation,
                 scale = scale,
                 transformType = TransformTypes.Absolute,
                 transformSpecifier = TransformSpecifier.AbsoluteTransform,
-                IsActive = true
+                IsActive = true,
             };
-            transformList.Add(absoluteTransform);
+            string transformName = SetTransformName(absoluteTransform);
+            absoluteTransform.transformName = transformName;
+            activeTransformListInput.Add(absoluteTransform);
         }
 
-        public List<Vector3> CalculateTransform(int previousAbsolute, int position)
+        public List<Vector3> CalculateTransform(int previousAbsolute, int position, List<CustomTransform> activeTransformListInput)
         {
             Vector3 positionVector = Vector3.zero;
-            Quaternion rotationQuaternion = Quaternion.identity;
+            Vector3 rotationQuaternion = Vector3.zero;
             Vector3 scaleVector = Vector3.one;
             
             List<Vector3> list = new List<Vector3>();
 
             for (int i = previousAbsolute; i <= position; i++)
             {
-                MyTransform myTransform = transformList[i];
-                if (myTransform.IsActive == false)
+                CustomTransform customTransform = activeTransformListInput[i];
+                if (customTransform.IsActive == false)
                 {
                     positionVector += Vector3.zero;
-                    rotationQuaternion *= Quaternion.identity;
+                    rotationQuaternion += Vector3.zero;
                     scaleVector = Vector3.Scale(scaleVector, Vector3.one);
                 }
                 else
                 {
-                    positionVector += myTransform.position;
-                    rotationQuaternion *= myTransform.rotation;
-                    scaleVector = Vector3.Scale(scaleVector, myTransform.scale);
+                    positionVector += customTransform.position;
+                    rotationQuaternion += customTransform.rotation;
+                    scaleVector = Vector3.Scale(scaleVector, customTransform.scale);
                 }
             }
             
             list.Add(positionVector);
-            list.Add(rotationQuaternion.eulerAngles);
+            list.Add(rotationQuaternion);
             list.Add(scaleVector);
 
             return list;
         }
         
-        public List<Vector3> CalculateSliderTransform(int previousAbsolute, int position)
+        public List<Vector3> CalculateSliderTransform(int previousAbsolute, int position, List<CustomTransform> activeTransformListInput)
         {
             Vector3 positionVector = Vector3.zero;
-            Quaternion rotationQuaternion = Quaternion.identity;
+            Vector3 rotationVector = Vector3.zero;
             Vector3 scaleVector = Vector3.one;
             
             List<Vector3> list = new List<Vector3>();
 
             for (int i = previousAbsolute; i <= position; i++)
             {
-                MyTransform myTransform = transformList[i];
-                positionVector += myTransform.position;
-                rotationQuaternion *= myTransform.rotation;
-                scaleVector = Vector3.Scale(scaleVector, myTransform.scale);
+                CustomTransform customTransform = activeTransformListInput[i];
+                positionVector += customTransform.position;
+                rotationVector += customTransform.rotation;
+                scaleVector = Vector3.Scale(scaleVector, customTransform.scale);
             }
             
             list.Add(positionVector);
-            list.Add(rotationQuaternion.eulerAngles);
+            list.Add(rotationVector);
             list.Add(scaleVector);
 
             return list;
@@ -202,11 +225,11 @@ namespace NurGIS.Runtime.TransformHistory
             transform.hasChanged = false;
         }
         
-        public void UpdateGameObjectRotation(Vector3 rotation, Quaternion lastRotation)
+        public void UpdateGameObjectRotation(Vector3 rotation, Vector3 lastRotation)
         {
             GameObject go = gameObject;
-            lastRotation *= Quaternion.Euler(rotation);
-            go.transform.localRotation = lastRotation;
+            lastRotation += rotation; //// this is the problem, check how we add quaternions
+            go.transform.localRotation = Quaternion.Euler(lastRotation);
             transform.hasChanged = false;
         }
         
@@ -217,50 +240,49 @@ namespace NurGIS.Runtime.TransformHistory
             go.transform.localScale = lastScale;
             transform.hasChanged = false;
         }
-        
-        public void SetTransformName()
-        {
-            string listValue = "";
-            MyTransform myTransform = transformList[^1];
 
-            switch (myTransform.transformSpecifier)
+        private string SetTransformName(CustomTransform customTransform)
+        {
+            string transformName = "";
+            
+            switch (customTransform.transformSpecifier)
             {
                 case TransformSpecifier.Translation:
-                    listValue += "Translation Changed";
+                    transformName += "Translation Changed";
                     break;    
                 case TransformSpecifier.Rotation:
-                    listValue += "Rotation Changed";
+                    transformName += "Rotation Changed";
                     break;
                 case TransformSpecifier.Scale:
-                    listValue += "Scale Changed";
+                    transformName += "Scale Changed";
                     break;
                 case TransformSpecifier.MultipleTransforms:
-                    listValue += "Transform Changed";
+                    transformName += "Transform Changed";
                     break;
                 case TransformSpecifier.AbsoluteTransform:
-                    listValue += "Transform Saved";
+                    transformName += "Transform Saved";
                     break;
                 default:
-                    listValue += "Unknown Transform Type";
+                    transformName += "Unknown Transform Type";
                     break;
             }
 
             if (applyToVertices)
             {
-                listValue += " // Vertices";
+                transformName += " // Vertices";
             }
 
-            transformNameList.Add(listValue);
+            return transformName;
         }
         
-        public int FindLastAbsoluteTransformIndex(int startIndex, bool onlyActiveTransforms)
+        public int FindLastAbsoluteTransformIndex(int startIndex, bool onlyActiveTransforms, List<CustomTransform> activeTransformListInput)
         {
             int lastIndex = 0;
             for (int i = startIndex - 1; i >= 0; i--)
             {
                 if (onlyActiveTransforms)
                 {
-                    if (transformList[i].transformType == TransformTypes.Absolute && transformList[i].IsActive)
+                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute && activeTransformListInput[i].IsActive)
                     {
                         lastIndex = i;
                         break;
@@ -268,7 +290,7 @@ namespace NurGIS.Runtime.TransformHistory
                 }
                 else
                 {
-                    if (transformList[i].transformType == TransformTypes.Absolute)
+                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute)
                     {
                         lastIndex = i;
                         break;
@@ -278,14 +300,14 @@ namespace NurGIS.Runtime.TransformHistory
             return lastIndex;
         }
         
-        public int FindNextAbsoluteTransformIndex(int startIndex, bool onlyActiveTransforms)
+        public int FindNextAbsoluteTransformIndex(int startIndex, bool onlyActiveTransforms, List<CustomTransform> activeTransformListInput)
         {
-            int nextIndex = transformList.Count - 1;
-            for (int i = startIndex + 1; i < transformList.Count; i++)
+            int nextIndex = activeTransformListInput.Count - 1;
+            for (int i = startIndex + 1; i < activeTransformListInput.Count; i++)
             {
                 if (onlyActiveTransforms)
                 {
-                    if (transformList[i].transformType == TransformTypes.Absolute && transformList[i].IsActive)
+                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute && activeTransformListInput[i].IsActive)
                     {
                         nextIndex = i;
                         break;
@@ -293,7 +315,7 @@ namespace NurGIS.Runtime.TransformHistory
                 }
                 else
                 {
-                    if (transformList[i].transformType == TransformTypes.Absolute)
+                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute)
                     {
                         nextIndex = i;
                         break;
@@ -303,55 +325,55 @@ namespace NurGIS.Runtime.TransformHistory
             
             if (nextIndex == 0)
             {
-                nextIndex = transformList.Count - 1;
+                nextIndex = activeTransformListInput.Count - 1;
             }
             
             return nextIndex;
         }
 
-        public void DeactivateTransforms(int startIndex)
+        public void DeactivateTransforms(int startIndex, List<CustomTransform> activeTransformListInput)
         {
-            var index = transformList.Count - 1;
+            var index = activeTransformListInput.Count - 1;
             
             for (int i = startIndex; i < index; i++)
             {
-                transformList[i].IsActive = false;
+                activeTransformListInput[i].IsActive = false;
             }
         }
 
-        public void SetActiveNotActiveOfTransforms(int position, int previousAbsolute, int nextAbsolute)
+        public void SetActiveNotActiveOfTransforms(int position, int previousAbsolute, int nextAbsolute, List<CustomTransform> activeTransformListInput)
         {
             for (int i = nextAbsolute; i > position; i--)
             {
-                transformList[i].IsActive = false;
+                activeTransformListInput[i].IsActive = false;
             }
             for (int i = position; i >= previousAbsolute; i--)
             {
-                transformList[i].IsActive = true;
+                activeTransformListInput[i].IsActive = true;
             }
             for (int i = previousAbsolute - 1; i >= 0; i--)
             {
-                transformList[i].IsActive = false;
+                activeTransformListInput[i].IsActive = false;
             }
 
-            if (transformList[position].transformType == TransformTypes.Absolute)
+            if (activeTransformListInput[position].transformType == TransformTypes.Absolute)
             {
-                for (int i = 0; i < transformList.Count - 1; i++)
+                for (int i = 0; i < activeTransformListInput.Count - 1; i++)
                 {
-                    transformList[i].IsActive = false;
+                    activeTransformListInput[i].IsActive = false;
                 }
-                transformList[position].IsActive = true;
+                activeTransformListInput[position].IsActive = true;
             }
         }
 
-        public void ToggleAbsoluteTransform(int position, int previousAbsolute, MyTransform myTransform)
+        public void ToggleAbsoluteTransform(int position, int previousAbsolute, CustomTransform customTransform, List<CustomTransform> activeTransformListInput)
         {
-            if (transformList.Count == 1)
+            if (activeTransformListInput.Count == 1)
             {
                 return;
             }
 
-            if (myTransform.IsActive) //Scenario 1; Absolute toggle gets activated
+            if (customTransform.IsActive) //Scenario 1; Absolute toggle gets activated
             {
                 for (int i = position - 1; i >= 0; i--)
                 {
@@ -360,18 +382,18 @@ namespace NurGIS.Runtime.TransformHistory
                         break;
                     }
                     
-                    transformList[i].IsActive = false;
+                    activeTransformListInput[i].IsActive = false;
                 }
                 
-                for (int i = position + 1; i < transformList.Count; i++) 
+                for (int i = position + 1; i < activeTransformListInput.Count; i++) 
                 {
-                    if (transformList[i].transformType == TransformTypes.Absolute)
+                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute)
                     {
-                        transformList[i].IsActive = false;
+                        activeTransformListInput[i].IsActive = false;
                     }
                     else
                     {
-                        transformList[i].IsActive = true;
+                        activeTransformListInput[i].IsActive = true;
                     }
                 }
             }
@@ -380,27 +402,69 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 for (int i = position - 1; i >= previousAbsolute; i--)
                 {
-                    if (transformList[i].transformType != TransformTypes.Absolute)
+                    if (activeTransformListInput[i].transformType != TransformTypes.Absolute)
                     {
-                        transformList[i].IsActive = true;
+                        activeTransformListInput[i].IsActive = true;
                     }
                     else
                     {
-                        transformList[i].IsActive = true;
+                        activeTransformListInput[i].IsActive = true;
                         break;
                     }
                 }
             }
         }
 
-        public void ResetTransforms()
+        public void ResetTransforms(List<CustomTransform> activeTransformListInput)
         {
-            transformList.RemoveRange(1, transformList.Count - 1);
-            transformNameList.RemoveRange(1, transformNameList.Count - 1);
-            CalculateTransform(0,0);
+            activeTransformListInput.RemoveRange(1, activeTransformListInput.Count - 1);
+            CalculateTransform(0,0, activeTransformListInput);
         }
 
-        private void GetRelativeTransform() // Calculate the rel. transform, triggered by transform.hasChanged
+        public void CreateNewTransformListEntry()
+        {
+            var newTransform = new CustomTransform
+            {
+                position = Vector3.zero,
+                rotation = Vector3.zero,
+                scale = Vector3.one,
+                transformType = TransformTypes.Relative,
+                transformSpecifier = TransformSpecifier.NoTransform,
+                IsActive = true,
+                transformName = "Empty Transform"
+            };
+            
+            var emptyTransformList = new List<CustomTransform> { newTransform };
+            
+            CustomTransformContainer transformListEntry = new CustomTransformContainer
+            {
+                singleTransformList = emptyTransformList,
+                transformListName = "Transform List " + transformListContainer.Count
+            };
+                    
+            transformListContainer.Add(transformListEntry);
+        }
+        
+        public void CopyTransformListEntry(int index)
+        {
+            CustomTransformContainer transformListEntry = new CustomTransformContainer
+            {
+                transformListName = transformListContainer[index].transformListName + " Copy"
+            };
+
+            List<CustomTransform> oldList = transformListContainer[index].singleTransformList;
+            List<CustomTransform> newList = new List<CustomTransform>(oldList.Count);
+            
+            oldList.ForEach((item)=>
+            {
+                newList.Add(item.Clone());
+            });
+            
+            transformListEntry.singleTransformList = newList;
+            transformListContainer.Add(transformListEntry);
+        }
+
+        private void GetRelativeTransform(List<CustomTransform> activeTransformListInput) // Calculate the rel. transform, triggered by transform.hasChanged
         {
             GameObject go = gameObject;
             var transform1 = go.transform;
@@ -408,9 +472,9 @@ namespace NurGIS.Runtime.TransformHistory
             Vector3 newRotation = transform1.localRotation.eulerAngles;
             Vector3 newScale = transform1.localScale;
             
-            Vector3 lastPosition = transformList[^1].position;
-            Vector3 lastRotation = transformList[^1].rotation.eulerAngles;
-            Vector3 lastScale = transformList[^1].scale;
+            Vector3 lastPosition = activeTransformListInput[^1].position;
+            Vector3 lastRotation = activeTransformListInput[^1].rotation;
+            Vector3 lastScale = activeTransformListInput[^1].scale;
             
             Vector3 relativePosition = newPosition - lastPosition;
             Vector3 relativeRotation = newRotation - lastRotation;
@@ -431,39 +495,18 @@ namespace NurGIS.Runtime.TransformHistory
             RotationInput = relativeRotation;
             scaleInput = relativeScale;
         }
-        
         #endregion
-        
+
+        private void Awake() // Initial state is in awake so that the GUI reflects it (Start is too late) 
+        {
+            CreateNewTransformListEntry();
+        }
+
         private void Update()
         {
-            if (Main.isInitialized) // Look if the initial state was set in main()
-            {
-                if (_initialStateLoaded == false) // Add the initial state of the monobehaviour
-                {
-                    var go = gameObject;
-                    var localScale = go.transform.localScale;
-                    var localPosition = go.transform.localPosition;
-                    var localRotation = go.transform.localRotation;
-
-                    var initialTransform = new MyTransform
-                    {
-                        position = localPosition,
-                        rotation = localRotation,
-                        scale = localScale,
-                        transformType = TransformTypes.Absolute,
-                        transformSpecifier = TransformSpecifier.NoTransform,
-                        IsActive = true
-                    };
-                    
-                    transformList.Add(initialTransform);
-                    transformNameList.Add("Start Position");
-                    _initialStateLoaded = true;
-                }
-            }
-
             if (transform.hasChanged)
             {
-                GetRelativeTransform();
+                //GetRelativeTransform();
                 transform.hasChanged = false;
             }
         }
