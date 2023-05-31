@@ -410,18 +410,33 @@ namespace NurGIS.Runtime.TransformHistory
             }
         }
         
-        public void CreateNewTransformListEntry()
+        public void CreateNewTransformListEntry(bool calledAtStart)
         {
-            var newTransform = new CustomTransform
+            var newTransform = new CustomTransform();
+            if (calledAtStart)
             {
-                position = Vector3.zero,
-                rotation = Vector3.zero,
-                scale = Vector3.one,
-                transformType = TransformTypes.Relative,
-                transformSpecifier = TransformSpecifier.NoTransform,
-                IsActive = true,
-                transformName = "Empty Transform"
-            };
+                var o = gameObject;
+
+                newTransform.position = o.transform.position;   
+                newTransform.rotation = o.transform.rotation.eulerAngles;
+                newTransform.scale = o.transform.localScale;
+                newTransform.transformType = TransformTypes.Absolute;
+                newTransform.transformSpecifier = TransformSpecifier.NoTransform;
+                newTransform.IsActive = true;
+                newTransform.transformName = "Start Transform";
+            }
+            else
+            {
+                newTransform.position = Vector3.zero;
+                newTransform.rotation = Vector3.zero;
+                newTransform.scale = Vector3.one;
+                newTransform.transformType = TransformTypes.Absolute;
+                newTransform.transformSpecifier = TransformSpecifier.NoTransform;
+                newTransform.IsActive = true;
+                newTransform.transformName = "Start Transform";
+            }
+
+
             
             var emptyTransformList = new List<CustomTransform> { newTransform };
             
@@ -495,7 +510,7 @@ namespace NurGIS.Runtime.TransformHistory
 
         private void Awake() // Initial state is in awake so that the GUI reflects it (Start is too late) 
         {
-            CreateNewTransformListEntry();
+            CreateNewTransformListEntry(true);
         }
 
         private void Update()

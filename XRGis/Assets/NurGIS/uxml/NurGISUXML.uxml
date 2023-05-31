@@ -15,6 +15,7 @@
         <ui:RadioButtonGroup value="-1" name="transformListSelection" style="height: auto; width: auto;" />
         <ui:Button text="Copy List" display-tooltip-when-elided="true" name="copyTransformList" style="height: auto; width: auto; align-items: auto;" />
         <ui:Button text="Create New Empty List" display-tooltip-when-elided="true" name="createNewEmptyList" style="white-space: nowrap; -unity-text-align: middle-center; align-items: auto; align-self: auto; height: auto; width: auto;" />
+        <ui:Button text="Delete List" display-tooltip-when-elided="true" name="deleteListButton" />
         <ui:Foldout text="Transform List" name="transformListFoldout" style="padding-bottom: 10px; -unity-font-style: bold; color: rgb(255, 255, 255);" />
         <ui:SliderInt picking-mode="Ignore" label="Transform" value="42" high-value="100" show-input-field="true" name="slider" style="padding-bottom: 10px;" />
         <ui:Button text="Set Absolute Transform" display-tooltip-when-elided="true" name="saveAbsolutePositionButton" />

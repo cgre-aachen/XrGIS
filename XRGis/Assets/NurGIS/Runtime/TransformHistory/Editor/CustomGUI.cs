@@ -34,6 +34,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             var copyTransformListButton = root.Q<Button>("copyTransformList");
             var createNewEmptyListButton = root.Q<Button>("createNewEmptyList");
+            var deleteListButton = root.Q<Button>("deleteListButton");
             
             translationInput.value = Vector3.zero;
             rotationInput.value = Vector3.zero;
@@ -110,7 +111,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             Action createNewEmptyListButtonAction = () =>
             {
-                helper.CreateNewTransformListEntry();
+                helper.CreateNewTransformListEntry(false);
             };
             
             Action saveAbsoluteTransformAction = () =>
@@ -237,6 +238,20 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 }
             };
             
+            Action deleteListAction = () =>
+            {
+                if (transformListRadioButtonGroup.value == -1 || 
+                    helper.transformListContainer.Count is 0 or 1)
+                {
+                    return;
+                }
+                
+                helper.transformListContainer.RemoveAt(transformListRadioButtonGroup.value);
+                transformListRadioButtonGroup.value -= 1;
+                updateRadioButtonDisplay();
+                updateTransformListAction();
+            };
+            
             Action debugAction = () =>
             {
                 #if true
@@ -357,6 +372,8 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             resetAllTransformsButton.clicked += resetAllTransformsAction;
             resetAllTransformsButton.clicked += updateTransformListAction;
+            
+            deleteListButton.clicked += deleteListAction;
 
             debugButton.clicked += debugAction;
             #endregion
