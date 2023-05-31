@@ -153,18 +153,10 @@ namespace NurGIS.Runtime.TransformHistory
             for (int i = previousAbsolute; i <= position; i++)
             {
                 CustomTransform customTransform = activeTransformListInput[i];
-                if (customTransform.IsActive == false)
-                {
-                    positionVector += Vector3.zero;
-                    rotationQuaternion += Vector3.zero;
-                    scaleVector = Vector3.Scale(scaleVector, Vector3.one);
-                }
-                else
-                {
-                    positionVector += customTransform.position;
-                    rotationQuaternion += customTransform.rotation;
-                    scaleVector = Vector3.Scale(scaleVector, customTransform.scale);
-                }
+                if (!customTransform.IsActive) continue;
+                positionVector += customTransform.position;
+                rotationQuaternion += customTransform.rotation;
+                scaleVector = Vector3.Scale(scaleVector, customTransform.scale);
             }
             
             list.Add(positionVector);
