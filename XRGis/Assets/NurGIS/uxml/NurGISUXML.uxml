@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <Style src="project://database/Assets/NurGIS/uxml/TransformHistoryUss.uss?fileID=7433441132597879392&amp;guid=e9ef29635c186424abe26c72753fd7d9&amp;type=3#TransformHistoryUss" />
+    <ui:VisualElement name="TransformInput" class="section" style="height: 195px;">
+        <ui:Label tabindex="-1" text="Transform Input" display-tooltip-when-elided="true" name="Label" style="height: 31px; text-overflow: clip; font-size: 20px; -unity-font-style: bold; background-color: rgba(32, 32, 32, 0);" />
+        <ui:Vector3Field label="Translation" name="translationInput" binding-path="positionInput" style="background-color: rgba(56, 56, 56, 0);" />
+        <ui:Vector3Field label="Rotation" name="rotationInput" binding-path="rotationInput" />
+        <ui:Vector3Field label="Scale" name="scaleInput" x="1" y="1" z="1" binding-path="scaleInput" />
+        <ui:Button text="Save Transform" display-tooltip-when-elided="true" name="applyTransformButton" style="height: auto; width: auto; white-space: nowrap; align-items: auto; align-self: auto;" />
+        <ui:Button text="Reset" display-tooltip-when-elided="true" name="resetInputButton" style="width: auto; height: auto; -unity-background-scale-mode: stretch-to-fill;" />
+        <ui:Toggle label="Apply To Vertices" name="VerticesToggle" binding-path="applyToVertices" style="height: 18px; width: 191px; flex-direction: row; justify-content: center; align-self: auto; align-items: auto;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="resetTransformButton" class="section" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-bottom: 0; padding-top: 0; align-items: stretch; padding-left: 0; padding-right: 0; position: relative; height: 480px; top: auto; width: auto;">
+        <ui:Label tabindex="-1" text="Transform History" display-tooltip-when-elided="true" name="TransformHistoryLabel" style="font-size: 20px; -unity-font-style: bold; height: 35px; width: 287px;" />
+        <ui:Label tabindex="-1" text="Transform List Selection" display-tooltip-when-elided="true" name="TransformListSelectionLabel" style="height: 24px; width: 287px;" />
+        <ui:RadioButtonGroup value="-1" name="transformListSelection" style="height: auto; width: auto;" />
+        <ui:Button text="Copy List" display-tooltip-when-elided="true" name="copyTransformList" style="height: auto; width: auto; align-items: auto;" />
+        <ui:Button text="Create New Empty List" display-tooltip-when-elided="true" name="createNewEmptyList" style="white-space: nowrap; -unity-text-align: middle-center; align-items: auto; align-self: auto; height: auto; width: auto;" />
+        <ui:Button text="Delete List" display-tooltip-when-elided="true" name="deleteListButton" />
+        <ui:Foldout text="Transform List" name="transformListFoldout" style="padding-bottom: 10px; -unity-font-style: bold; color: rgb(255, 255, 255);" />
+        <ui:SliderInt picking-mode="Ignore" label="Transform" value="42" high-value="100" show-input-field="true" name="slider" style="padding-bottom: 10px;" />
+        <ui:Button text="Set Absolute Transform" display-tooltip-when-elided="true" name="saveAbsolutePositionButton" />
+        <ui:Button text="Reset All Transforms" display-tooltip-when-elided="true" name="resetTransformButton" style="-unity-slice-bottom: 10;" />
+        <ui:Button text="Debug" display-tooltip-when-elided="true" name="debug" />
+    </ui:VisualElement>
+</ui:UXML>
