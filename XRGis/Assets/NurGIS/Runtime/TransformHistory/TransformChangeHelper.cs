@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace NurGIS.Runtime.TransformHistory
 {
@@ -29,7 +30,7 @@ namespace NurGIS.Runtime.TransformHistory
             public Vector3 scale;
             public TransformTypes transformType;
             public TransformSpecifier transformSpecifier;
-            public bool IsActive;
+            public bool isActive;
             public string transformName;
 
             public CustomTransform Clone()
@@ -41,7 +42,7 @@ namespace NurGIS.Runtime.TransformHistory
                     scale = scale,
                     transformType = transformType,
                     transformSpecifier = transformSpecifier,
-                    IsActive = IsActive,
+                    isActive = isActive,
                     transformName = transformName
                 };
                 return clone;
@@ -55,10 +56,11 @@ namespace NurGIS.Runtime.TransformHistory
         }
         
         public readonly List<CustomTransformContainer> transformListContainer = new();
-
+        
         public bool noEntry;
         public bool applyToVertices;
         public int activeRadioButton;
+        public List<int> activeTransformListIndex = new List<int>();
 
         public Vector3 positionInput = Vector3.zero;
         public Vector3 scaleInput = Vector3.one;
@@ -91,7 +93,7 @@ namespace NurGIS.Runtime.TransformHistory
             CustomTransform customTransform = new CustomTransform
             {
                 transformType = TransformTypes.Relative,
-                IsActive = true,
+                isActive = true,
                 position = translation,
                 rotation = rotation,
                 scale = scale,
@@ -135,7 +137,7 @@ namespace NurGIS.Runtime.TransformHistory
                 scale = scale,
                 transformType = TransformTypes.Absolute,
                 transformSpecifier = TransformSpecifier.AbsoluteTransform,
-                IsActive = true,
+                isActive = true,
             };
             string transformName = SetTransformName(absoluteTransform);
             absoluteTransform.transformName = transformName;
@@ -153,7 +155,7 @@ namespace NurGIS.Runtime.TransformHistory
             for (int i = previousAbsolute; i <= position; i++)
             {
                 CustomTransform customTransform = activeTransformListInput[i];
-                if (!customTransform.IsActive) continue;
+                if (!customTransform.isActive) continue;
                 rotationQuaternion += customTransform.rotation;
                 positionVector += customTransform.position;
                 scaleVector = Vector3.Scale(scaleVector, customTransform.scale);
@@ -177,7 +179,7 @@ namespace NurGIS.Runtime.TransformHistory
             for (int i = previousAbsolute; i <= position; i++)
             {
                 CustomTransform customTransform = activeTransformListInput[i];
-                if (!customTransform.IsActive) continue;
+                if (!customTransform.isActive) continue;
                 positionVector += customTransform.position;
                 rotationVector += customTransform.rotation;
                 scaleVector = Vector3.Scale(scaleVector, customTransform.scale);
@@ -276,7 +278,7 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 if (onlyActiveTransforms)
                 {
-                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute && activeTransformListInput[i].IsActive)
+                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute && activeTransformListInput[i].isActive)
                     {
                         lastIndex = i;
                         break;
@@ -302,7 +304,7 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 if (onlyActiveTransforms)
                 {
-                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute && activeTransformListInput[i].IsActive)
+                    if (activeTransformListInput[i].transformType == TransformTypes.Absolute && activeTransformListInput[i].isActive)
                     {
                         nextIndex = i;
                         break;
@@ -332,7 +334,7 @@ namespace NurGIS.Runtime.TransformHistory
             
             for (int i = startIndex; i < index; i++)
             {
-                activeTransformListInput[i].IsActive = false;
+                activeTransformListInput[i].isActive = false;
             }
         }
 
@@ -340,24 +342,24 @@ namespace NurGIS.Runtime.TransformHistory
         {
             for (int i = nextAbsolute; i > position; i--)
             {
-                activeTransformListInput[i].IsActive = false;
+                activeTransformListInput[i].isActive = false;
             }
             for (int i = position; i >= previousAbsolute; i--)
             {
-                activeTransformListInput[i].IsActive = true;
+                activeTransformListInput[i].isActive = true;
             }
             for (int i = previousAbsolute - 1; i >= 0; i--)
             {
-                activeTransformListInput[i].IsActive = false;
+                activeTransformListInput[i].isActive = false;
             }
 
             if (activeTransformListInput[position].transformType == TransformTypes.Absolute)
             {
                 for (int i = 0; i < activeTransformListInput.Count - 1; i++)
                 {
-                    activeTransformListInput[i].IsActive = false;
+                    activeTransformListInput[i].isActive = false;
                 }
-                activeTransformListInput[position].IsActive = true;
+                activeTransformListInput[position].isActive = true;
             }
         }
 
@@ -368,7 +370,7 @@ namespace NurGIS.Runtime.TransformHistory
                 return;
             }
 
-            if (customTransform.IsActive) //Scenario 1; Absolute toggle gets activated
+            if (customTransform.isActive) //Scenario 1; Absolute toggle gets activated
             {
                 for (int i = position - 1; i >= 0; i--)
                 {
@@ -377,18 +379,18 @@ namespace NurGIS.Runtime.TransformHistory
                         break;
                     }
                     
-                    activeTransformListInput[i].IsActive = false;
+                    activeTransformListInput[i].isActive = false;
                 }
                 
                 for (int i = position + 1; i < activeTransformListInput.Count; i++) 
                 {
                     if (activeTransformListInput[i].transformType == TransformTypes.Absolute)
                     {
-                        activeTransformListInput[i].IsActive = false;
+                        activeTransformListInput[i].isActive = false;
                     }
                     else
                     {
-                        activeTransformListInput[i].IsActive = true;
+                        activeTransformListInput[i].isActive = true;
                     }
                 }
             }
@@ -399,11 +401,11 @@ namespace NurGIS.Runtime.TransformHistory
                 {
                     if (activeTransformListInput[i].transformType != TransformTypes.Absolute)
                     {
-                        activeTransformListInput[i].IsActive = true;
+                        activeTransformListInput[i].isActive = true;
                     }
                     else
                     {
-                        activeTransformListInput[i].IsActive = true;
+                        activeTransformListInput[i].isActive = true;
                         break;
                     }
                 }
@@ -422,7 +424,7 @@ namespace NurGIS.Runtime.TransformHistory
                 newTransform.scale = o.transform.localScale;
                 newTransform.transformType = TransformTypes.Absolute;
                 newTransform.transformSpecifier = TransformSpecifier.NoTransform;
-                newTransform.IsActive = true;
+                newTransform.isActive = true;
                 newTransform.transformName = "Start Transform";
             }
             else
@@ -432,7 +434,7 @@ namespace NurGIS.Runtime.TransformHistory
                 newTransform.scale = Vector3.one;
                 newTransform.transformType = TransformTypes.Absolute;
                 newTransform.transformSpecifier = TransformSpecifier.NoTransform;
-                newTransform.IsActive = true;
+                newTransform.isActive = true;
                 newTransform.transformName = "Start Transform";
             }
 
@@ -506,6 +508,31 @@ namespace NurGIS.Runtime.TransformHistory
             RotationInput = relativeRotation;
             scaleInput = relativeScale;
         }
+        
+        public void HighlightListEntry(List<int> selectedIndexList, VisualElement listRoot)
+        {
+            if (listRoot.childCount < 1)
+            {
+                return;
+            }
+            
+            for (int i = 0; i < listRoot.childCount; i++)
+            {
+                var listEntry = listRoot.ElementAt(i);
+                foreach (var t in selectedIndexList)
+                {
+                    if (i == t)
+                    {
+                        listEntry.style.backgroundColor = new StyleColor(Color.blue);
+                    }
+                    else
+                    {
+                        listEntry.style.backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray);
+                    }
+                }
+            }
+        }
+
         #endregion
 
         private void Awake() // Initial state is in awake so that the GUI reflects it (Start is too late) 
