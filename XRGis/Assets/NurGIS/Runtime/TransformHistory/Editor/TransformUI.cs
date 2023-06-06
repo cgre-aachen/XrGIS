@@ -161,6 +161,8 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 listRoot.Clear();
                 uxmlFoldout.Add(listRoot);
 
+                var transformContentPanelContainer = new VisualElement();
+                
                 var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
                 for (var i = 0; i < activeTransformList.Count; i++)
                 {
@@ -180,11 +182,14 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     {
                         switch (evt.button)
                         {
-                            case 0: // Left click on list, highlights the entry and sets the active index /////// Cont. here /////// Add code to create a popup window with the transform values
+                            case 0: // Left click on list, highlights the entry and sets the active index
                                 transformMono.selectedTransformListIndex.Clear();
                                 transformMono.selectedTransformListIndex.Add(index);
                                 TransformGuiMethods.HighlightListEntry(transformMono.selectedTransformListIndex, listRoot);
+                                var singleTransform = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList[index];
+                                TransformGuiMethods.CreatePopUp(transformContentPanelContainer, singleTransform.position, singleTransform.rotation, singleTransform.scale);
                                 break;
+                            
                             case 1: // Right click, highlights multiple entries and adds entries
                                 if (!transformMono.selectedTransformListIndex.Contains(index))
                                 {
@@ -249,6 +254,8 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     listEntry.Add(textField);
                     listRoot.Add(listEntry);
                 }
+                
+                listRoot.Add(transformContentPanelContainer);
             };
             
             Action deleteTransformAction = () =>
@@ -290,8 +297,6 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 
                 transformMono.transformListContainer.RemoveAt(transformListRadioButtonGroup.value);
                 transformListRadioButtonGroup.value -= 1;
-                updateRadioButtonDisplay();
-                updateTransformListAction();
             };
             
             Action debugAction = () =>
@@ -416,6 +421,8 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             resetAllTransformsButton.clicked += updateTransformListAction;
             
             deleteListButton.clicked += deleteListAction;
+            deleteListButton.clicked += updateRadioButtonDisplay;  
+            deleteListButton.clicked += updateTransformListAction;
             
             deleteTransformButton.clicked += deleteTransformAction;
             deleteTransformButton.clicked += updateTransformListAction;

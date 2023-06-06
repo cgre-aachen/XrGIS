@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <Style src="project://database/Assets/NurGIS/uxml/TransformHistoryUss.uss?fileID=7433441132597879392&amp;guid=849134f04e0b04c488f3310b0a84ae1a&amp;type=3#TransformHistoryUss" />
+    <Style src="project://database/Assets/NurGIS/uxml/TransformHistoryUss.uss?fileID=7433441132597879392&amp;guid=e9ef29635c186424abe26c72753fd7d9&amp;type=3#TransformHistoryUss" />
     <ui:VisualElement name="TransformInput" class="section" style="height: 195px;">
         <ui:Label tabindex="-1" text="Transform Input" display-tooltip-when-elided="true" name="Label" style="height: 31px; text-overflow: clip; font-size: 20px; -unity-font-style: bold; background-color: rgba(32, 32, 32, 0);" />
         <ui:Vector3Field label="Translation" name="translationInput" binding-path="positionInput" style="background-color: rgba(56, 56, 56, 0);" />
@@ -23,4 +23,5 @@
         <ui:Button text="Reset All Transforms" display-tooltip-when-elided="true" name="resetTransformButton" style="-unity-slice-bottom: 10;" />
         <ui:Button text="Debug" display-tooltip-when-elided="true" name="debug" />
     </ui:VisualElement>
+    <ui:ScrollView />
 </ui:UXML>

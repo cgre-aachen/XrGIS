@@ -796,6 +796,6 @@ MonoBehaviour:
   applyToVertices: 0
   activeRadioButton: 0
   selectedTransformListIndex: 
-  positionInput: {x: 0, y: 0, z: 0}
+  positionInput: {x: 2, y: 0, z: 0}
   scaleInput: {x: 1, y: 1, z: 1}
   rotationInput: {x: 0, y: 0, z: 0}

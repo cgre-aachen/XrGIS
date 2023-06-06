@@ -201,8 +201,8 @@ namespace NurGIS.Runtime.TransformHistory
             absoluteTransform.transformName = transformName;
             activeTransformListInput.Add(absoluteTransform);
         }
-        
-        public static string SetTransformName(TransformMonobehaviour mono, TransformMonobehaviour.CustomTransform customTransform)
+
+        private static string SetTransformName(TransformMonobehaviour mono, TransformMonobehaviour.CustomTransform customTransform)
         {
             var transformName = "";
             
@@ -247,6 +247,169 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 activeTransformListInput[i].isActive = false;
             }
+        }
+
+        public static void CreatePopUp(VisualElement transformContentPanelContainer, Vector3 translation, Vector3 rotation, Vector3 scale) // Create a panel with the transform values
+        {
+            if (transformContentPanelContainer.childCount > 0) // Check if there is already a selected detail window displayed and delete it
+            {
+                transformContentPanelContainer.RemoveAt(transformContentPanelContainer.childCount - 1);
+            }
+            
+            var transformValuesPanel = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Column),
+                    backgroundColor = new StyleColor(Color.gray)
+                }
+            };
+            
+            var positionValuesPanel = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row),
+                    backgroundColor = new StyleColor(Color.gray)
+                }
+            };
+                        
+                var positionValuesChangedLabel = new Label
+                {
+                    text = "Translation Changes"
+                };
+                
+                var positionValueXLabel = new Label
+                {
+                    text = "X: " + translation.x
+                };
+                
+                var positionValueYLabel = new Label
+                {
+                    text = "Y: " + translation.y
+                };
+                
+                var positionValueZLabel = new Label
+                {
+                    text = "Z: " + translation.z
+                };
+            
+            var rotationValuesPanel = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row),
+                    backgroundColor = new StyleColor(Color.white)
+                }
+            };
+                var rotationValuesChangedLabel = new Label
+                {
+                    text = "Rotation Changes",
+                    style =
+                    {
+                        color = new StyleColor(Color.black)
+                    }
+                };
+                
+                var rotationValueXLabel = new Label
+                {
+                    text = "X: " + rotation.x,
+                    style =
+                    {
+                        color = new StyleColor(Color.black)
+                    }
+                };
+                
+                var rotationValueYLabel = new Label
+                {
+                    text = "Y: " + rotation.y,
+                    style =
+                    {
+                        color = new StyleColor(Color.black)
+                    }
+                };
+                
+                var rotationValueZLabel = new Label
+                {
+                    text = "Z: " + rotation.z,
+                    style =
+                    {
+                        color = new StyleColor(Color.black)
+                    }
+                };
+            
+            var scaleValuesPanel = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row),
+                    backgroundColor = new StyleColor(Color.gray)
+                }
+            };
+            
+                var scaleValuesChangedLabel = new Label
+                {
+                    text = "Scale Changes"
+                };
+
+                var scaleChangesVector3 = new Vector3Field();
+                scaleChangesVector3.SetValueWithoutNotify(scale);
+                
+                
+                    
+                /*
+                var scaleValueXLabel = new Label
+                {
+                    text = "X: " + scale.x
+                };
+                
+                var scaleValueYLabel = new Label
+                {
+                    text = "Y: " + scale.y
+                };
+                
+                var scaleValueZLabel = new Label
+                {
+                    text = "Z: " + scale.z
+                };
+                */
+            
+            var transformValuesButton = new Button
+            {
+                text = "Close"
+            };
+            
+            transformValuesButton.clicked += () =>
+            {
+                transformValuesPanel.Clear();
+                transformValuesPanel.RemoveFromHierarchy();
+            };
+            
+            positionValuesPanel.Add(positionValuesChangedLabel);
+            positionValuesPanel.Add(positionValueXLabel);
+            positionValuesPanel.Add(positionValueYLabel);
+            positionValuesPanel.Add(positionValueZLabel);
+            
+            rotationValuesPanel.Add(rotationValuesChangedLabel);
+            rotationValuesPanel.Add(rotationValueXLabel);
+            rotationValuesPanel.Add(rotationValueYLabel);
+            rotationValuesPanel.Add(rotationValueZLabel);
+            
+            scaleValuesPanel.Add(scaleValuesChangedLabel);
+            scaleValuesPanel.Add(scaleChangesVector3);
+            
+            /*
+            scaleValuesPanel.Add(scaleValueXLabel);
+            scaleValuesPanel.Add(scaleValueYLabel);
+            scaleValuesPanel.Add(scaleValueZLabel);
+            */
+            
+            transformValuesPanel.Add(positionValuesPanel);
+            transformValuesPanel.Add(rotationValuesPanel);
+            transformValuesPanel.Add(scaleValuesPanel);
+            transformValuesPanel.Add(transformValuesButton);
+            
+            transformContentPanelContainer.Add(transformValuesPanel);
         }
     }
 }
