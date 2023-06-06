@@ -371,6 +371,30 @@ namespace NurGIS.Runtime.TransformHistory
                     break;
             }
         }
+         public void SetActiveNotActiveOfTransforms(int position, int previousAbsolute, int nextAbsolute, List<CustomTransform> activeTransformListInput)
+                {
+                    for (int i = nextAbsolute; i > position; i--)
+                    {
+                        activeTransformListInput[i].isActive = false;
+                    }
+                    for (int i = position; i >= previousAbsolute; i--)
+                    {
+                        activeTransformListInput[i].isActive = true;
+                    }
+                    for (int i = previousAbsolute - 1; i >= 0; i--)
+                    {
+                        activeTransformListInput[i].isActive = false;
+                    }
+
+                    if (activeTransformListInput[position].transformType == TransformTypes.Absolute)
+                    {
+                        for (int i = 0; i < activeTransformListInput.Count - 1; i++)
+                        {
+                            activeTransformListInput[i].isActive = false;
+                        }
+                        activeTransformListInput[position].isActive = true;
+                    }
+                }
 
         #endregion
 

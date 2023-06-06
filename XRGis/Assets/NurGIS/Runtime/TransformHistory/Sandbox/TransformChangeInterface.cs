@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-namespace NurGIS.Runtime.TransformHistory
+namespace NurGIS.Runtime.TransformHistory.Sandbox
 {
     public class TransformChangeInterface : MonoBehaviour
     {
@@ -11,7 +10,7 @@ namespace NurGIS.Runtime.TransformHistory
         private void IdentifyLastChangedGo()
         {
             GameObject go = transformGoList[^1];
-            TransformChangeHelper helper = go.GetComponent<TransformChangeHelper>();
+            TransformMonobehaviour mono = go.GetComponent<TransformMonobehaviour>();
             transformGoList.RemoveAt(transformGoList.Count - 1);
         }
         
