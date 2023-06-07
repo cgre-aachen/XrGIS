@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
     <Style src="project://database/Assets/NurGIS/uxml/TransformHistoryUss.uss?fileID=7433441132597879392&amp;guid=e9ef29635c186424abe26c72753fd7d9&amp;type=3#TransformHistoryUss" />
+    <NurGIS.Runtime.GUI.TransformHistoryControl />
     <ui:VisualElement name="resetTransformButton" class="section" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0); margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; padding-bottom: 0; padding-top: 0; align-items: stretch; padding-left: 0; padding-right: 0; position: relative; height: auto; top: auto; width: auto;">
         <ui:Label tabindex="-1" text="Transform History" display-tooltip-when-elided="true" name="TransformHistoryLabel" style="font-size: 20px; -unity-font-style: flex-start; height: 35px; width: 287px;" />
         <ui:Label tabindex="-1" text="Transform List Selection" display-tooltip-when-elided="true" name="TransformListSelectionLabel" style="height: 24px; width: 287px;" />
