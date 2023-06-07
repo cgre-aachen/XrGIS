@@ -352,12 +352,9 @@ namespace NurGIS.Runtime.TransformHistory
                     text = "Scale Changes"
                 };
 
-                var scaleChangesVector3 = new Vector3Field();
-                scaleChangesVector3.SetValueWithoutNotify(scale);
+                //var scaleChangesVector3 = new Vector3Field();
+                //scaleChangesVector3.SetValueWithoutNotify(scale);
                 
-                
-                    
-                /*
                 var scaleValueXLabel = new Label
                 {
                     text = "X: " + scale.x
@@ -372,8 +369,7 @@ namespace NurGIS.Runtime.TransformHistory
                 {
                     text = "Z: " + scale.z
                 };
-                */
-            
+                
             var transformValuesButton = new Button
             {
                 text = "Close"
@@ -396,13 +392,10 @@ namespace NurGIS.Runtime.TransformHistory
             rotationValuesPanel.Add(rotationValueZLabel);
             
             scaleValuesPanel.Add(scaleValuesChangedLabel);
-            scaleValuesPanel.Add(scaleChangesVector3);
             
-            /*
             scaleValuesPanel.Add(scaleValueXLabel);
             scaleValuesPanel.Add(scaleValueYLabel);
             scaleValuesPanel.Add(scaleValueZLabel);
-            */
             
             transformValuesPanel.Add(positionValuesPanel);
             transformValuesPanel.Add(rotationValuesPanel);
