@@ -1,12 +1,15 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 
 // ReSharper disable once CheckNamespace
-namespace GemPlayControls.Advanced
+namespace NurGIS.Runtime.GUI
 {
     public class TransformControl : VisualElement
     {
+        private Foldout _foldout;
+
         internal enum TranformGroup
         {
             Position,
@@ -38,14 +41,35 @@ namespace GemPlayControls.Advanced
         <ui:Vector3Field label="Rotation" name="rotationInput" binding-path="rotationInput" />
         <ui:Vector3Field label="Scale" name="scaleInput" x="1" y="1" z="1" binding-path="scaleInput" />
         */
-        public TransformControl()
+        public override VisualElement contentContainer { get; }
+
+        public TransformControl(string name): this()
         {
-            var foldout = new Foldout
+           _foldout.name = name; 
+        }
+        public TransformControl()
+        
+        {
+            // style.flexDirection = FlexDirection.Row;
+            // var rowContainer = new VisualElement
+            // {
+            //     name = "rowContainer"
+            // };
+            //
+            // hierarchy.Add(rowContainer);
+            _foldout = new Foldout
             {
-                text = "A transform"
+                text = "Transform"
             };
-            Add(foldout);
-            
+            hierarchy.Add(_foldout);
+
+            // var buttonsContainer = new VisualElement
+            // {
+            //     name = "buttonsContainer"
+            // };
+            //
+            // rowContainer.Add(buttonsContainer);
+
             var position = new Vector3Field
             {
                 label = "Position",
@@ -55,15 +79,15 @@ namespace GemPlayControls.Advanced
                     backgroundColor = new Color(56, 56, 56, 0)
                 }
             };
-            foldout.Add(position);
-            
+            _foldout.Add(position);
+
             var rotation = new Vector3Field
             {
                 label = "Rotation",
                 name  = "rotationInput"
             };
-            foldout.Add(rotation);
-            
+            _foldout.Add(rotation);
+
             var scale = new Vector3Field
             {
                 label = "Scale",
@@ -71,8 +95,26 @@ namespace GemPlayControls.Advanced
                 value = new Vector3(1, 1, 1)
             };
 
-            foldout.Add(scale);
-            
+            _foldout.Add(scale);
+
+            var appliedToVertexCheckbox = new Toggle
+            {
+                label = "Applied to vertex",
+                name  = "appliedToVertexCheckbox"
+            };
+            _foldout.Add(appliedToVertexCheckbox);
+
+            var addTransformButton = new Button
+            {
+                text = "Abs",
+                style =
+                {
+                    right = 0,
+                    position = Position.Absolute
+                }
+            };
+            var toggleRow = _foldout.Q<Toggle>().Children().First();
+            toggleRow.Add(addTransformButton);
         }
     }
 }
