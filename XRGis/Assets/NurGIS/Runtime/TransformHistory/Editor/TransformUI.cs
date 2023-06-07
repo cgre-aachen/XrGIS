@@ -24,14 +24,14 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             var resetButton = root.Q<Button>("resetInputButton");
             var setAbsoluteTransformButton = root.Q<Button>("saveAbsolutePositionButton");
             var resetAllTransformsButton = root.Q<Button>("resetTransformButton");
-            var debugButton = root.Q<Button>("debug");
-            
+
             var translationInput = root.Q<Vector3Field>("translationInput");
             var rotationInput = root.Q<Vector3Field>("rotationInput");
             var scaleInput = root.Q<Vector3Field>("scaleInput");
+            var dropdownField = root.Q<DropdownField>("dropdownField");
             
-            var transformListRadioButtonGroup = root.Q<RadioButtonGroup>("transformListSelection");
-            transformListRadioButtonGroup.value = 0;
+            var radioButtonGroup = root.Q<RadioButtonGroup>("transformListSelection");
+            radioButtonGroup.value = 0;
             
             var copyTransformListButton = root.Q<Button>("copyTransformList");
             var createNewEmptyListButton = root.Q<Button>("createNewEmptyList");
@@ -48,7 +48,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
             if (transformMono.transformListContainer.Count > 0) // Sets values for the slider and the radiobutton group whenever the GUI is loaded
             {
-                var activeDefaultTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeDefaultTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
             
                 if (activeDefaultTransformList.Count > 0)
                 {
@@ -68,7 +68,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             #region Actions
             Action saveTransformAction = () =>
             {
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 TransformGuiMethods.SaveRelativeTransformFromGui(transformMono, translationInput.value, rotationInput.value, scaleInput.value, activeTransformList);
                 if (transformMono.noEntry) return;
@@ -106,7 +106,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             Action copyTransformListButtonAction = () =>
             {
-                var selectedTransformListIndex = transformListRadioButtonGroup.value;
+                var selectedTransformListIndex = radioButtonGroup.value;
                 TransformGuiMethods.CopyTransformListEntry(transformMono, selectedTransformListIndex);
             };
             
@@ -117,7 +117,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             Action saveAbsoluteTransformAction = () =>
             {
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
                 TransformGuiMethods.SaveAbsoluteTransform(transformMono, transformList[0], transformList[1], transformList[2], activeTransformList);
@@ -128,7 +128,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             Action resetAllTransformsAction = () =>
             {
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 activeTransformList.RemoveRange(1, activeTransformList.Count - 1);
                 activeTransformList[0].isActive = true;
                 
@@ -148,12 +148,24 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 {
                     transformListNames.Add(transformList.transformListName); 
                 }
-                transformListRadioButtonGroup.choices = transformListNames;
+                radioButtonGroup.choices = transformListNames;
+                
+                if (radioButtonGroup.value == -1)
+                {
+                    uxmlFoldout.text = "No Transform List Selected";
+                    return;
+                }
+                if (transformListNames.Count == 0)
+                {
+                    uxmlFoldout.text = "No Transform List Selected";
+                    return;
+                }
+                uxmlFoldout.text = transformListNames[radioButtonGroup.value]; 
             };
             
             Action updateTransformListAction = () =>
             {
-                if (transformMono.noEntry || transformListRadioButtonGroup.value == -1 || transformMono.transformListContainer.Count == 0)
+                if (transformMono.noEntry || radioButtonGroup.value == -1 || transformMono.transformListContainer.Count == 0)
                 {
                     return;
                 }
@@ -163,7 +175,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
                 var transformContentPanelContainer = new VisualElement();
                 
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 for (var i = 0; i < activeTransformList.Count; i++)
                 {
                     var selectedTransform = activeTransformList[i];
@@ -186,7 +198,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                                 transformMono.selectedTransformListIndex.Clear();
                                 transformMono.selectedTransformListIndex.Add(index);
                                 TransformGuiMethods.HighlightListEntry(transformMono.selectedTransformListIndex, listRoot);
-                                var singleTransform = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList[index];
+                                var singleTransform = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList[index];
                                 TransformGuiMethods.CreatePopUp(transformContentPanelContainer, singleTransform.position, singleTransform.rotation, singleTransform.scale);
                                 break;
                             
@@ -260,8 +272,8 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             Action deleteTransformAction = () =>
             {
-                if (transformListRadioButtonGroup.value == -1 || 
-                    transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList.Count == 0)
+                if (radioButtonGroup.value == -1 || 
+                    transformMono.transformListContainer[radioButtonGroup.value].singleTransformList.Count == 0)
                 {
                     return;
                 }
@@ -272,7 +284,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     return;
                 }
                 
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
 
                 for (var i = transformMono.selectedTransformListIndex.Count - 1; i >= 0; i--)
                 {
@@ -289,25 +301,34 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
             Action deleteListAction = () =>
             {
-                if (transformListRadioButtonGroup.value == -1 || 
+                if (radioButtonGroup.value == -1 || 
                     transformMono.transformListContainer.Count is 0 or 1)
                 {
                     return;
                 }
                 
-                transformMono.transformListContainer.RemoveAt(transformListRadioButtonGroup.value);
-                transformListRadioButtonGroup.value -= 1;
+                transformMono.transformListContainer.RemoveAt(radioButtonGroup.value);
+                radioButtonGroup.value -= 1;
             };
             
-            Action debugAction = () =>
+            Action dropdownFieldAction = () =>
             {
+                var dropdownFieldOptions = new List<String>
+                {
+                    "Copy List",
+                    "Delete List",
+                    "Reset Transforms"
+                };
+
+                dropdownField.choices = dropdownFieldOptions;
+                dropdownField.value = null;
             };
             #endregion
 
             #region Callback Events
             slider.RegisterValueChangedCallback(evt => // Changes in Slider position
             {
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 if(activeTransformList[evt.newValue].transformType != TransformMonobehaviour.TransformTypes.Absolute)
                 {
@@ -322,24 +343,46 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 }
             });
             
-            transformListRadioButtonGroup.RegisterValueChangedCallback(evt => // Changes of the RadioButtonGroup for selecting different transform LoLs
+            radioButtonGroup.RegisterValueChangedCallback(evt => // Changes of the RadioButtonGroup for selecting different transform LoLs
             {
                 if (evt.newValue == -1)
                 {
-                    transformListRadioButtonGroup.value = evt.previousValue;    
+                    radioButtonGroup.value = evt.previousValue;    
                 }
                 
                 updateTransformListAction();
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
                 TransformGoOperations.ApplyTransformToGo(transformMono, transformList[0], transformList[1], transformList[2]);
                 
+                uxmlFoldout.text = transformMono.transformListContainer[radioButtonGroup.value].transformListName;
                 slider.highValue = activeTransformList.Count - 1;
                 slider.value = activeTransformList.Count - 1;
                 
                 transformMono.activeRadioButton = evt.newValue;
                 transformMono.selectedTransformListIndex.Clear();
+            });
+
+            dropdownField.RegisterValueChangedCallback(evt =>
+            {
+                switch (evt.newValue)
+                {
+                    case "Copy List":
+                        copyTransformListButtonAction();
+                        updateRadioButtonDisplay();
+                        break;
+                    case "Delete List":
+                        deleteListAction();
+                        updateRadioButtonDisplay();  
+                        updateTransformListAction();
+                        break;
+                    case "Reset Transforms":
+                        resetAllTransformsAction();
+                        updateTransformListAction();
+                        break;
+                }
+                dropdownField.value = null;
             });
 
             translationInput.RegisterValueChangedCallback(evt =>
@@ -349,7 +392,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     return;
                 }
                 
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 if (activeTransformList.Count == 0)
                 {
@@ -369,7 +412,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     return;
                 }
                 
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 if (activeTransformList.Count == 0)
                 {
@@ -388,7 +431,7 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     return;
                 }
                 
-                var activeTransformList = transformMono.transformListContainer[transformListRadioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 if (activeTransformList.Count == 0)
                 {
@@ -408,33 +451,22 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             
             resetButton.clicked += resetInputAction;
 
-            copyTransformListButton.clicked += copyTransformListButtonAction;
-            copyTransformListButton.clicked += updateRadioButtonDisplay;
-            
             createNewEmptyListButton.clicked += createNewEmptyListButtonAction;
             createNewEmptyListButton.clicked += updateRadioButtonDisplay;
             
             setAbsoluteTransformButton.clicked += saveAbsoluteTransformAction;
             setAbsoluteTransformButton.clicked += updateTransformListAction;
-            
-            resetAllTransformsButton.clicked += resetAllTransformsAction;
-            resetAllTransformsButton.clicked += updateTransformListAction;
-            
-            deleteListButton.clicked += deleteListAction;
-            deleteListButton.clicked += updateRadioButtonDisplay;  
-            deleteListButton.clicked += updateTransformListAction;
-            
+
             deleteTransformButton.clicked += deleteTransformAction;
             deleteTransformButton.clicked += updateTransformListAction;
-
-            debugButton.clicked += debugAction;
             #endregion
             
             resetInputAction();
             updateTransformListAction();
+            dropdownFieldAction();
             
             updateRadioButtonDisplay();
-            transformListRadioButtonGroup.value = 0;
+            radioButtonGroup.value = 0;
             return root;
         }
     }
