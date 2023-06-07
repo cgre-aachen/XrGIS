@@ -31,66 +31,80 @@ namespace NurGIS.Runtime.GUI
         public TransformHistoryControl()
         {
             AddToClassList("radial-group");
-            var scrollView = new ScrollView
+
+            // * Set up scrollView
+            ScrollView scrollView;
             {
-                style =
+                scrollView = new ScrollView
                 {
-                    height = 200
-                }
-            };
-            scrollView.horizontalScrollerVisibility = ScrollerVisibility.Hidden;
+                    style =
+                    {
+                        height = 200
+                    },
+                    horizontalScrollerVisibility = ScrollerVisibility.Hidden
+                };
+
+                Add(scrollView);
+            }
+
+            // * Header
+            VisualElement header;
+            {
+                header = new VisualElement
+                {
+                    style =
+                    {
+                        flexDirection = FlexDirection.Row
+                    }
+                };
+
+                // in petrol
+                var label = new Label("<color=#00FFFF>Transform history</color>")
+                {
+                    style =
+                    {
+                        flexGrow = 1
+                    }
+                };
+                header.Add(label);
+
+                var addButton = new Button()
+                {
+                    text = "+",
+                    style =
+                    {
+                        right    = 0,
+                        position = Position.Absolute
+                    },
+                };
+
+                var renameButton = new Button()
+                {
+                    text = "Rename",
+                    style =
+                    {
+                        right    = 0,
+                        position = Position.Absolute
+                    },
+                };
+
+                addButton.clicked    += () => { AddGroup($"New group  {_groups.Count}"); };
+                renameButton.clicked += RenameRadioButton;
+
+                header.Add(addButton);
+            }
+
+            // * RadialGroup
+            {
+                _radialGroup = new RadioButtonGroup
+                {
+                    choices = _groups
+                };
+                CreateAndRegisterCallbackAddTransform(_radialGroup);
+            } 
             
-
-            Add(scrollView);
-            var header = new VisualElement
-            {
-                style =
-                {
-                    flexDirection = FlexDirection.Row
-                }
-            };
-            scrollView.Add(header);
-
-            // in petrol
-            var label = new Label("<color=#00FFFF>Transform history</color>")
-            {
-                style =
-                {
-                    flexGrow = 1
-                }
-            };
-            header.Add(label);
-
-            var addButton = new Button()
-            {
-                text = "+",
-                style =
-                {
-                    right    = 0,
-                    position = Position.Absolute
-                },
-            };
-
-            var renameButton = new Button()
-            {
-                text = "Rename",
-                style =
-                {
-                    right    = 0,
-                    position = Position.Absolute
-                },
-            };
-            
-            addButton.clicked    += () => { AddGroup($"New group  { _groups.Count }"); };
-            renameButton.clicked += () => { RenameRadioButton(); };
-
-            header.Add(addButton);
-            // header.Add(renameButton);
-
-            _radialGroup = new RadioButtonGroup();
             scrollView.Add(_radialGroup);
-            _radialGroup.choices = _groups;
-            CreateAndRegisterCallbackAddTransform(_radialGroup);
+            scrollView.Add(header);
         }
 
 
@@ -109,7 +123,15 @@ namespace NurGIS.Runtime.GUI
                     },
                 };
 
-                addTransformButton.clicked += () => { AddTransform(radioButton);};
+                Foldout foldout = radioButton.Q<Foldout>("transforms foldout") ?? new Foldout
+                {
+                    name = "transforms foldout",
+                    text = "Foldout"
+                };
+
+                addTransformButton.clicked += () => { AddTransform(foldout); };
+
+                radioButton.Add(foldout);
                 radioButton.Children().First().Add(addTransformButton);
             });
         }
@@ -117,21 +139,20 @@ namespace NurGIS.Runtime.GUI
         private void AddGroup(string groupName)
         {
             _groups.Add(groupName);
-
             _radialGroup.choices = _groups;
             CreateAndRegisterCallbackAddTransform(_radialGroup);
         }
 
-        private void AddTransform(RadioButton radioButton)
+        private void AddTransform(Foldout radioButtonFoldout)
         {
             // TODO: These transforms should be stored somewhere? 
-            var transformName = $"Transform: {radioButton.label} - {radioButton.label}"; 
-            radioButton.Add(new TransformControl(radioButton.label));
+            var transformName = $"Transform:"; //{radioButton.label} - {radioButton.label}"; 
+            radioButtonFoldout.Add(new TransformControl(transformName));
         }
-        
+
         private void RenameRadioButton()
         {
-           throw new System.NotImplementedException();
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,13 +10,6 @@ namespace NurGIS.Runtime.GUI
     public class TransformControl : VisualElement
     {
         private Foldout _foldout;
-
-        internal enum TranformGroup
-        {
-            Position,
-            Rotation,
-            Scale
-        }
 
         [UnityEngine.Scripting.Preserve]
         public new class UxmlFactory : UxmlFactory<TransformControl, UxmlTraits>
@@ -35,67 +29,52 @@ namespace NurGIS.Runtime.GUI
                 var item = ve as TransformControl;
             }
         }
-
-        /*
-        <ui:Vector3Field label="Translation" name="translationInput" binding-path="positionInput" style="background-color: rgba(56, 56, 56, 0);" />
-        <ui:Vector3Field label="Rotation" name="rotationInput" binding-path="rotationInput" />
-        <ui:Vector3Field label="Scale" name="scaleInput" x="1" y="1" z="1" binding-path="scaleInput" />
-        */
         public override VisualElement contentContainer { get; }
 
-        public TransformControl(string name): this()
+        public TransformControl(string name) : this()
         {
-           _foldout.name = name; 
+            _foldout.text = name;
         }
+
         public TransformControl()
-        
         {
-            // style.flexDirection = FlexDirection.Row;
-            // var rowContainer = new VisualElement
-            // {
-            //     name = "rowContainer"
-            // };
-            //
-            // hierarchy.Add(rowContainer);
-            _foldout = new Foldout
+            // * Foldout
             {
-                text = "Transform"
-            };
-            hierarchy.Add(_foldout);
-
-            // var buttonsContainer = new VisualElement
-            // {
-            //     name = "buttonsContainer"
-            // };
-            //
-            // rowContainer.Add(buttonsContainer);
-
-            var position = new Vector3Field
-            {
-                label = "Position",
-                name  = "positionInput",
-                style =
+                _foldout = new Foldout
                 {
-                    backgroundColor = new Color(56, 56, 56, 0)
-                }
-            };
-            _foldout.Add(position);
+                    text = "Transform"
+                };
+                hierarchy.Add(_foldout);
+            }
 
-            var rotation = new Vector3Field
+            // * Vector3Fields
             {
-                label = "Rotation",
-                name  = "rotationInput"
-            };
-            _foldout.Add(rotation);
+                var position = new Vector3Field
+                {
+                    label = "Position",
+                    name  = "positionInput",
+                    style =
+                    {
+                        backgroundColor = new Color(56, 56, 56, 0)
+                    }
+                };
+                _foldout.Add(position);
 
-            var scale = new Vector3Field
-            {
-                label = "Scale",
-                name  = "scaleInput",
-                value = new Vector3(1, 1, 1)
-            };
+                var rotation = new Vector3Field
+                {
+                    label = "Rotation",
+                    name  = "rotationInput"
+                };
+                _foldout.Add(rotation);
 
-            _foldout.Add(scale);
+                var scale = new Vector3Field
+                {
+                    label = "Scale",
+                    name  = "scaleInput",
+                    value = new Vector3(1, 1, 1)
+                };
+                _foldout.Add(scale);
+            }
 
             var appliedToVertexCheckbox = new Toggle
             {
@@ -104,17 +83,34 @@ namespace NurGIS.Runtime.GUI
             };
             _foldout.Add(appliedToVertexCheckbox);
 
-            var addTransformButton = new Button
+            // * Transform buttons
             {
-                text = "Abs",
-                style =
+                var addTransformButton = new Button
                 {
-                    right = 0,
-                    position = Position.Absolute
-                }
-            };
-            var toggleRow = _foldout.Q<Toggle>().Children().First();
-            toggleRow.Add(addTransformButton);
+                    text = "Abs",
+                    style =
+                    {
+                        right    = 0,
+                        position = Position.Absolute
+                    }
+                };
+            
+                var isActiveCheckbox = new Toggle()
+                {
+                    text = "Active",
+                    style =
+                    {
+                        right    = 20,
+                        position = Position.Absolute
+                    },
+                };
+                isActiveCheckbox.RegisterCallback((ChangeEvent<bool> evt) => { throw new NotImplementedException(); });
+
+            
+                var toggleRow = _foldout.Q<Toggle>().Children().First();
+                toggleRow.Add(addTransformButton);
+                toggleRow.Add(isActiveCheckbox);
+            }
         }
     }
 }
