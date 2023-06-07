@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NurGIS.Runtime.GUI;
 using UnityEngine.UIElements;
 
-namespace NurGIS.Runtime.GUI
+namespace NurGIS.Runtime.TransformHistory.GUI
 {
     public class TransformHistoryControl : VisualElement
     {

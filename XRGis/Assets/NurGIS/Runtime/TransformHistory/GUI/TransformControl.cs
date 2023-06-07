@@ -3,7 +3,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-
 // ReSharper disable once CheckNamespace
 namespace NurGIS.Runtime.GUI
 {
