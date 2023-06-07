@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,6 +23,7 @@ namespace NurGIS.Runtime.TransformHistory
             MultipleTransforms
         }     
         
+        [Serializable]
         public class CustomTransform
         {
             public Vector3 position;
@@ -47,7 +49,7 @@ namespace NurGIS.Runtime.TransformHistory
                 return clone;
             }
         }
-        
+        [Serializable]
         public class CustomTransformContainer
         {
             public List<CustomTransform> singleTransformList;
