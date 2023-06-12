@@ -1,52 +1,28 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-// ReSharper disable once CheckNamespace
-namespace NurGIS.Runtime.GUI
+namespace NurGIS.Runtime.TransformHistory.GUI
 {
-    public class TransformControl : VisualElement
+    public class SingleTransform : VisualElement
     {
-        private Foldout _foldout;
-
-        [UnityEngine.Scripting.Preserve]
-        public new class UxmlFactory : UxmlFactory<TransformControl, UxmlTraits>
+        private readonly Foldout m_foldout;
+        
+        public SingleTransform(string name) : this()
         {
+            m_foldout.text = name;
         }
 
-        [UnityEngine.Scripting.Preserve]
-        public new class UxmlTraits : VisualElement.UxmlTraits
+        private SingleTransform()
         {
-            private readonly UxmlStringAttributeDescription iconAddress = new UxmlStringAttributeDescription()
-                { name = "IconAddress", defaultValue = "" };
-
-
-            public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
             {
-                base.Init(ve, bag, cc);
-                var item = ve as TransformControl;
-            }
-        }
-        public override VisualElement contentContainer { get; }
-
-        public TransformControl(string name) : this()
-        {
-            _foldout.text = name;
-        }
-
-        public TransformControl()
-        {
-            // * Foldout
-            {
-                _foldout = new Foldout
+                m_foldout = new Foldout
                 {
                     text = "Transform"
                 };
-                hierarchy.Add(_foldout);
+                hierarchy.Add(m_foldout);
             }
-
-            // * Vector3Fields
+            
             {
                 var position = new Vector3Field
                 {
@@ -57,14 +33,14 @@ namespace NurGIS.Runtime.GUI
                         backgroundColor = new Color(56, 56, 56, 0)
                     }
                 };
-                _foldout.Add(position);
+                m_foldout.Add(position);
 
                 var rotation = new Vector3Field
                 {
                     label = "Rotation",
                     name  = "rotationInput"
                 };
-                _foldout.Add(rotation);
+                m_foldout.Add(rotation);
 
                 var scale = new Vector3Field
                 {
@@ -72,7 +48,7 @@ namespace NurGIS.Runtime.GUI
                     name  = "scaleInput",
                     value = new Vector3(1, 1, 1)
                 };
-                _foldout.Add(scale);
+                m_foldout.Add(scale);
             }
 
             var appliedToVertexCheckbox = new Toggle
@@ -80,9 +56,8 @@ namespace NurGIS.Runtime.GUI
                 label = "Applied to vertex",
                 name  = "appliedToVertexCheckbox"
             };
-            _foldout.Add(appliedToVertexCheckbox);
-
-            // * Transform buttons
+            m_foldout.Add(appliedToVertexCheckbox);
+            
             {
                 var addTransformButton = new Button
                 {
@@ -103,10 +78,8 @@ namespace NurGIS.Runtime.GUI
                         position = Position.Absolute
                     },
                 };
-                isActiveCheckbox.RegisterCallback((ChangeEvent<bool> evt) => { throw new NotImplementedException(); });
-
-            
-                var toggleRow = _foldout.Q<Toggle>().Children().First();
+                
+                var toggleRow = m_foldout.Q<Toggle>().Children().First();
                 toggleRow.Add(addTransformButton);
                 toggleRow.Add(isActiveCheckbox);
             }
