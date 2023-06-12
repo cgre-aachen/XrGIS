@@ -28,10 +28,6 @@ namespace NurGIS.Runtime.TransformHistory.GUI
                 {
                     label = "Position",
                     name  = "positionInput",
-                    style =
-                    {
-                        backgroundColor = new Color(56, 56, 56, 0)
-                    }
                 };
                 m_foldout.Add(position);
 
@@ -53,8 +49,8 @@ namespace NurGIS.Runtime.TransformHistory.GUI
 
             var appliedToVertexCheckbox = new Toggle
             {
-                label = "Applied to vertex",
-                name  = "appliedToVertexCheckbox"
+                label = "Applied To Vertices",
+                name  = "appliedToVerticesCheckbox"
             };
             m_foldout.Add(appliedToVertexCheckbox);
             
