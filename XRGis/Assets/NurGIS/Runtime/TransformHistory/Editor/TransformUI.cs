@@ -16,33 +16,31 @@ namespace NurGIS.Runtime.TransformHistory.Editor
         {
             #region Properties
             var root = new VisualElement();
-            TransformMonobehaviour transformMono = (TransformMonobehaviour)target;
+            var transformMono = (TransformMonobehaviour)target;
             mUxml.CloneTree(root);
             
-            var saveTransformButton = root.Q<Button>("applyTransformButton");
-            var deleteTransformButton = root.Q<Button>("deleteTransformButton");
-            var resetButton = root.Q<Button>("resetInputButton");
-            var setAbsoluteTransformButton = root.Q<Button>("saveAbsolutePositionButton");
-            var resetAllTransformsButton = root.Q<Button>("resetTransformButton");
+            var radioButtonGroup = root.Q<RadioButtonGroup>("transformListSelection"); // The radiobutton group that is used to select the transform list
+            radioButtonGroup.value = 0;
 
+            var createNewEmptyListButton = root.Q<Button>("createNewEmptyList");
+            
+            var uxmlFoldout = root.Q<Foldout>("transformListFoldout");
+            var dropdownField = root.Q<DropdownField>("dropdownField"); // The dropdown field that is used to select functionality for the transform lists
+            
+            var slider = root.Q<SliderInt>("slider");
+            slider.lowValue = 0;
+            
             var translationInput = root.Q<Vector3Field>("translationInput");
             var rotationInput = root.Q<Vector3Field>("rotationInput");
             var scaleInput = root.Q<Vector3Field>("scaleInput");
-            var dropdownField = root.Q<DropdownField>("dropdownField");
-            
-            var radioButtonGroup = root.Q<RadioButtonGroup>("transformListSelection");
-            radioButtonGroup.value = 0;
-            
-            var copyTransformListButton = root.Q<Button>("copyTransformList");
-            var createNewEmptyListButton = root.Q<Button>("createNewEmptyList");
-            var deleteListButton = root.Q<Button>("deleteListButton");
-            
             translationInput.value = Vector3.zero;
             rotationInput.value = Vector3.zero;
             scaleInput.value = Vector3.one;
-
-            var slider = root.Q<SliderInt>("slider");
-            slider.lowValue = 0;
+            
+            var saveTransformButton = root.Q<Button>("applyTransformButton");
+            var resetButton = root.Q<Button>("resetInputButton");
+            var setAbsoluteTransformButton = root.Q<Button>("saveAbsolutePositionButton");
+            var deleteTransformButton = root.Q<Button>("deleteTransformButton");
 
             var listRoot = new VisualElement();
 
@@ -61,8 +59,6 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     slider.value = 0;
                 }
             }
-            
-            var uxmlFoldout = root.Q<Foldout>("transformListFoldout");
             #endregion
             
             #region Actions
@@ -446,13 +442,13 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             #endregion
             
             #region Button Actions
+            createNewEmptyListButton.clicked += createNewEmptyListButtonAction;
+            createNewEmptyListButton.clicked += updateRadioButtonDisplay;
+            
             saveTransformButton.clicked += saveTransformAction;
             saveTransformButton.clicked += updateTransformListAction;
             
             resetButton.clicked += resetInputAction;
-
-            createNewEmptyListButton.clicked += createNewEmptyListButtonAction;
-            createNewEmptyListButton.clicked += updateRadioButtonDisplay;
             
             setAbsoluteTransformButton.clicked += saveAbsoluteTransformAction;
             setAbsoluteTransformButton.clicked += updateTransformListAction;
