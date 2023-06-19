@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿# if false
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace NurGIS.Runtime.TransformHistory
@@ -53,16 +54,16 @@ namespace NurGIS.Runtime.TransformHistory
             return list;
         }
         
-        public static void ApplyTransformToVertices(GameObject gameObject, Vector3 translation, Vector3 rotation, Vector3 scale)
+        public static void ApplyTransformToVertices(TransformMonobehaviour mono, Vector3 translation, Vector3 rotation, Vector3 scale)
         {
-            var mesh = gameObject.GetComponent<MeshFilter>().mesh;
+            var mesh = mono.GetComponent<MeshFilter>().mesh;
             Vector3[] vertices = mesh.vertices;
             Matrix4x4 matrix = Matrix4x4.TRS(translation, Quaternion.Euler(rotation), scale);
             for (var i = 0; i < vertices.Length; i++)
             {
                 vertices[i] = matrix.MultiplyPoint3x4(vertices[i]);
             }
-            gameObject.transform.hasChanged = false;
+            mono.transform.hasChanged = false;
         }
         
                 public static int FindLastAbsoluteTransformIndex(int startIndex, bool onlyActiveTransforms, List<TransformMonobehaviour.CustomTransform> activeTransformListInput)
@@ -114,19 +115,20 @@ namespace NurGIS.Runtime.TransformHistory
             return nextIndex;
         }
         
-        public static void GetRelativeTransform(GameObject go, int selectedRadioButton) // Calculate the rel. transform, triggered by transform.hasChanged
+        public static void GetRelativeTransform(TransformMonobehaviour mono, int selectedRadioButton) // Calculate the rel. transform, triggered by transform.hasChanged
         {
             if (selectedRadioButton == -1)
             {
                 return;
             }
             
+            var go = mono.gameObject;
             var transform1 = go.transform;
             var newPositionVector3 = transform1.localPosition;
             var newRotationVector3 = transform1.localRotation.eulerAngles;
             var newScaleVector3 = transform1.localScale;
             
-            List<TransformMonobehaviour.CustomTransform> activeTransformList = TransformMonobehaviour.TransformListContainer[selectedRadioButton].singleTransformList;
+            List<TransformMonobehaviour.CustomTransform> activeTransformList = mono.transformListContainer[selectedRadioButton].singleTransformList;
             
             var lastPositionVector3 = activeTransformList[^1].position;
             var lastRotationVector3 = activeTransformList[^1].rotation;
@@ -147,9 +149,10 @@ namespace NurGIS.Runtime.TransformHistory
                 relativeScaleVector3 = Vector3.one;
             }
             
-            TransformMonobehaviour.positionInput = relativePositionVector3;
-            TransformMonobehaviour.rotationInput = relativeRotationVector3;
-            TransformMonobehaviour.scaleInput = relativeScaleVector3;
+            mono.positionInput = relativePositionVector3;
+            mono.rotationInput = relativeRotationVector3;
+            mono.scaleInput = relativeScaleVector3;
         }
     }
 }
+#endif

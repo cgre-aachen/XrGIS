@@ -4,37 +4,33 @@ namespace NurGIS.Runtime.TransformHistory
 {
     public static class TransformGoOperations
     {
-        public static void ApplyTransformToGo(TransformMonobehaviour mono, Vector3 translation, Vector3 rotation, Vector3 scale) // combine to a single method
+        public static void ApplyTransformToGo(GameObject go, Vector3 translation, Vector3 rotation, Vector3 scale) // combine to a single method
         {
-            var gameObject = mono.gameObject;
-            gameObject.transform.localPosition = translation;
-            gameObject.transform.localRotation = Quaternion.Euler(rotation);
-            gameObject.transform.localScale = scale;
-            gameObject.transform.hasChanged = false;
+            go.transform.localPosition = translation;
+            go.transform.localRotation = Quaternion.Euler(rotation);
+            go.transform.localScale = scale;
+            go.transform.hasChanged = false;
         }
         
-        public static void UpdateGameObjectTranslation(TransformMonobehaviour mono, Vector3 translation, Vector3 lastTranslation)
+        public static void UpdateGameObjectTranslation(GameObject go, Vector3 translation, Vector3 lastTranslation)
         {
-            var gameObject = mono.gameObject;
             lastTranslation += translation;
-            gameObject.transform.localPosition = lastTranslation;
-            mono.transform.hasChanged = false;
+            go.transform.localPosition = lastTranslation;
+            go.transform.hasChanged = false;
         } 
         
-        public static void UpdateGameObjectRotation(TransformMonobehaviour mono, Vector3 rotation, Vector3 lastRotation)
+        public static void UpdateGameObjectRotation(GameObject go, Vector3 rotation, Vector3 lastRotation)
         {
-            var gameObject = mono.gameObject;
             lastRotation += rotation; 
-            gameObject.transform.localRotation = Quaternion.Euler(lastRotation);
-            mono.transform.hasChanged = false;
+            go.transform.localRotation = Quaternion.Euler(lastRotation);
+            go.transform.hasChanged = false;
         }
         
-        public static void UpdateGameObjectScale(TransformMonobehaviour mono, Vector3 scale, Vector3 lastScale)
+        public static void UpdateGameObjectScale(GameObject go, Vector3 scale, Vector3 lastScale)
         {
-            var gameObject = mono.gameObject;
             lastScale = Vector3.Scale(lastScale, scale);
-            gameObject.transform.localScale = lastScale;
-            mono.transform.hasChanged = false;
+            go.transform.localScale = lastScale;
+            go.transform.hasChanged = false;
         }
     }
 }

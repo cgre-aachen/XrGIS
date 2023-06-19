@@ -1,6 +1,6 @@
+#if false
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace NurGIS.Runtime.TransformHistory
@@ -13,7 +13,7 @@ namespace NurGIS.Runtime.TransformHistory
             Absolute,
             Relative
         }
-        
+
         public enum TransformSpecifier
         {
             Translation,
@@ -50,7 +50,6 @@ namespace NurGIS.Runtime.TransformHistory
                 return clone;
             }
         }
-        
         [Serializable]
         public class CustomTransformContainer
         {
@@ -58,16 +57,16 @@ namespace NurGIS.Runtime.TransformHistory
             public string transformListName;
         }
         
-        public static List<CustomTransformContainer> TransformListContainer = new();
+        public readonly List<CustomTransformContainer> transformListContainer = new();
         
-        public static bool noEntry;
-        public static bool applyToVertices;
-        public static int activeRadioButton;
-        public static List<int> selectedTransformListIndex = new List<int>();
-        
-        public static Vector3 positionInput = Vector3.zero;
-        public static Vector3 scaleInput = Vector3.one;
-        public static Vector3 rotationInput = Vector3.zero;
+        public bool noEntry;
+        public bool applyToVertices;
+        public int activeRadioButton;
+        public List<int> selectedTransformListIndex = new List<int>();
+
+        public Vector3 positionInput = Vector3.zero;
+        public Vector3 scaleInput = Vector3.one;
+        public Vector3 rotationInput = Vector3.zero;
         private Vector3 RotationInput // set to round to nearest 0.2 in GUI
         {
             set
@@ -82,14 +81,15 @@ namespace NurGIS.Runtime.TransformHistory
         
         private void Awake() // Initial state is in awake so that the GUI reflects it (Start is too late) 
         {
-            TransformGuiMethods.SaveStartPosition(gameObject);
+            TransformGuiMethods.CreateNewTransformListEntry(this, true);
         }
     
         private void Update()
         {
             if (!transform.hasChanged) return;
-            TransformCalculation.GetRelativeTransform(gameObject, activeRadioButton);
+            TransformCalculation.GetRelativeTransform(this, activeRadioButton);
             transform.hasChanged = false;
         }
     }
 }
+#endif

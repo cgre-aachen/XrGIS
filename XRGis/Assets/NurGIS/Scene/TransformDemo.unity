@@ -572,10 +572,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33d1eae986489fd48bf2de80917de802, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noEntry: 0
-  applyToVertices: 0
-  activeRadioButton: 0
-  selectedTransformListIndex: 
-  positionInput: {x: 2, y: 0, z: 0}
-  scaleInput: {x: 1, y: 1, z: 1}
-  rotationInput: {x: 0, y: 0, z: 0}

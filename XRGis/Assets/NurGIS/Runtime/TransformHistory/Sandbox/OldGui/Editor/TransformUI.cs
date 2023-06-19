@@ -1,12 +1,12 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Color = UnityEngine.Color;
 
-namespace NurGIS.Runtime.TransformHistory.Editor
+namespace NurGIS.Runtime.TransformHistory.Sandbox.OldGui.Editor
 {
     #if true
     [CustomEditor(typeof(TransformMonobehaviour))]
@@ -18,10 +18,9 @@ namespace NurGIS.Runtime.TransformHistory.Editor
         {
             #region Properties
             var root = new VisualElement();
+            var transformMono = (TransformMonobehaviour)target;
             mUxml.CloneTree(root);
             
-            // reference the game object of the selected object
-            var selectedGameObject = target.GameObject();
             var radioButtonGroup = root.Q<RadioButtonGroup>("transformListSelection"); // The radiobutton group that is used to select the transform list
             radioButtonGroup.value = 0;
 
@@ -47,9 +46,9 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
             var listRoot = new VisualElement();
 
-            if (TransformMonobehaviour.TransformListContainer.Count > 0) // Sets values for the slider and the radiobutton group whenever the GUI is loaded
+            if (transformMono.transformListContainer.Count > 0) // Sets values for the slider and the radiobutton group whenever the GUI is loaded
             {
-                var activeDefaultTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                var activeDefaultTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
             
                 if (activeDefaultTransformList.Count > 0)
                 {
@@ -62,154 +61,166 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     slider.value = 0;
                 }
             }
-            
             #endregion
             
             #region Actions
-
-            void SaveTransformAction()
+            Action saveTransformAction = () =>
             {
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
-
-                TransformGuiMethods.SaveRelativeTransformFromGui(translationInput.value, rotationInput.value, scaleInput.value, activeTransformList);
-                if (TransformMonobehaviour.noEntry) return;
-                var lastActiveTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms: true, activeTransformList);
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
+                
+                TransformGuiMethods.SaveRelativeTransformFromGui(transformMono, translationInput.value, rotationInput.value, scaleInput.value, activeTransformList);
+                if (transformMono.noEntry) return;
+                var lastActiveTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastActiveTransform, activeTransformList.Count - 1, activeTransformList);
 
-                switch (TransformMonobehaviour.applyToVertices)
+                switch (transformMono.applyToVertices)
                 {
                     case true:
-                        TransformCalculation.ApplyTransformToVertices(selectedGameObject, transformList[0], transformList[1], transformList[2]);
+                        TransformCalculation.ApplyTransformToVertices(transformMono, transformList[0], transformList[1], transformList[2]);
                         break;
                     case false:
-                        TransformGoOperations.ApplyTransformToGo(selectedGameObject, transformList[0], transformList[1], transformList[2]);
+                        TransformGoOperations.ApplyTransformToGo(transformMono, transformList[0], transformList[1], transformList[2]);
                         break;
                 }
-
+                    
                 slider.highValue = activeTransformList.Count - 1;
                 slider.value = activeTransformList.Count - 1;
-
+                    
                 translationInput.value = Vector3.zero;
                 rotationInput.value = Vector3.zero;
                 scaleInput.value = Vector3.one;
-
-                TransformMonobehaviour.positionInput = Vector3.zero;
-                TransformMonobehaviour.rotationInput = Vector3.zero;
-                TransformMonobehaviour.scaleInput = Vector3.one;
-            }
-
-            void ResetInputAction()
+                    
+                transformMono.positionInput = Vector3.zero;
+                transformMono.rotationInput = Vector3.zero;
+                transformMono.scaleInput = Vector3.one;
+            };
+            
+            Action resetInputAction = () =>
             {
                 translationInput.value = Vector3.zero;
                 rotationInput.value = Vector3.zero;
                 scaleInput.value = Vector3.one;
-            }
-
-            void SaveAbsoluteTransformAction()
+            };
+            
+            Action copyTransformListButtonAction = () =>
             {
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
-                var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms: true, activeTransformList);
+                var selectedTransformListIndex = radioButtonGroup.value;
+                TransformGuiMethods.CopyTransformListEntry(transformMono, selectedTransformListIndex);
+            };
+            
+            Action createNewEmptyListButtonAction = () =>
+            {
+                TransformGuiMethods.CreateNewTransformListEntry(transformMono, false);
+            };
+            
+            Action saveAbsoluteTransformAction = () =>
+            {
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
+                var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
-                TransformGuiMethods.SaveAbsoluteTransform(transformList[0], transformList[1], transformList[2], activeTransformList);
+                TransformGuiMethods.SaveAbsoluteTransform(transformMono, transformList[0], transformList[1], transformList[2], activeTransformList);
                 TransformGuiMethods.DeactivateTransforms(lastAbsoluteTransform, activeTransformList);
                 slider.highValue = activeTransformList.Count - 1;
                 slider.value = activeTransformList.Count - 1;
-            }
-
-            void ResetAllTransformsAction()
+            };
+            
+            Action resetAllTransformsAction = () =>
             {
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 activeTransformList.RemoveRange(1, activeTransformList.Count - 1);
                 activeTransformList[0].isActive = true;
-
-                var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms: true, activeTransformList);
+                
+                var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
-                TransformGoOperations.ApplyTransformToGo(selectedGameObject, transformList[0], transformList[1], transformList[2]);
+                TransformGoOperations.ApplyTransformToGo(transformMono, transformList[0], transformList[1], transformList[2]);
+                
+                slider.highValue = activeTransformList.Count -1;
+                slider.value = activeTransformList.Count -1;
+            };
 
-                slider.highValue = activeTransformList.Count - 1;
-                slider.value = activeTransformList.Count - 1;
-            }
-
-            void UpdateRadioButtonDisplay()
+            Action updateRadioButtonDisplay = () =>
             {
                 var transformListNames = new List<string>(); // Iterate over helper all entries in the transform list container and create a new radio button for each entry
-
-                foreach (TransformMonobehaviour.CustomTransformContainer transformList in TransformMonobehaviour.TransformListContainer)
+                
+                foreach (TransformMonobehaviour.CustomTransformContainer transformList in transformMono.transformListContainer)
                 {
-                    transformListNames.Add(transformList.transformListName);
+                    transformListNames.Add(transformList.transformListName); 
                 }
-
                 radioButtonGroup.choices = transformListNames;
-
+                
                 if (radioButtonGroup.value == -1)
                 {
                     uxmlFoldout.text = "No Transform List Selected";
                     return;
                 }
-
                 if (transformListNames.Count == 0)
                 {
                     uxmlFoldout.text = "No Transform List Selected";
                     return;
                 }
-
-                uxmlFoldout.text = transformListNames[radioButtonGroup.value];
-            }
-
-            void UpdateTransformListAction()
+                uxmlFoldout.text = transformListNames[radioButtonGroup.value]; 
+            };
+            
+            Action updateTransformListAction = () =>
             {
-                if (TransformMonobehaviour.noEntry || radioButtonGroup.value == -1 || TransformMonobehaviour.TransformListContainer.Count == 0)
+                if (transformMono.noEntry || radioButtonGroup.value == -1 || transformMono.transformListContainer.Count == 0)
                 {
                     return;
                 }
-
+                
                 listRoot.Clear();
                 uxmlFoldout.Add(listRoot);
 
                 var transformContentPanelContainer = new VisualElement();
-
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 for (var i = 0; i < activeTransformList.Count; i++)
                 {
                     var selectedTransform = activeTransformList[i];
                     var index = i;
-
-                    var listEntry = new VisualElement { style = { flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row), backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray) } }; // Create a new list entry
-
+                    
+                    var listEntry = new VisualElement
+                    {
+                        style =
+                        {
+                            flexDirection = new StyleEnum<FlexDirection>(FlexDirection.Row),
+                            backgroundColor = i % 2 == 0 ? new StyleColor(Color.clear) : new StyleColor(Color.gray)
+                        }
+                    }; // Create a new list entry
+                    
                     listEntry.RegisterCallback<MouseDownEvent>(evt =>
                     {
                         switch (evt.button)
                         {
                             case 0: // Left click on list, highlights the entry and sets the active index
-                                TransformMonobehaviour.selectedTransformListIndex.Clear();
-                                TransformMonobehaviour.selectedTransformListIndex.Add(index);
-                                TransformGuiMethods.HighlightListEntry(TransformMonobehaviour.selectedTransformListIndex, listRoot);
-                                var singleTransform = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList[index];
+                                transformMono.selectedTransformListIndex.Clear();
+                                transformMono.selectedTransformListIndex.Add(index);
+                                TransformGuiMethods.HighlightListEntry(transformMono.selectedTransformListIndex, listRoot);
+                                var singleTransform = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList[index];
                                 TransformGuiMethods.CreatePopUp(transformContentPanelContainer, singleTransform.position, singleTransform.rotation, singleTransform.scale);
                                 break;
-
+                            
                             case 1: // Right click, highlights multiple entries and adds entries
-                                if (!TransformMonobehaviour.selectedTransformListIndex.Contains(index))
+                                if (!transformMono.selectedTransformListIndex.Contains(index))
                                 {
-                                    TransformMonobehaviour.selectedTransformListIndex.Add(index);
-                                    TransformMonobehaviour.selectedTransformListIndex.Sort();
+                                    transformMono.selectedTransformListIndex.Add(index);
+                                    transformMono.selectedTransformListIndex.Sort();
                                 }
-
-                                TransformGuiMethods.HighlightListEntry(TransformMonobehaviour.selectedTransformListIndex, listRoot);
+                                TransformGuiMethods.HighlightListEntry(transformMono.selectedTransformListIndex, listRoot);
                                 break;
                         }
                     });
-
+                    
                     var textField = new TextField // Add a label for the transform name
                     {
                         value = selectedTransform.transformName
-                    };
+                    };    
 
                     textField.RegisterValueChangedCallback(evt => // Callback logic when a label is changed
                     {
                         selectedTransform.transformName = evt.newValue;
                     });
-
+                    
                     var indexLabel = new Label("#" + i); // Add a readonly integer next to the label
                     var toggle = new Toggle(); // Add a toggle next to the label
                     {
@@ -217,107 +228,116 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                         toggle.RegisterValueChangedCallback(evt => // Callback logic when a toggle is selected
                         {
                             selectedTransform.isActive = evt.newValue;
-                            var nextAbsoluteTransform = TransformCalculation.FindNextAbsoluteTransformIndex(index, onlyActiveTransforms: true, activeTransformList);
-                            var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(index, onlyActiveTransforms: true, activeTransformList);
-
-                            if (lastAbsoluteTransform == 0 && index < nextAbsoluteTransform && selectedTransform.transformType != TransformMonobehaviour.TransformTypes.Absolute && activeTransformList[nextAbsoluteTransform].transformType == TransformMonobehaviour.TransformTypes.Absolute && activeTransformList[nextAbsoluteTransform].isActive)
+                            var nextAbsoluteTransform = TransformCalculation.FindNextAbsoluteTransformIndex(index, onlyActiveTransforms:true, activeTransformList);
+                            var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(index, onlyActiveTransforms:true, activeTransformList);
+                            
+                            if (lastAbsoluteTransform == 0  &&
+                                index < nextAbsoluteTransform && 
+                                selectedTransform.transformType != TransformMonobehaviour.TransformTypes.Absolute &&
+                                activeTransformList[nextAbsoluteTransform].transformType == TransformMonobehaviour.TransformTypes.Absolute &&
+                                activeTransformList[nextAbsoluteTransform].isActive)
                             {
                                 toggle.value = false;
                                 return;
                             }
-
+                            
                             if (selectedTransform.transformType == TransformMonobehaviour.TransformTypes.Absolute)
                             {
-                                lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(index, onlyActiveTransforms: false, activeTransformList);
+                                lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(index, onlyActiveTransforms:false, activeTransformList);
                                 TransformGuiMethods.ToggleAbsoluteTransform(index, lastAbsoluteTransform, selectedTransform, activeTransformList);
                             }
-
+                            
                             var transformList = TransformCalculation.CalculateTransform(lastAbsoluteTransform, nextAbsoluteTransform, activeTransformList);
-                            TransformGoOperations.ApplyTransformToGo(selectedGameObject, transformList[0], transformList[1], transformList[2]);
+                            TransformGoOperations.ApplyTransformToGo(transformMono, transformList[0], transformList[1], transformList[2]);
                         });
                     }
-
+                    
                     toggle.schedule.Execute(() => // Update the toggle value every 100ms
-                        {
-                            toggle.SetValueWithoutNotify(selectedTransform.isActive);
-                        })
-                        .Every(100);
-
+                    {
+                        toggle.SetValueWithoutNotify(selectedTransform.isActive);
+                    }).Every(100);
+                    
                     toggle.style.paddingRight = 5;
-
+                    
                     listEntry.Add(indexLabel);
                     listEntry.Add(toggle);
                     listEntry.Add(textField);
                     listRoot.Add(listEntry);
                 }
-
+                
                 listRoot.Add(transformContentPanelContainer);
-            }
-
-            void DeleteTransformAction()
+            };
+            
+            Action deleteTransformAction = () =>
             {
-                if (radioButtonGroup.value == -1 || TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList.Count == 0)
+                if (radioButtonGroup.value == -1 || 
+                    transformMono.transformListContainer[radioButtonGroup.value].singleTransformList.Count == 0)
                 {
                     return;
                 }
-
-                if (TransformMonobehaviour.selectedTransformListIndex.Count < 1)
+                
+                if (transformMono.selectedTransformListIndex.Count < 1)
                 {
                     Debug.Log("No transform selected");
                     return;
                 }
+                
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
 
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
-
-                for (var i = TransformMonobehaviour.selectedTransformListIndex.Count - 1; i >= 0; i--)
+                for (var i = transformMono.selectedTransformListIndex.Count - 1; i >= 0; i--)
                 {
-                    activeTransformList.RemoveAt(TransformMonobehaviour.selectedTransformListIndex[i]);
+                    activeTransformList.RemoveAt(transformMono.selectedTransformListIndex[i]);
                 }
-
-                var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms: true, activeTransformList);
+                
+                var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
-                TransformGoOperations.ApplyTransformToGo(selectedGameObject, transformList[0], transformList[1], transformList[2]);
+                TransformGoOperations.ApplyTransformToGo(transformMono, transformList[0], transformList[1], transformList[2]);
+                
+                slider.highValue = activeTransformList.Count -1;
+                transformMono.selectedTransformListIndex.Clear();
+            };
 
-                slider.highValue = activeTransformList.Count - 1;
-                TransformMonobehaviour.selectedTransformListIndex.Clear();
-            }
-
-            void DeleteListAction()
+            Action deleteListAction = () =>
             {
-                if (radioButtonGroup.value == -1 || TransformMonobehaviour.TransformListContainer.Count is 0 or 1)
+                if (radioButtonGroup.value == -1 || 
+                    transformMono.transformListContainer.Count is 0 or 1)
                 {
                     return;
                 }
-
-                TransformMonobehaviour.TransformListContainer.RemoveAt(radioButtonGroup.value);
+                
+                transformMono.transformListContainer.RemoveAt(radioButtonGroup.value);
                 radioButtonGroup.value -= 1;
-            }
-
-            void DropdownFieldAction()
+            };
+            
+            Action dropdownFieldAction = () =>
             {
-                var dropdownFieldOptions = new List<String> { "Copy List", "Delete List", "Reset Transforms" };
+                var dropdownFieldOptions = new List<String>
+                {
+                    "Copy List",
+                    "Delete List",
+                    "Reset Transforms"
+                };
 
                 dropdownField.choices = dropdownFieldOptions;
                 dropdownField.value = null;
-            }
-
+            };
             #endregion
 
             #region Callback Events
             slider.RegisterValueChangedCallback(evt => // Changes in Slider position
             {
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 if(activeTransformList[evt.newValue].transformType != TransformMonobehaviour.TransformTypes.Absolute)
                 {
                     var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(evt.newValue, onlyActiveTransforms:true, activeTransformList);
                     var transformList = TransformCalculation.CalculateSliderTransform(lastAbsoluteTransform, evt.newValue, activeTransformList);
-                    TransformGoOperations.ApplyTransformToGo(selectedGameObject, transformList[0], transformList[1], transformList[2]);
+                    TransformGoOperations.ApplyTransformToGo(transformMono, transformList[0], transformList[1], transformList[2]);
                 }
 
                 if (activeTransformList[evt.newValue].transformType == TransformMonobehaviour.TransformTypes.Absolute && activeTransformList[evt.newValue].isActive) // In case we are setting the slider to an absolute transform
                 {
-                    TransformGoOperations.ApplyTransformToGo(selectedGameObject, activeTransformList[evt.newValue].position, activeTransformList[evt.newValue].rotation, activeTransformList[evt.newValue].scale);
+                    TransformGoOperations.ApplyTransformToGo(transformMono, activeTransformList[evt.newValue].position, activeTransformList[evt.newValue].rotation, activeTransformList[evt.newValue].scale);
                 }
             });
             
@@ -328,36 +348,36 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                     radioButtonGroup.value = evt.previousValue;    
                 }
                 
-                UpdateTransformListAction();
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                updateTransformListAction();
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 var lastAbsoluteTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastAbsoluteTransform, activeTransformList.Count - 1, activeTransformList);
-                TransformGoOperations.ApplyTransformToGo(selectedGameObject, transformList[0], transformList[1], transformList[2]);
+                TransformGoOperations.ApplyTransformToGo(transformMono, transformList[0], transformList[1], transformList[2]);
                 
-                uxmlFoldout.text = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].transformListName;
+                uxmlFoldout.text = transformMono.transformListContainer[radioButtonGroup.value].transformListName;
                 slider.highValue = activeTransformList.Count - 1;
                 slider.value = activeTransformList.Count - 1;
                 
-                TransformMonobehaviour.activeRadioButton = evt.newValue;
-                TransformMonobehaviour.selectedTransformListIndex.Clear();
+                transformMono.activeRadioButton = evt.newValue;
+                transformMono.selectedTransformListIndex.Clear();
             });
 
-            dropdownField.RegisterValueChangedCallback(evt => // DropdownField for Copying, Deleting and Resetting Transform Lists
+            dropdownField.RegisterValueChangedCallback(evt =>
             {
                 switch (evt.newValue)
                 {
                     case "Copy List":
-                        TransformGuiMethods.CopyTransformListEntry(radioButtonGroup.value);
-                        UpdateRadioButtonDisplay();
+                        copyTransformListButtonAction();
+                        updateRadioButtonDisplay();
                         break;
                     case "Delete List":
-                        DeleteListAction();
-                        UpdateRadioButtonDisplay();  
-                        UpdateTransformListAction();
+                        deleteListAction();
+                        updateRadioButtonDisplay();  
+                        updateTransformListAction();
                         break;
                     case "Reset Transforms":
-                        ResetAllTransformsAction();
-                        UpdateTransformListAction();
+                        resetAllTransformsAction();
+                        updateTransformListAction();
                         break;
                 }
                 dropdownField.value = null;
@@ -365,12 +385,12 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
             translationInput.RegisterValueChangedCallback(evt =>
             {
-                if (TransformMonobehaviour.TransformListContainer.Count == 0)
+                if (transformMono.transformListContainer.Count == 0)
                 {
                     return;
                 }
                 
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 if (activeTransformList.Count == 0)
                 {
@@ -380,17 +400,17 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 var lastActiveTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastActiveTransform, activeTransformList.Count - 1, activeTransformList);
                 var translationVector3 = transformList[0];
-                TransformGoOperations.UpdateGameObjectTranslation(selectedGameObject, evt.newValue, translationVector3);
+                TransformGoOperations.UpdateGameObjectTranslation(transformMono, evt.newValue, translationVector3);
             });
             
             rotationInput.RegisterValueChangedCallback(evt =>
             {
-                if (TransformMonobehaviour.TransformListContainer.Count == 0)
+                if (transformMono.transformListContainer.Count == 0)
                 {
                     return;
                 }
                 
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 if (activeTransformList.Count == 0)
                 {
@@ -399,17 +419,17 @@ namespace NurGIS.Runtime.TransformHistory.Editor
 
                 var lastActiveTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastActiveTransform, activeTransformList.Count - 1, activeTransformList);
-                TransformGoOperations.UpdateGameObjectRotation(selectedGameObject, evt.newValue, transformList[1]);
+                TransformGoOperations.UpdateGameObjectRotation(transformMono, evt.newValue, transformList[1]);
             });
             
             scaleInput.RegisterValueChangedCallback(evt =>
             {
-                if (TransformMonobehaviour.TransformListContainer.Count == 0)
+                if (transformMono.transformListContainer.Count == 0)
                 {
                     return;
                 }
                 
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                var activeTransformList = transformMono.transformListContainer[radioButtonGroup.value].singleTransformList;
                 
                 if (activeTransformList.Count == 0)
                 {
@@ -419,34 +439,35 @@ namespace NurGIS.Runtime.TransformHistory.Editor
                 var lastActiveTransform = TransformCalculation.FindLastAbsoluteTransformIndex(activeTransformList.Count - 1, onlyActiveTransforms:true, activeTransformList);
                 var transformList = TransformCalculation.CalculateTransform(lastActiveTransform, activeTransformList.Count - 1, activeTransformList);
                 var lastScaleVector3 = transformList[2];
-                TransformGoOperations.UpdateGameObjectScale(selectedGameObject, evt.newValue, lastScaleVector3);
+                TransformGoOperations.UpdateGameObjectScale(transformMono, evt.newValue, lastScaleVector3);
             });
             #endregion
             
             #region Button Actions
-            createNewEmptyListButton.clicked += TransformGuiMethods.CreateNewTransformListEntry;
-            createNewEmptyListButton.clicked += UpdateRadioButtonDisplay;
+            createNewEmptyListButton.clicked += createNewEmptyListButtonAction;
+            createNewEmptyListButton.clicked += updateRadioButtonDisplay;
             
-            saveTransformButton.clicked += SaveTransformAction;
-            saveTransformButton.clicked += UpdateTransformListAction;
+            saveTransformButton.clicked += saveTransformAction;
+            saveTransformButton.clicked += updateTransformListAction;
             
-            resetButton.clicked += ResetInputAction;
+            resetButton.clicked += resetInputAction;
             
-            setAbsoluteTransformButton.clicked += SaveAbsoluteTransformAction;
-            setAbsoluteTransformButton.clicked += UpdateTransformListAction;
+            setAbsoluteTransformButton.clicked += saveAbsoluteTransformAction;
+            setAbsoluteTransformButton.clicked += updateTransformListAction;
 
-            deleteTransformButton.clicked += DeleteTransformAction;
-            deleteTransformButton.clicked += UpdateTransformListAction;
+            deleteTransformButton.clicked += deleteTransformAction;
+            deleteTransformButton.clicked += updateTransformListAction;
             #endregion
             
-            ResetInputAction();
-            UpdateTransformListAction();
-            DropdownFieldAction();
+            resetInputAction();
+            updateTransformListAction();
+            dropdownFieldAction();
             
-            UpdateRadioButtonDisplay();
+            updateRadioButtonDisplay();
             radioButtonGroup.value = 0;
             return root;
         }
     }
-    #endif
 }
+#endif
+#endif
