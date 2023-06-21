@@ -141,7 +141,7 @@ namespace NurGIS.Runtime.TransformHistory
             deleteTransformButton.clicked += () => {TransformGuiMethods.DeleteSingleTransform(index, radioButtonGroup);};
             deleteTransformButton.clicked += () => {TransformGuiMethods.CreateAllSingleTransforms(index, radioButtonGroup, radioButtonFoldout) ;};
 
-            renameTransformButton.clicked += () => {TransformGuiMethods.RenameInputWindow(index, radioButtonGroup, this);};
+            renameTransformButton.clicked += () => {TransformGuiMethods.RenameSingleTransformInputWindow(index, radioButtonGroup, this);};
             absTransformButton.clicked += () => {;};
             position.RegisterValueChangedCallback(evt => {;});
             rotation.RegisterValueChangedCallback(evt => {;});

@@ -526,18 +526,61 @@ namespace NurGIS.Runtime.TransformHistory
             CreateAndRegisterCallbackTransformList(go, radioButtonGroup);
 
         }
-
-        private static void RenameTransformGroup(int index, List<string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup, string newGroupName)
+        
+        private static void RenameTransformGroup(int index, List<string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup)
         {
             if (radioButtonGroup.value == -1)
             {
                 radioButtonGroup.value = index;
             }
             
-            TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].transformListName = newGroupName;
-            radioButtonGroupsList[radioButtonGroup.value] = newGroupName;
-            radioButtonGroup.choices = radioButtonGroupsList;
+            var radioButtonFoldout = radioButtonGroup.Q<Foldout>();
+            var toggleRow = radioButtonGroup.Q<RadioButton>().Children().First();
+            
+            var renameTransformField = new TextField
+            {
+                value = radioButtonFoldout.text,
+                style =
+                {
+                    width = 120,
+                    position = Position.Absolute,
+                    right = 190,
+                }
+            };
+            
+            var newTransformName = renameTransformField.value;
+            
+            var textContainer = renameTransformField.Children().First();
+            textContainer.style.unityTextAlign = TextAnchor.MiddleCenter;
+            textContainer.style.unityFontStyleAndWeight = FontStyle.Bold;
+            textContainer.style.paddingBottom = 1;
+            
+            toggleRow.Add(renameTransformField);
+            
+            renameTransformField.RegisterValueChangedCallback(evt =>
+            {
+                newTransformName = evt.newValue;
+            });
+            
+            // Callback for when the user clicks outside of the text field or presses enter
+            renameTransformField.RegisterCallback<BlurEvent>(_ =>
+            {
+                TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].transformListName = newTransformName;
+                radioButtonGroupsList[radioButtonGroup.value] = newTransformName;
+                radioButtonGroup.choices = radioButtonGroupsList;
+                toggleRow.Remove(renameTransformField);
+            });
+            
+            renameTransformField.RegisterCallback<KeyDownEvent>(evt =>
+            {
+                if (evt.keyCode != KeyCode.Return) return;
+                TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].transformListName = newTransformName;
+                radioButtonGroupsList[radioButtonGroup.value] = newTransformName;
+                radioButtonGroup.choices = radioButtonGroupsList;
+                toggleRow.Remove(renameTransformField);
+            });
         }
+        
         public static void CreateAllSingleTransforms(int index, RadioButtonGroup radioButtonGroup, Foldout transformFoldout)
         {
             if(radioButtonGroup.value == -1)
@@ -567,33 +610,30 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 index++;
                 radioButton.Children().First().style.paddingBottom = 10;
-
-                // Copy group button
+                
+                var renameButton = new Button()
+                {
+                    text = "Rename",
+                    style =
+                    {
+                        right = 117,
+                        position = Position.Absolute
+                    },
+                };
+                
                 var copyButton = new Button()
                 {
                     text = "Copy",
                     style =
                     {
-                        right = 133,
+                        right = 72,
                         position = Position.Absolute
                     },
                 };
-
-                // Reset group button
+                
                 var resetButton = new Button()
                 {
                     text = "Reset",
-                    style =
-                    {
-                        right = 85,
-                        position = Position.Absolute
-                    },
-                };
-
-                // Rename group button
-                var renameButton = new Button()
-                {
-                    text = "Rename",
                     style =
                     {
                         right = 24,
@@ -601,7 +641,6 @@ namespace NurGIS.Runtime.TransformHistory
                     },
                 };
                 
-                // Add new transform button
                 var addTransformButton = new Button()
                 {
                     text = "+",
@@ -634,7 +673,7 @@ namespace NurGIS.Runtime.TransformHistory
                 
                 renameButton.clicked += () =>
                 {
-                    RenameTransformGroup(index, GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup, "test");
+                    RenameTransformGroup(index, GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup);
                 };
                 
                 addTransformButton.clicked += () => { AddSingleTransform(index, foldout, radioButtonGroup); };
@@ -651,7 +690,7 @@ namespace NurGIS.Runtime.TransformHistory
             activeTransformList.RemoveAt(i);
         }
 
-        public static void RenameInputWindow(int index, RadioButtonGroup radioButtonGroup, SingleTransform singleTransform)
+        public static void RenameSingleTransformInputWindow(int index, RadioButtonGroup radioButtonGroup, SingleTransform singleTransform)
         {
             var singleTransformFoldout = singleTransform.Q<Foldout>();
             var toggleRow = singleTransformFoldout.Q<Toggle>().Children().First();
@@ -672,36 +711,32 @@ namespace NurGIS.Runtime.TransformHistory
             textContainer.style.paddingBottom = 1;
             
             toggleRow.Add(renameTransformField);
+            
+            var newTransformName = "";
 
             // Callback for when the user changes the text field, updates the transform name in the GUI and the container
             renameTransformField.RegisterValueChangedCallback(evt =>
             {
-                RenameSingleTransform(index, radioButtonGroup, evt.newValue, singleTransform);
+                newTransformName = evt.newValue;
             });
             
             // Callback for when the user clicks outside of the text field or presses enter
             renameTransformField.RegisterCallback<BlurEvent>(_ =>
             {
+                singleTransform.Q<Foldout>().text = newTransformName;
+                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                activeTransformList[index].transformName = newTransformName;
                 toggleRow.Remove(renameTransformField);
             });
             renameTransformField.RegisterCallback<KeyDownEvent>(evt =>
             {
-                if (evt.keyCode == KeyCode.Return)
-                {
-                    toggleRow.Remove(renameTransformField);
-                }
+                if (evt.keyCode != KeyCode.Return) return;
+                singleTransform.Q<Foldout>().text = newTransformName;
+                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                activeTransformList[index].transformName = newTransformName;
+                toggleRow.Remove(renameTransformField);
             });
         }
-
-        private static void RenameSingleTransform(int i, RadioButtonGroup radioButtonGroup, string newTransformName, SingleTransform singleTransform)
-        {
-            var singleTransformFoldout = singleTransform.Q<Foldout>();
-            singleTransformFoldout.text = newTransformName;
-            
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
-            activeTransformList[i].transformName = newTransformName;
-        }
-        
         #endregion
     }
 }
