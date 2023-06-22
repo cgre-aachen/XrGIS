@@ -6,7 +6,7 @@ namespace NurGIS.Runtime.TransformHistory
 {
     public class SingleTransform : VisualElement
     {
-        public SingleTransform(string name, int index, RadioButtonGroup radioButtonGroup, Foldout radioButtonFoldout, GameObject go)
+        public SingleTransform(string name, int singleTransformIndex, RadioButtonGroup radioButtonGroup, Foldout radioButtonFoldout, GameObject go)
         {
             ///////////////// Single Transform Foldout /////////////////
             var foldout = new Foldout
@@ -23,7 +23,7 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 label = "Position",
                 name  = "positionInput",
-                value = activeTransformList[index].position  
+                value = activeTransformList[singleTransformIndex].position  
             };
             foldout.Add(position);
 
@@ -31,7 +31,7 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 label = "Rotation",
                 name  = "rotationInput",
-                value = activeTransformList[index].rotation
+                value = activeTransformList[singleTransformIndex].rotation
             };
             foldout.Add(rotation);
 
@@ -39,7 +39,7 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 label = "Scale",
                 name  = "scaleInput",
-                value = activeTransformList[index].scale
+                value = activeTransformList[singleTransformIndex].scale
             };
             foldout.Add(scale);
             ///////////////// Vector3Fields /////////////////
@@ -113,7 +113,7 @@ namespace NurGIS.Runtime.TransformHistory
                     paddingLeft = 10
                 },
                 
-                value = activeTransformList[index].isActive
+                value = activeTransformList[singleTransformIndex].isActive
             };
             
             var appliedToVertexCheckbox = new Toggle
@@ -144,15 +144,18 @@ namespace NurGIS.Runtime.TransformHistory
             toggleContainer.Add(appliedToVertexCheckbox);
 
             ////////// Callbacks //////////
-            deleteTransformButton.clicked += () => {TransformGuiMethods.DeleteSingleTransform(index, radioButtonGroup);};
-            deleteTransformButton.clicked += () => {TransformGuiMethods.CreateAllSingleTransforms(index, radioButtonGroup, radioButtonFoldout, go) ;};
+            deleteTransformButton.clicked += () => {TransformGuiMethods.DeleteSingleTransform(singleTransformIndex, radioButtonGroup);};
+            deleteTransformButton.clicked += () => {TransformGuiMethods.CreateAllSingleTransforms(singleTransformIndex, radioButtonGroup, radioButtonFoldout, go) ;};
 
-            renameTransformButton.clicked += () => {TransformGuiMethods.RenameSingleTransformInputWindow(index, radioButtonGroup, this);};
-            absTransformButton.clicked += () => {;};
-            position.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(evt.newValue, Vector3.zero, Vector3.one, radioButtonGroup, index, go);});
-            rotation.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero, evt.newValue, Vector3.one, radioButtonGroup, index, go);});
-            scale.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , evt.newValue, radioButtonGroup, index, go);});
-            isActiveCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[index].isActive = evt.newValue; TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, index, go); });
+            renameTransformButton.clicked += () => {TransformGuiMethods.RenameSingleTransformInputWindow(singleTransformIndex, radioButtonGroup, this);};
+            absTransformButton.clicked += () => {TransformGuiMethods.MakeTransformAbsolute(singleTransformIndex, radioButtonGroup);};
+            absTransformButton.clicked += () => { TransformGuiMethods.CreateAndRegisterCallbackTransformList(go, radioButtonGroup); };
+            
+            position.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(evt.newValue, Vector3.zero, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
+            rotation.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero, evt.newValue, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
+            scale.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , evt.newValue, radioButtonGroup, singleTransformIndex, go);});
+            
+            isActiveCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[singleTransformIndex].isActive = evt.newValue; TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go); });
             appliedToVertexCheckbox.RegisterValueChangedCallback(evt => {;});
             ////////// Callbacks //////////
         }

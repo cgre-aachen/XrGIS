@@ -89,9 +89,11 @@ namespace NurGIS.Runtime.TransformHistory
             scrollView.Add(radioButtonGroup);
             
             ///////////////// Callbacks /////////////////
+            radioButtonGroup.RegisterValueChangedCallback(evt => { TransformGuiMethods.ApplyTransform(radioButtonGroup, go); });
             addButton.clicked    += () => { TransformGuiMethods.AddTransformGroup($"New Group  {m_groups.Count}",m_groups, radioButtonGroup); };
             addButton.clicked    += () => { TransformGuiMethods.CreateAndRegisterCallbackTransformList(go, radioButtonGroup); };
             deleteButton.clicked += () => { TransformGuiMethods.DeleteTransformGroup(m_groups, radioButtonGroup); };
+            deleteButton.clicked += () => { TransformGuiMethods.CreateAndRegisterCallbackTransformList(go, radioButtonGroup); };
             ///////////////// Callbacks /////////////////
         }
     }
