@@ -111,7 +111,9 @@ namespace NurGIS.Runtime.TransformHistory
                 style =
                 {
                     paddingLeft = 10
-                }
+                },
+                
+                value = activeTransformList[index].isActive
             };
             
             var appliedToVertexCheckbox = new Toggle
@@ -150,7 +152,7 @@ namespace NurGIS.Runtime.TransformHistory
             position.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(evt.newValue, Vector3.zero, Vector3.one, radioButtonGroup, index, go);});
             rotation.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero, evt.newValue, Vector3.one, radioButtonGroup, index, go);});
             scale.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , evt.newValue, radioButtonGroup, index, go);});
-            isActiveCheckbox.RegisterValueChangedCallback(evt => {;});
+            isActiveCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[index].isActive = evt.newValue; TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, index, go); });
             appliedToVertexCheckbox.RegisterValueChangedCallback(evt => {;});
             ////////// Callbacks //////////
         }
