@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace NurGIS.Runtime.TransformHistory
@@ -68,16 +67,6 @@ namespace NurGIS.Runtime.TransformHistory
         public static Vector3 positionInput = Vector3.zero;
         public static Vector3 scaleInput = Vector3.one;
         public static Vector3 rotationInput = Vector3.zero;
-        private Vector3 RotationInput // set to round to nearest 0.2 in GUI
-        {
-            set
-            {
-                rotationInput = value;
-                rotationInput.x = Mathf.Round(rotationInput.x * 5)/5;
-                rotationInput.y = Mathf.Round(rotationInput.y * 5)/5;
-                rotationInput.z = Mathf.Round(rotationInput.z * 5)/5;
-            }
-        }
         #endregion
         
         private void Awake() // Initial state is in awake so that the GUI reflects it (Start is too late) 

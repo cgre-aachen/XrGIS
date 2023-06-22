@@ -6,7 +6,7 @@ namespace NurGIS.Runtime.TransformHistory
 {
     public class SingleTransform : VisualElement
     {
-        public SingleTransform(string name, int singleTransformIndex, RadioButtonGroup radioButtonGroup, Foldout radioButtonFoldout, GameObject go)
+        public SingleTransform(string name, int singleTransformIndex, int transformGroupIndex, RadioButtonGroup radioButtonGroup, Foldout radioButtonFoldout, GameObject go)
         {
             ///////////////// Single Transform Foldout /////////////////
             var foldout = new Foldout
@@ -17,7 +17,7 @@ namespace NurGIS.Runtime.TransformHistory
             ///////////////// Single Transform Foldout /////////////////
 
             ///////////////// Vector3Fields /////////////////
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var activeTransformList = TransformMonobehaviour.TransformListContainer[transformGroupIndex].singleTransformList;
             
             var position = new Vector3Field
             {
@@ -145,11 +145,12 @@ namespace NurGIS.Runtime.TransformHistory
 
             ////////// Callbacks //////////
             deleteTransformButton.clicked += () => {TransformGuiMethods.DeleteSingleTransform(singleTransformIndex, radioButtonGroup);};
-            deleteTransformButton.clicked += () => {TransformGuiMethods.CreateAllSingleTransforms(singleTransformIndex, radioButtonGroup, radioButtonFoldout, go) ;};
+            deleteTransformButton.clicked += () => {TransformGuiMethods.CreateAllSingleTransforms(radioButtonGroup.value, radioButtonGroup, radioButtonFoldout, go) ;};
 
             renameTransformButton.clicked += () => {TransformGuiMethods.RenameSingleTransformInputWindow(singleTransformIndex, radioButtonGroup, this);};
-            absTransformButton.clicked += () => {TransformGuiMethods.MakeTransformAbsolute(singleTransformIndex, radioButtonGroup);};
-            absTransformButton.clicked += () => { TransformGuiMethods.CreateAndRegisterCallbackTransformList(go, radioButtonGroup); };
+            
+            absTransformButton.clicked += () => {TransformGuiMethods.MakeTransformAbsolute(singleTransformIndex, TransformGuiMethods.GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup);};
+            absTransformButton.clicked += () => { TransformGuiMethods.DrawGUI(go, radioButtonGroup); };
             
             position.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(evt.newValue, Vector3.zero, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
             rotation.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero, evt.newValue, Vector3.one, radioButtonGroup, singleTransformIndex, go);});

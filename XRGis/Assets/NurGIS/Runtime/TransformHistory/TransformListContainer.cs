@@ -34,7 +34,7 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 choices = m_groups
             };
-            TransformGuiMethods.CreateAndRegisterCallbackTransformList(go, radioButtonGroup);
+            TransformGuiMethods.DrawGUI(go, radioButtonGroup);
             ///////////////// Radio Button Group /////////////////
             
             ///////////////// Header Container /////////////////
@@ -91,9 +91,10 @@ namespace NurGIS.Runtime.TransformHistory
             ///////////////// Callbacks /////////////////
             radioButtonGroup.RegisterValueChangedCallback(evt => { TransformGuiMethods.ApplyTransform(radioButtonGroup, go); });
             addButton.clicked    += () => { TransformGuiMethods.AddTransformGroup($"New Group  {m_groups.Count}",m_groups, radioButtonGroup); };
-            addButton.clicked    += () => { TransformGuiMethods.CreateAndRegisterCallbackTransformList(go, radioButtonGroup); };
+            addButton.clicked    += () => { TransformGuiMethods.DrawGUI(go, radioButtonGroup); };
+            
             deleteButton.clicked += () => { TransformGuiMethods.DeleteTransformGroup(m_groups, radioButtonGroup); };
-            deleteButton.clicked += () => { TransformGuiMethods.CreateAndRegisterCallbackTransformList(go, radioButtonGroup); };
+            deleteButton.clicked += () => { TransformGuiMethods.DrawGUI(go, radioButtonGroup); };
             ///////////////// Callbacks /////////////////
         }
     }
