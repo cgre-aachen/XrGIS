@@ -409,7 +409,87 @@ namespace NurGIS.Runtime.TransformHistory
 
         ////////////////////////////// Transform Group Functions - New GUI ////////////////////////////
         #region Transform Group Functions
-        private static void CopyTransformListEntryNew(int index, List<string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup)
+        public static void CreateAndRegisterCallbackTransformList(GameObject go, RadioButtonGroup radioButtonGroup) 
+        {
+            // Create a callback for when a new RadioButton is added, add all the necessary UI elements
+            var allRadioButtons = radioButtonGroup.Query<RadioButton>();
+            
+            var index = -1;
+            allRadioButtons.ForEach(radioButton =>
+            {
+                index++;
+                radioButton.Children().First().style.paddingBottom = 10;
+                
+                var renameButton = new Button()
+                {
+                    text = "Rename",
+                    style =
+                    {
+                        right = 117,
+                        position = Position.Absolute
+                    },
+                };
+                
+                var copyButton = new Button()
+                {
+                    text = "Copy",
+                    style =
+                    {
+                        right = 72,
+                        position = Position.Absolute
+                    },
+                };
+                
+                var resetButton = new Button()
+                {
+                    text = "Reset",
+                    style =
+                    {
+                        right = 24,
+                        position = Position.Absolute
+                    },
+                };
+                
+                var addTransformButton = new Button()
+                {
+                    text = "+",
+                    style =
+                    {
+                        right = 0,
+                        position = Position.Absolute
+                    },
+                };
+
+                var foldout = radioButton.Q<Foldout>() ?? new Foldout
+                {
+                    text = "Transforms"
+                };
+                
+                if (foldout.value)
+                {
+                    CreateAllSingleTransforms(index, radioButtonGroup, foldout, go);
+                }
+
+                radioButton.Children().First().Add(copyButton);
+                radioButton.Children().First().Add(resetButton);
+                radioButton.Children().First().Add(renameButton);
+                radioButton.Children().First().Add(addTransformButton);
+                radioButton.Add(foldout);
+
+                copyButton.clicked += () => { CopyTransformGroup(radioButtonGroup.value, GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup); };
+                copyButton.clicked += () => { CreateAndRegisterCallbackTransformList(go, radioButtonGroup); };
+                resetButton.clicked += () => { ResetTransformGroup(index, go, radioButtonGroup); };
+                
+                renameButton.clicked += () =>
+                {
+                    RenameTransformGroup(index, GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup);
+                };
+                
+                addTransformButton.clicked += () => { AddSingleTransform(index, foldout, radioButtonGroup, go); };
+            });
+        }
+        
+        private static void CopyTransformGroup(int index, List<string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup)
         {
             if (index < 0 || index >= TransformMonobehaviour.TransformListContainer.Count)
             {
@@ -436,6 +516,7 @@ namespace NurGIS.Runtime.TransformHistory
             radioButtonGroupsList.Add(transformListEntry.transformListName);
             radioButtonGroup.choices = radioButtonGroupsList;
         }
+        
         public static List<string> GetTransformGroupNames(List<TransformMonobehaviour.CustomTransformContainer> transformContainer)
         {
             var transformGroupNames = new List<string>();
@@ -448,6 +529,7 @@ namespace NurGIS.Runtime.TransformHistory
             
             return transformGroupNames;
         }
+        
         public static void AddTransformGroup(string groupName, List<string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup)
         {
             radioButtonGroupsList.Add(groupName);
@@ -475,6 +557,7 @@ namespace NurGIS.Runtime.TransformHistory
 
             TransformMonobehaviour.TransformListContainer.Add(transformListEntry);
         }
+        
         public static void DeleteTransformGroup(List<string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup)
         {
             if (radioButtonGroup.value == -1 || 
@@ -489,31 +572,8 @@ namespace NurGIS.Runtime.TransformHistory
             
             radioButtonGroup.value -= 1;
         }
-
-        private static void AddSingleTransform(int index, Foldout radioButtonFoldout, RadioButtonGroup radioButtonGroup)
-        {
-            if (radioButtonGroup.value == -1)
-            {
-                radioButtonGroup.value = index;
-            }
-            
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
-            
-            var customTransform = new TransformMonobehaviour.CustomTransform
-            {
-                position = Vector3.zero,
-                rotation = Vector3.zero,
-                scale = Vector3.one,
-                transformType = TransformMonobehaviour.TransformTypes.Relative,
-                isActive = true,
-                transformName = "Transform:"
-            };
-            
-            activeTransformList.Add(customTransform);
-            radioButtonFoldout.Add(new SingleTransform(customTransform.transformName, activeTransformList.Count - 1, radioButtonGroup, radioButtonFoldout));
-        }
-
-        private static void ResetAllTransformsInSelectedList(int index, GameObject go, RadioButtonGroup radioButtonGroup)
+        
+        private static void ResetTransformGroup(int index, GameObject go, RadioButtonGroup radioButtonGroup)
         {
             if (radioButtonGroup.value == -1)
             {
@@ -581,7 +641,7 @@ namespace NurGIS.Runtime.TransformHistory
             });
         }
         
-        public static void CreateAllSingleTransforms(int index, RadioButtonGroup radioButtonGroup, Foldout transformFoldout)
+        public static void CreateAllSingleTransforms(int index, RadioButtonGroup radioButtonGroup, Foldout transformFoldout, GameObject go)
         {
             if(radioButtonGroup.value == -1)
             {
@@ -596,93 +656,37 @@ namespace NurGIS.Runtime.TransformHistory
             
             foreach (TransformMonobehaviour.CustomTransform cT in activeTransformList)
             {
-                transformFoldout.Add(new SingleTransform(cT.transformName, singleTransformIndex, radioButtonGroup, transformFoldout));
+                transformFoldout.Add(new SingleTransform(cT.transformName, singleTransformIndex, radioButtonGroup, transformFoldout, go));
                 singleTransformIndex++;
             }
-        }
-        public static void CreateAndRegisterCallbackTransformList(GameObject go, RadioButtonGroup radioButtonGroup) //rewrite so that it uses the list of transform groups
-        {
-            // Create a callback for when a new RadioButton is added, add all the necessary UI elements
-            var allRadioButtons = radioButtonGroup.Query<RadioButton>();
-            
-            var index = -1;
-            allRadioButtons.ForEach(radioButton =>
-            {
-                index++;
-                radioButton.Children().First().style.paddingBottom = 10;
-                
-                var renameButton = new Button()
-                {
-                    text = "Rename",
-                    style =
-                    {
-                        right = 117,
-                        position = Position.Absolute
-                    },
-                };
-                
-                var copyButton = new Button()
-                {
-                    text = "Copy",
-                    style =
-                    {
-                        right = 72,
-                        position = Position.Absolute
-                    },
-                };
-                
-                var resetButton = new Button()
-                {
-                    text = "Reset",
-                    style =
-                    {
-                        right = 24,
-                        position = Position.Absolute
-                    },
-                };
-                
-                var addTransformButton = new Button()
-                {
-                    text = "+",
-                    style =
-                    {
-                        right = 0,
-                        position = Position.Absolute
-                    },
-                };
-
-                var foldout = radioButton.Q<Foldout>() ?? new Foldout
-                {
-                    text = "Transforms"
-                };
-                
-                if (foldout.value)
-                {
-                    CreateAllSingleTransforms(index, radioButtonGroup, foldout);
-                }
-
-                radioButton.Children().First().Add(copyButton);
-                radioButton.Children().First().Add(resetButton);
-                radioButton.Children().First().Add(renameButton);
-                radioButton.Children().First().Add(addTransformButton);
-                radioButton.Add(foldout);
-
-                copyButton.clicked += () => { CopyTransformListEntryNew(radioButtonGroup.value, GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup); };
-                copyButton.clicked += () => { CreateAndRegisterCallbackTransformList(go, radioButtonGroup); };
-                resetButton.clicked += () => { ResetAllTransformsInSelectedList(index, go, radioButtonGroup); };
-                
-                renameButton.clicked += () =>
-                {
-                    RenameTransformGroup(index, GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup);
-                };
-                
-                addTransformButton.clicked += () => { AddSingleTransform(index, foldout, radioButtonGroup); };
-            });
         }
         #endregion
         
         ////////////////////////////// Single Transform Functions -- New GUI ////////////////////////////
         #region Single Transform Functions
+        private static void AddSingleTransform(int index, Foldout radioButtonFoldout, RadioButtonGroup radioButtonGroup, GameObject go)
+        {
+            if (radioButtonGroup.value == -1)
+            {
+                radioButtonGroup.value = index;
+            }
+            
+            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            
+            var customTransform = new TransformMonobehaviour.CustomTransform
+            {
+                position = Vector3.zero,
+                rotation = Vector3.zero,
+                scale = Vector3.one,
+                transformType = TransformMonobehaviour.TransformTypes.Relative,
+                isActive = true,
+                transformName = "Transform:"
+            };
+            
+            activeTransformList.Add(customTransform);
+            radioButtonFoldout.Add(new SingleTransform(customTransform.transformName, activeTransformList.Count - 1, radioButtonGroup, radioButtonFoldout, go));
+        }
+        
         public static void DeleteSingleTransform(int i, RadioButtonGroup radioButtonGroup)
         {
             
@@ -736,6 +740,51 @@ namespace NurGIS.Runtime.TransformHistory
                 activeTransformList[index].transformName = newTransformName;
                 toggleRow.Remove(renameTransformField);
             });
+        }
+        #endregion
+        
+        #region Utility Functions
+        public static void UpdateTransform(Vector3 translation, Vector3 rotation, Vector3 scale, RadioButtonGroup radioButtonGroup, int index, GameObject go)
+        {
+            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var selectedTransform = activeTransformList[index];
+            
+            if (translation!= Vector3.zero)
+            {
+                selectedTransform.position = translation;
+            }
+            if (rotation != Vector3.zero)
+            {
+                selectedTransform.rotation = rotation;
+            }
+            if (scale != Vector3.one)
+            {
+                selectedTransform.scale = scale;
+            }
+            
+            ApplyTransform(radioButtonGroup, go);
+        }
+
+        private static void ApplyTransform(RadioButtonGroup radioButtonGroup, GameObject go)
+        {
+            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            
+            var translation = Vector3.zero;
+            var rotation = Vector3.zero;
+            var scale = Vector3.one;
+
+            for (var i = 0; i < activeTransformList.Count(); i++)
+            {
+                TransformMonobehaviour.CustomTransform customTransform = activeTransformList[i];
+                if (!customTransform.isActive) continue;
+                rotation += customTransform.rotation;
+                translation += customTransform.position;
+                scale = Vector3.Scale(scale, customTransform.scale);
+            }
+            
+            go.transform.localPosition = translation;
+            go.transform.localRotation = Quaternion.Euler(rotation);
+            go.transform.localScale = scale;
         }
         #endregion
     }

@@ -91,5 +91,10 @@ namespace NurGIS.Runtime.TransformHistory
             TransformCalculation.GetRelativeTransform(gameObject, activeRadioButton);
             transform.hasChanged = false;
         }
+
+        private void OnDestroy()
+        {
+            TransformListContainer.Clear();
+        }
     }
 }
