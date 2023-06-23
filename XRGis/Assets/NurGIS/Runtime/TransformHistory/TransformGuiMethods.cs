@@ -409,8 +409,11 @@ namespace NurGIS.Runtime.TransformHistory
 
         ////////////////////////////// Transform Group Functions - New GUI ////////////////////////////
         #region Transform Group Functions
-        public static void DrawGUI(GameObject go, RadioButtonGroup radioButtonGroup) 
+        public static void DrawGUI(GameObject go, RadioButtonGroup radioButtonGroup)
         {
+            var transformGroupNames = GetTransformGroupNames(TransformMonobehaviour.TransformListContainer);
+            radioButtonGroup.choices = transformGroupNames;
+            
             // Create a callback for when a new RadioButton is added, add all the necessary UI elements
             var allRadioButtons = radioButtonGroup.Query<RadioButton>();
             
@@ -476,11 +479,11 @@ namespace NurGIS.Runtime.TransformHistory
                 radioButton.Children().First().Add(addTransformButton);
                 radioButton.Add(foldout);
 
-                copyButton.clicked += () => { CopyTransformGroup(radioButtonGroup.value, GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup); };
+                copyButton.clicked += () => { CopyTransformGroup(radioButtonGroup.value, transformGroupNames, radioButtonGroup); };
                 copyButton.clicked += () => { DrawGUI(go, radioButtonGroup); };
                 resetButton.clicked += () => { ResetTransformGroup(radioButtonIndex, go, radioButtonGroup); };
                 
-                renameButton.clicked += () => { RenameTransformGroup(radioButtonIndex, GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup); };
+                renameButton.clicked += () => { RenameTransformGroup(radioButtonIndex, transformGroupNames, radioButtonGroup); };
                 addTransformButton.clicked += () => { AddSingleTransform(radioButtonIndex, foldout, radioButtonGroup, go); };
             });
         }

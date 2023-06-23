@@ -6,8 +6,7 @@ namespace NurGIS.Runtime.TransformHistory
 {
     public class TransformListContainer : VisualElement
     {
-        
-        private readonly List<string> m_groups = TransformGuiMethods.GetTransformGroupNames(TransformMonobehaviour.TransformListContainer);
+        private readonly List<string> _mGroups = TransformGuiMethods.GetTransformGroupNames(TransformMonobehaviour.TransformListContainer);
         public TransformListContainer(GameObject go)
         {
             AddToClassList("radio-group");
@@ -32,7 +31,7 @@ namespace NurGIS.Runtime.TransformHistory
             ///////////////// Radio Button Group /////////////////
             var radioButtonGroup = new RadioButtonGroup
             {
-                choices = m_groups
+                choices = _mGroups
             };
             TransformGuiMethods.DrawGUI(go, radioButtonGroup);
             ///////////////// Radio Button Group /////////////////
@@ -89,11 +88,11 @@ namespace NurGIS.Runtime.TransformHistory
             scrollView.Add(radioButtonGroup);
             
             ///////////////// Callbacks /////////////////
-            radioButtonGroup.RegisterValueChangedCallback(evt => { TransformGuiMethods.ApplyTransform(radioButtonGroup, go); });
-            addButton.clicked    += () => { TransformGuiMethods.AddTransformGroup($"New Group  {m_groups.Count}",m_groups, radioButtonGroup); };
+            radioButtonGroup.RegisterValueChangedCallback(_ => { TransformGuiMethods.ApplyTransform(radioButtonGroup, go); });
+            addButton.clicked    += () => { TransformGuiMethods.AddTransformGroup($"New Group  {_mGroups.Count}",_mGroups, radioButtonGroup); };
             addButton.clicked    += () => { TransformGuiMethods.DrawGUI(go, radioButtonGroup); };
             
-            deleteButton.clicked += () => { TransformGuiMethods.DeleteTransformGroup(m_groups, radioButtonGroup); };
+            deleteButton.clicked += () => { TransformGuiMethods.DeleteTransformGroup(_mGroups, radioButtonGroup); };
             deleteButton.clicked += () => { TransformGuiMethods.DrawGUI(go, radioButtonGroup); };
             ///////////////// Callbacks /////////////////
         }
