@@ -6,31 +6,12 @@ namespace NurGIS.Runtime.TransformHistory
 {
     public class TransformMonobehaviour : MonoBehaviour
     {
-        #region Properties
-        public enum TransformTypes
-        {
-            Absolute,
-            Relative
-        }
-        
-        public enum TransformSpecifier
-        {
-            Translation,
-            Rotation,
-            Scale,
-            AbsoluteTransform,
-            NoTransform,
-            MultipleTransforms
-        }     
-        
         [Serializable]
         public class CustomTransform
         {
             public Vector3 position;
             public Vector3 rotation;
             public Vector3 scale;
-            public TransformTypes transformType;
-            public TransformSpecifier transformSpecifier;
             public bool isActive;
             public bool appliedToVertices;
             public string transformName;
@@ -42,8 +23,6 @@ namespace NurGIS.Runtime.TransformHistory
                     position = position,
                     rotation = rotation,
                     scale = scale,
-                    transformType = transformType,
-                    transformSpecifier = transformSpecifier,
                     isActive = isActive,
                     appliedToVertices = appliedToVertices,
                     transformName = transformName
@@ -59,30 +38,13 @@ namespace NurGIS.Runtime.TransformHistory
             public string transformListName;
         }
         
-        public static List<CustomTransformContainer> TransformListContainer = new();
-        
-        public static bool noEntry;
-        public static bool applyToVertices;
-        public static int activeRadioButton;
-        public static List<int> selectedTransformListIndex = new List<int>();
-        
-        public static Vector3 positionInput = Vector3.zero;
-        public static Vector3 scaleInput = Vector3.one;
-        public static Vector3 rotationInput = Vector3.zero;
-        #endregion
+        public static readonly List<CustomTransformContainer> TransformListContainer = new();
         
         private void Awake() // Initial state is in awake so that the GUI reflects it (Start is too late) 
         {
             TransformGuiMethods.SaveStartPosition(gameObject);
         }
-    
-        private void Update()
-        {
-            if (!transform.hasChanged) return;
-            TransformCalculation.GetRelativeTransform(gameObject, activeRadioButton);
-            transform.hasChanged = false;
-        }
-
+        
         private void OnDestroy()
         {
             TransformListContainer.Clear();
