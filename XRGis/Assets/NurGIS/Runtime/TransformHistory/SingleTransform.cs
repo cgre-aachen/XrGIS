@@ -150,14 +150,18 @@ namespace NurGIS.Runtime.TransformHistory
             renameTransformButton.clicked += () => {TransformGuiMethods.RenameSingleTransformInputWindow(singleTransformIndex, radioButtonGroup, this);};
             
             absTransformButton.clicked += () => {TransformGuiMethods.MakeTransformAbsolute(singleTransformIndex, TransformGuiMethods.GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup);};
-            absTransformButton.clicked += () => { TransformGuiMethods.DrawGUI(go, radioButtonGroup); };
+            absTransformButton.clicked += () => {TransformGuiMethods.DrawGUI(go, radioButtonGroup);};
             
             position.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(evt.newValue, Vector3.zero, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
             rotation.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero, evt.newValue, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
             scale.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , evt.newValue, radioButtonGroup, singleTransformIndex, go);});
             
-            isActiveCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[singleTransformIndex].isActive = evt.newValue; TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go); });
-            appliedToVertexCheckbox.RegisterValueChangedCallback(evt => {;});
+            isActiveCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[singleTransformIndex].isActive = evt.newValue; 
+                TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go); });
+            
+            appliedToVertexCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[singleTransformIndex].appliedToVertices = evt.newValue;
+                TransformGuiMethods.ApplyTransformToVertices(singleTransformIndex, radioButtonGroup, go);
+                TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go); });
             ////////// Callbacks //////////
         }
     }

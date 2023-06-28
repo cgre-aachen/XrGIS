@@ -785,6 +785,7 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 TransformMonobehaviour.CustomTransform customTransform = activeTransformList[i];
                 if (!customTransform.isActive) continue;
+                if(customTransform.appliedToVertices) continue;
                 rotation += customTransform.rotation;
                 translation += customTransform.position;
                 scale = Vector3.Scale(scale, customTransform.scale);
@@ -802,7 +803,8 @@ namespace NurGIS.Runtime.TransformHistory
             TransformMonobehaviour.CustomTransformContainer transformListEntry =
                 new TransformMonobehaviour.CustomTransformContainer
                 {
-                    transformListName = activeTransformList.transformListName + " Collapsed"
+                    transformListName = activeTransformList.transformListName + " Collapsed",
+                    singleTransformList = new List<TransformMonobehaviour.CustomTransform>()
                 };
             
             var translation = Vector3.zero;
@@ -831,6 +833,21 @@ namespace NurGIS.Runtime.TransformHistory
             TransformMonobehaviour.TransformListContainer.Add(transformListEntry);
             radioButtonGroupsList.Add(transformListEntry.transformListName);
             radioButtonGroup.choices = radioButtonGroupsList;
+        }
+
+        public static void ApplyTransformToVertices(int singleTransformIndex, RadioButtonGroup radioButtonGroup, GameObject go)
+        {
+            if (radioButtonGroup.value == -1) return;
+            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var selectedTransform = activeTransformList[singleTransformIndex];
+            
+            var mesh = go.GetComponent<MeshFilter>().mesh;
+            Vector3[] vertices = mesh.vertices;
+            Matrix4x4 matrix = Matrix4x4.TRS(selectedTransform.position, Quaternion.Euler(selectedTransform.rotation), selectedTransform.scale);
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                vertices[i] = matrix.MultiplyPoint3x4(vertices[i]);
+            }
         }
         #endregion
     }

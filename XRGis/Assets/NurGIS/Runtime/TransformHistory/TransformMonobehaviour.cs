@@ -32,6 +32,7 @@ namespace NurGIS.Runtime.TransformHistory
             public TransformTypes transformType;
             public TransformSpecifier transformSpecifier;
             public bool isActive;
+            public bool appliedToVertices;
             public string transformName;
 
             public CustomTransform Clone()
@@ -44,6 +45,7 @@ namespace NurGIS.Runtime.TransformHistory
                     transformType = transformType,
                     transformSpecifier = transformSpecifier,
                     isActive = isActive,
+                    appliedToVertices = appliedToVertices,
                     transformName = transformName
                 };
                 return clone;
