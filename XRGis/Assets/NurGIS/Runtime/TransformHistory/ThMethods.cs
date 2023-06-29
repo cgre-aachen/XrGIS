@@ -5,13 +5,13 @@ using UnityEngine.UIElements;
 
 namespace NurGIS.Runtime.TransformHistory
 {
-    public static class TransformGuiMethods
+    public static class ThMethods
     {
         ////////////////////////////// Transform Group Functions ////////////////////////////
         #region Transform Group Functions
         public static void DrawGUI(GameObject go, RadioButtonGroup radioButtonGroup)
         {
-            var transformGroupNames = GetTransformGroupNames(TransformMonobehaviour.TransformListContainer);
+            var transformGroupNames = GetTransformGroupNames(ThMono.TransformListContainer);
             radioButtonGroup.choices = transformGroupNames;
             
             // Create a callback for when a new RadioButton is added, add all the necessary UI elements
@@ -90,37 +90,37 @@ namespace NurGIS.Runtime.TransformHistory
         
         private static void CopyTransformGroup(int index, List<string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup)
         {
-            if (index < 0 || index >= TransformMonobehaviour.TransformListContainer.Count)
+            if (index < 0 || index >= ThMono.TransformListContainer.Count)
             {
                 return;
             }
             
-            TransformMonobehaviour.CustomTransformContainer transformListEntry =
-                new TransformMonobehaviour.CustomTransformContainer
+            ThMono.CustomTransformContainer transformListEntry =
+                new ThMono.CustomTransformContainer
                 {
-                    transformListName = TransformMonobehaviour.TransformListContainer[index].transformListName + " Copy"
+                    transformListName = ThMono.TransformListContainer[index].transformListName + " Copy"
                 };
 
-            List<TransformMonobehaviour.CustomTransform> oldList =
-                TransformMonobehaviour.TransformListContainer[index].singleTransformList;
+            List<ThMono.CustomTransform> oldList =
+                ThMono.TransformListContainer[index].singleTransformList;
             
-            List<TransformMonobehaviour.CustomTransform> newList =
-                new List<TransformMonobehaviour.CustomTransform>(oldList.Count);
+            List<ThMono.CustomTransform> newList =
+                new List<ThMono.CustomTransform>(oldList.Count);
 
             oldList.ForEach(item => { newList.Add(item.Clone()); });
 
             transformListEntry.singleTransformList = newList;
-            TransformMonobehaviour.TransformListContainer.Add(transformListEntry);
+            ThMono.TransformListContainer.Add(transformListEntry);
             
             radioButtonGroupsList.Add(transformListEntry.transformListName);
             radioButtonGroup.choices = radioButtonGroupsList;
         }
         
-        public static List<string> GetTransformGroupNames(List<TransformMonobehaviour.CustomTransformContainer> transformContainer)
+        public static List<string> GetTransformGroupNames(List<ThMono.CustomTransformContainer> transformContainer)
         {
             var transformGroupNames = new List<string>();
             
-            foreach (TransformMonobehaviour.CustomTransformContainer cTc in transformContainer)
+            foreach (ThMono.CustomTransformContainer cTc in transformContainer)
             {
                 var transformGroupName = cTc.transformListName;
                 transformGroupNames.Add(transformGroupName);
@@ -134,7 +134,7 @@ namespace NurGIS.Runtime.TransformHistory
             radioButtonGroupsList.Add(groupName);
             radioButtonGroup.choices = radioButtonGroupsList;
 
-            var newTransform = new TransformMonobehaviour.CustomTransform
+            var newTransform = new ThMono.CustomTransform
             {
                 position = Vector3.zero,
                 rotation = Vector3.zero,
@@ -143,29 +143,29 @@ namespace NurGIS.Runtime.TransformHistory
                 transformName = "Start Transform"
             };
 
-            var emptyTransformList = new List<TransformMonobehaviour.CustomTransform> { newTransform };
+            var emptyTransformList = new List<ThMono.CustomTransform> { newTransform };
 
-            TransformMonobehaviour.CustomTransformContainer transformListEntry =
-                new TransformMonobehaviour.CustomTransformContainer
+            ThMono.CustomTransformContainer transformListEntry =
+                new ThMono.CustomTransformContainer
                 {
                     singleTransformList = emptyTransformList,
-                    transformListName = "Transform List " + TransformMonobehaviour.TransformListContainer.Count
+                    transformListName = "Transform List " + ThMono.TransformListContainer.Count
                 };
 
-            TransformMonobehaviour.TransformListContainer.Add(transformListEntry);
+            ThMono.TransformListContainer.Add(transformListEntry);
         }
         
         public static void DeleteTransformGroup(List<string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup)
         {
             if (radioButtonGroup.value == -1 || 
-                TransformMonobehaviour.TransformListContainer.Count is 0 or 1)
+                ThMono.TransformListContainer.Count is 0 or 1)
             {
                 return;
             }
 
             var newRadioValue = radioButtonGroup.value - 1;
             
-            TransformMonobehaviour.TransformListContainer.RemoveAt(radioButtonGroup.value);
+            ThMono.TransformListContainer.RemoveAt(radioButtonGroup.value);
             radioButtonGroupsList.RemoveAt(radioButtonGroup.value);
             radioButtonGroup.choices = radioButtonGroupsList;
             
@@ -179,7 +179,7 @@ namespace NurGIS.Runtime.TransformHistory
                 radioButtonGroup.value = index;
             }
             
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
             activeTransformList.RemoveRange(1, activeTransformList.Count - 1);
 
             DrawGUI(go, radioButtonGroup);
@@ -222,7 +222,7 @@ namespace NurGIS.Runtime.TransformHistory
             // Callback for when the user clicks outside of the text field or presses enter
             renameTransformField.RegisterCallback<BlurEvent>(_ =>
             {
-                TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].transformListName = newTransformName;
+                ThMono.TransformListContainer[radioButtonGroup.value].transformListName = newTransformName;
                 radioButtonGroupsList[radioButtonGroup.value] = newTransformName;
                 radioButtonGroup.choices = radioButtonGroupsList;
                 toggleRow.Remove(renameTransformField);
@@ -232,7 +232,7 @@ namespace NurGIS.Runtime.TransformHistory
             renameTransformField.RegisterCallback<KeyDownEvent>(evt =>
             {
                 if (evt.keyCode != KeyCode.Return) return;
-                TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].transformListName = newTransformName;
+                ThMono.TransformListContainer[radioButtonGroup.value].transformListName = newTransformName;
                 radioButtonGroupsList[radioButtonGroup.value] = newTransformName;
                 radioButtonGroup.choices = radioButtonGroupsList;
                 toggleRow.Remove(renameTransformField);
@@ -247,15 +247,15 @@ namespace NurGIS.Runtime.TransformHistory
                 radioButtonGroup.value = transformGroupIndex;
             }
             
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[transformGroupIndex].singleTransformList;
+            var activeTransformList = ThMono.TransformListContainer[transformGroupIndex].singleTransformList;
             
             transformFoldout.Clear();
 
             var singleTransformIndex = 0;
             
-            foreach (TransformMonobehaviour.CustomTransform cT in activeTransformList)
+            foreach (ThMono.CustomTransform cT in activeTransformList)
             {
-                transformFoldout.Add(new SingleTransform(cT.transformName, singleTransformIndex, transformGroupIndex, radioButtonGroup, transformFoldout, go));
+                transformFoldout.Add(new ThSingleTContainer(cT.transformName, singleTransformIndex, transformGroupIndex, radioButtonGroup, transformFoldout, go));
                 singleTransformIndex++;
             }
         }
@@ -270,9 +270,9 @@ namespace NurGIS.Runtime.TransformHistory
                 radioButtonGroup.value = singleTransformIndex;
             }
             
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
             
-            var customTransform = new TransformMonobehaviour.CustomTransform
+            var customTransform = new ThMono.CustomTransform
             {
                 position = Vector3.zero,
                 rotation = Vector3.zero,
@@ -282,19 +282,19 @@ namespace NurGIS.Runtime.TransformHistory
             };
             
             activeTransformList.Add(customTransform);
-            radioButtonFoldout.Add(new SingleTransform(customTransform.transformName, activeTransformList.Count - 1, radioButtonGroup.value, radioButtonGroup, radioButtonFoldout, go));
+            radioButtonFoldout.Add(new ThSingleTContainer(customTransform.transformName, activeTransformList.Count - 1, radioButtonGroup.value, radioButtonGroup, radioButtonFoldout, go));
         }
         
         public static void DeleteSingleTransform(int singleTransformIndex, RadioButtonGroup radioButtonGroup)
         {
             
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
             activeTransformList.RemoveAt(singleTransformIndex);
         }
 
-        public static void RenameSingleTransformInputWindow(int singleTransformIndex, RadioButtonGroup radioButtonGroup, SingleTransform singleTransform)
+        public static void RenameSingleTransformInputWindow(int singleTransformIndex, RadioButtonGroup radioButtonGroup, ThSingleTContainer thSingleTContainer)
         {
-            var singleTransformFoldout = singleTransform.Q<Foldout>();
+            var singleTransformFoldout = thSingleTContainer.Q<Foldout>();
             var toggleRow = singleTransformFoldout.Q<Toggle>().Children().First();
             // Create a string input field for renaming the transform
             var renameTransformField = new TextField
@@ -326,8 +326,8 @@ namespace NurGIS.Runtime.TransformHistory
             renameTransformField.RegisterCallback<BlurEvent>(_ =>
             {
                 if (radioButtonGroup.value == -1) return;
-                singleTransform.Q<Foldout>().text = newTransformName;
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                thSingleTContainer.Q<Foldout>().text = newTransformName;
+                var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
                 activeTransformList[singleTransformIndex].transformName = newTransformName;
                 toggleRow.Remove(renameTransformField);
             });
@@ -335,8 +335,8 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 if (radioButtonGroup.value == -1) return;
                 if (evt.keyCode != KeyCode.Return) return;
-                singleTransform.Q<Foldout>().text = newTransformName;
-                var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+                thSingleTContainer.Q<Foldout>().text = newTransformName;
+                var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
                 activeTransformList[singleTransformIndex].transformName = newTransformName;
                 toggleRow.Remove(renameTransformField);
             });
@@ -348,7 +348,7 @@ namespace NurGIS.Runtime.TransformHistory
         public static void UpdateTransform(Vector3 translation, Vector3 rotation, Vector3 scale, RadioButtonGroup radioButtonGroup, int singleTransformIndex, GameObject go)
         {
             if (radioButtonGroup.value == -1) return;
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
             var selectedTransform = activeTransformList[singleTransformIndex];
             
             if (translation!= Vector3.zero)
@@ -370,7 +370,7 @@ namespace NurGIS.Runtime.TransformHistory
         public static void ApplyTransform(RadioButtonGroup radioButtonGroup, GameObject go)
         {
             if (radioButtonGroup.value < 0) return;
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
 
             var translation = Vector3.zero;
             var rotation = Vector3.zero;
@@ -378,7 +378,7 @@ namespace NurGIS.Runtime.TransformHistory
 
             for (var i = 0; i < activeTransformList.Count(); i++)
             {
-                TransformMonobehaviour.CustomTransform customTransform = activeTransformList[i];
+                ThMono.CustomTransform customTransform = activeTransformList[i];
                 if (!customTransform.isActive) continue;
                 if(customTransform.appliedToVertices) continue;
                 rotation += customTransform.rotation;
@@ -393,13 +393,13 @@ namespace NurGIS.Runtime.TransformHistory
 
         public static void MakeTransformAbsolute(int singleTransformIndex, List< string> radioButtonGroupsList, RadioButtonGroup radioButtonGroup)
         {
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value];
+            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value];
 
-            TransformMonobehaviour.CustomTransformContainer transformListEntry =
-                new TransformMonobehaviour.CustomTransformContainer
+            ThMono.CustomTransformContainer transformListEntry =
+                new ThMono.CustomTransformContainer
                 {
                     transformListName = activeTransformList.transformListName + " Collapsed",
-                    singleTransformList = new List<TransformMonobehaviour.CustomTransform>()
+                    singleTransformList = new List<ThMono.CustomTransform>()
                 };
             
             var translation = Vector3.zero;
@@ -408,14 +408,14 @@ namespace NurGIS.Runtime.TransformHistory
 
             for (var i = 0; i <= singleTransformIndex; i++)
             {
-                TransformMonobehaviour.CustomTransform customTransform = activeTransformList.singleTransformList[i];
+                ThMono.CustomTransform customTransform = activeTransformList.singleTransformList[i];
                 if (!customTransform.isActive) continue;
                 rotation += customTransform.rotation;
                 translation += customTransform.position;
                 scale = Vector3.Scale(scale, customTransform.scale);
             }
             
-            transformListEntry.singleTransformList.Add(new TransformMonobehaviour.CustomTransform
+            transformListEntry.singleTransformList.Add(new ThMono.CustomTransform
             {
                 position = translation,
                 rotation = rotation,
@@ -424,7 +424,7 @@ namespace NurGIS.Runtime.TransformHistory
                 transformName = "Start Position:"
             });
             
-            TransformMonobehaviour.TransformListContainer.Add(transformListEntry);
+            ThMono.TransformListContainer.Add(transformListEntry);
             radioButtonGroupsList.Add(transformListEntry.transformListName);
             radioButtonGroup.choices = radioButtonGroupsList;
         }
@@ -432,7 +432,7 @@ namespace NurGIS.Runtime.TransformHistory
         public static void ApplyTransformToVertices(int singleTransformIndex, RadioButtonGroup radioButtonGroup, GameObject go)
         {
             if (radioButtonGroup.value == -1) return;
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
             var selectedTransform = activeTransformList[singleTransformIndex];
             
             var mesh = go.GetComponent<MeshFilter>().mesh;
@@ -440,13 +440,41 @@ namespace NurGIS.Runtime.TransformHistory
             Matrix4x4 matrix = Matrix4x4.TRS(selectedTransform.position, Quaternion.Euler(selectedTransform.rotation), selectedTransform.scale);
             for (var i = 0; i < vertices.Length; i++)
             {
+                //Debug.Log("Former vertex # " + i + ": " + vertices[i]);
                 vertices[i] = matrix.MultiplyPoint3x4(vertices[i]);
+                //Debug.Log("New vertex # " + i + ": " + vertices[i]);
             }
+            
+            mesh.vertices = vertices;
+            mesh.RecalculateBounds();
+        }
+
+        public static void RemoveTransformFromVertices(int singleTransformIndex, RadioButtonGroup radioButtonGroup,
+            GameObject go)
+        {            
+            if (radioButtonGroup.value == -1) return;
+            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
+            var selectedTransform = activeTransformList[singleTransformIndex];
+            
+            var mesh = go.GetComponent<MeshFilter>().mesh;
+            Vector3[] vertices = mesh.vertices;
+            var matrix = Matrix4x4.TRS(selectedTransform.position, Quaternion.Euler(selectedTransform.rotation), selectedTransform.scale);
+            var inverseMatrix = matrix.inverse;
+            
+            for (var i = 0; i < vertices.Length; i++)
+            {
+                //Debug.Log("Former vertex # " + i + ": " + vertices[i]);
+                vertices[i] = inverseMatrix.MultiplyPoint3x4(vertices[i]);
+                //Debug.Log("New vertex # " + i + ": " + vertices[i]);
+            }
+            
+            mesh.vertices = vertices;
+            mesh.RecalculateBounds();
         }
         
         public static void SaveStartPosition(GameObject go)
         {
-            var newTransform = new TransformMonobehaviour.CustomTransform
+            var newTransform = new ThMono.CustomTransform
             {
                 position = go.transform.position,
                 rotation = go.transform.rotation.eulerAngles,
@@ -455,15 +483,15 @@ namespace NurGIS.Runtime.TransformHistory
                 transformName = "Start Transform"
             };
 
-            var emptyTransformList = new List<TransformMonobehaviour.CustomTransform> { newTransform };
+            var emptyTransformList = new List<ThMono.CustomTransform> { newTransform };
 
-            var transformListEntry = new TransformMonobehaviour.CustomTransformContainer
+            var transformListEntry = new ThMono.CustomTransformContainer
             {
                 singleTransformList = emptyTransformList,
-                transformListName = "Transform List " + TransformMonobehaviour.TransformListContainer.Count
+                transformListName = "Transform List " + ThMono.TransformListContainer.Count
             };
 
-            TransformMonobehaviour.TransformListContainer.Add(transformListEntry);
+            ThMono.TransformListContainer.Add(transformListEntry);
         }
         #endregion
     }

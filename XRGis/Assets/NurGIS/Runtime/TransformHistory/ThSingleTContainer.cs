@@ -4,20 +4,23 @@ using UnityEngine.UIElements;
 
 namespace NurGIS.Runtime.TransformHistory
 {
-    public class SingleTransform : VisualElement
+    public class ThSingleTContainer : VisualElement
     {
-        public SingleTransform(string name, int singleTransformIndex, int transformGroupIndex, RadioButtonGroup radioButtonGroup, Foldout radioButtonFoldout, GameObject go)
+        public ThSingleTContainer(string name, int singleTransformIndex, int transformGroupIndex, RadioButtonGroup radioButtonGroup, Foldout radioButtonFoldout, GameObject go)
         {
             ///////////////// Single Transform Foldout /////////////////
+            #region foldoutStyle
             var foldout = new Foldout
             {
                 text = name
             };
             hierarchy.Add(foldout);
+            #endregion
             ///////////////// Single Transform Foldout /////////////////
 
             ///////////////// Vector3Fields /////////////////
-            var activeTransformList = TransformMonobehaviour.TransformListContainer[transformGroupIndex].singleTransformList;
+            #region Vector3FieldsStyle
+            var activeTransformList = ThMono.TransformListContainer[transformGroupIndex].singleTransformList;
             
             var position = new Vector3Field
             {
@@ -42,9 +45,11 @@ namespace NurGIS.Runtime.TransformHistory
                 value = activeTransformList[singleTransformIndex].scale
             };
             foldout.Add(scale);
+            #endregion
             ///////////////// Vector3Fields /////////////////
             
             ///////////////// Single Transform Buttons /////////////////
+            #region buttonStyle
             var buttonRow = foldout.Q<Toggle>().Children().First();
             buttonRow.style.paddingBottom = 6;
             
@@ -83,9 +88,11 @@ namespace NurGIS.Runtime.TransformHistory
                     paddingRight = 0
                 }
             };
+            #endregion
             ///////////////// Single Transform Buttons /////////////////
         
             ///////////////// Single Transform Toggles /////////////////
+            #region toggleStyle
             var toggleContainer = new VisualElement
             {
                 style =
@@ -133,6 +140,7 @@ namespace NurGIS.Runtime.TransformHistory
                     paddingLeft = 10
                 }
             };
+            #endregion
             ///////////////// Single Transform Toggles /////////////////
             
             foldout.Add(toggleContainer);
@@ -144,24 +152,27 @@ namespace NurGIS.Runtime.TransformHistory
             toggleContainer.Add(appliedToVertexCheckbox);
 
             ////////// Callbacks //////////
-            deleteTransformButton.clicked += () => {TransformGuiMethods.DeleteSingleTransform(singleTransformIndex, radioButtonGroup);};
-            deleteTransformButton.clicked += () => {TransformGuiMethods.CreateAllSingleTransforms(radioButtonGroup.value, radioButtonGroup, radioButtonFoldout, go) ;};
+            #region Callbacks
+            deleteTransformButton.clicked += () => {ThMethods.DeleteSingleTransform(singleTransformIndex, radioButtonGroup);};
+            deleteTransformButton.clicked += () => {ThMethods.CreateAllSingleTransforms(radioButtonGroup.value, radioButtonGroup, radioButtonFoldout, go) ;};
 
-            renameTransformButton.clicked += () => {TransformGuiMethods.RenameSingleTransformInputWindow(singleTransformIndex, radioButtonGroup, this);};
+            renameTransformButton.clicked += () => {ThMethods.RenameSingleTransformInputWindow(singleTransformIndex, radioButtonGroup, this);};
             
-            absTransformButton.clicked += () => {TransformGuiMethods.MakeTransformAbsolute(singleTransformIndex, TransformGuiMethods.GetTransformGroupNames(TransformMonobehaviour.TransformListContainer), radioButtonGroup);};
-            absTransformButton.clicked += () => {TransformGuiMethods.DrawGUI(go, radioButtonGroup);};
+            absTransformButton.clicked += () => {ThMethods.MakeTransformAbsolute(singleTransformIndex, ThMethods.GetTransformGroupNames(ThMono.TransformListContainer), radioButtonGroup);};
+            absTransformButton.clicked += () => {ThMethods.DrawGUI(go, radioButtonGroup);};
             
-            position.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(evt.newValue, Vector3.zero, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
-            rotation.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero, evt.newValue, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
-            scale.RegisterValueChangedCallback(evt => {TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , evt.newValue, radioButtonGroup, singleTransformIndex, go);});
+            position.RegisterValueChangedCallback(evt => {ThMethods.UpdateTransform(evt.newValue, Vector3.zero, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
+            rotation.RegisterValueChangedCallback(evt => {ThMethods.UpdateTransform(Vector3.zero, evt.newValue, Vector3.one, radioButtonGroup, singleTransformIndex, go);});
+            scale.RegisterValueChangedCallback(evt => {ThMethods.UpdateTransform(Vector3.zero,Vector3.zero , evt.newValue, radioButtonGroup, singleTransformIndex, go);});
             
             isActiveCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[singleTransformIndex].isActive = evt.newValue; 
-                TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go); });
+                ThMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go); });
             
             appliedToVertexCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[singleTransformIndex].appliedToVertices = evt.newValue;
-                TransformGuiMethods.ApplyTransformToVertices(singleTransformIndex, radioButtonGroup, go);
-                TransformGuiMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go); });
+                if (evt.newValue) ThMethods.ApplyTransformToVertices(singleTransformIndex, radioButtonGroup, go);
+                else ThMethods.RemoveTransformFromVertices(singleTransformIndex, radioButtonGroup, go);
+                ThMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go);});
+            #endregion
             ////////// Callbacks //////////
         }
     }

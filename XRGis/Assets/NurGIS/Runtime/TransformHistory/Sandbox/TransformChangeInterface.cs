@@ -10,7 +10,7 @@ namespace NurGIS.Runtime.TransformHistory.Sandbox
         private void IdentifyLastChangedGo()
         {
             GameObject go = transformGoList[^1];
-            TransformMonobehaviour mono = go.GetComponent<TransformMonobehaviour>();
+            ThMono mono = go.GetComponent<ThMono>();
             transformGoList.RemoveAt(transformGoList.Count - 1);
         }
         

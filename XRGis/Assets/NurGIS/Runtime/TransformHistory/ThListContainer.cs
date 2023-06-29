@@ -4,10 +4,10 @@ using UnityEngine.UIElements;
 
 namespace NurGIS.Runtime.TransformHistory
 {
-    public class TransformListContainer : VisualElement
+    public class ThListContainer : VisualElement
     {
-        private readonly List<string> m_mGroups = TransformGuiMethods.GetTransformGroupNames(TransformMonobehaviour.TransformListContainer);
-        public TransformListContainer(GameObject go)
+        private readonly List<string> m_mGroups = ThMethods.GetTransformGroupNames(ThMono.TransformListContainer);
+        public ThListContainer(GameObject go)
         {
             AddToClassList("radio-group");
             
@@ -33,7 +33,7 @@ namespace NurGIS.Runtime.TransformHistory
             {
                 choices = m_mGroups
             };
-            TransformGuiMethods.DrawGUI(go, radioButtonGroup);
+            ThMethods.DrawGUI(go, radioButtonGroup);
             ///////////////// Radio Button Group /////////////////
             
             ///////////////// Header Container /////////////////
@@ -88,12 +88,12 @@ namespace NurGIS.Runtime.TransformHistory
             scrollView.Add(radioButtonGroup);
             
             ///////////////// Callbacks /////////////////
-            radioButtonGroup.RegisterValueChangedCallback(_ => { TransformGuiMethods.ApplyTransform(radioButtonGroup, go); });
-            addButton.clicked    += () => { TransformGuiMethods.AddTransformGroup($"New Group  {m_mGroups.Count}",m_mGroups, radioButtonGroup); };
-            addButton.clicked    += () => { TransformGuiMethods.DrawGUI(go, radioButtonGroup); };
+            radioButtonGroup.RegisterValueChangedCallback(_ => { ThMethods.ApplyTransform(radioButtonGroup, go); });
+            addButton.clicked    += () => { ThMethods.AddTransformGroup($"New Group  {m_mGroups.Count}",m_mGroups, radioButtonGroup); };
+            addButton.clicked    += () => { ThMethods.DrawGUI(go, radioButtonGroup); };
             
-            deleteButton.clicked += () => { TransformGuiMethods.DeleteTransformGroup(m_mGroups, radioButtonGroup); };
-            deleteButton.clicked += () => { TransformGuiMethods.DrawGUI(go, radioButtonGroup); };
+            deleteButton.clicked += () => { ThMethods.DeleteTransformGroup(m_mGroups, radioButtonGroup); };
+            deleteButton.clicked += () => { ThMethods.DrawGUI(go, radioButtonGroup); };
             ///////////////// Callbacks /////////////////
         }
     }

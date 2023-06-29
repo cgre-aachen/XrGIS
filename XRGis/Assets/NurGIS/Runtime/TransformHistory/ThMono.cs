@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NurGIS.Runtime.TransformHistory
 {
-    public class TransformMonobehaviour : MonoBehaviour
+    public class ThMono : MonoBehaviour
     {
         [Serializable]
         public class CustomTransform
@@ -42,7 +42,7 @@ namespace NurGIS.Runtime.TransformHistory
         
         private void Awake() // Initial state is in awake so that the GUI reflects it (Start is too late) 
         {
-            TransformGuiMethods.SaveStartPosition(gameObject);
+            ThMethods.SaveStartPosition(gameObject);
         }
         
         private void OnDestroy()
