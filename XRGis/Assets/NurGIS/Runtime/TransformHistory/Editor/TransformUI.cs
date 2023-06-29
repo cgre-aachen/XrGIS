@@ -4,7 +4,6 @@ using UnityEngine.UIElements;
 
 namespace NurGIS.Runtime.TransformHistory.Editor
 {
-    #if true
     [CustomEditor(typeof(TransformMonobehaviour))]
     public class TransformUI : UnityEditor.Editor
     {
@@ -22,5 +21,4 @@ namespace NurGIS.Runtime.TransformHistory.Editor
             return root;
         }
     }
-    #endif
 }
