@@ -8,7 +8,6 @@ namespace NurGIS.Runtime.TransformHistory
     {
         public ThSingleTContainer(string name, int singleTransformIndex, int transformGroupIndex, RadioButtonGroup radioButtonGroup, Foldout radioButtonFoldout, GameObject go)
         {
-            ///////////////// Single Transform Foldout /////////////////
             #region foldoutStyle
             var foldout = new Foldout
             {
@@ -16,9 +15,7 @@ namespace NurGIS.Runtime.TransformHistory
             };
             hierarchy.Add(foldout);
             #endregion
-            ///////////////// Single Transform Foldout /////////////////
 
-            ///////////////// Vector3Fields /////////////////
             #region Vector3FieldsStyle
             var activeTransformList = ThMono.TransformListContainer[transformGroupIndex].singleTransformList;
             
@@ -46,9 +43,7 @@ namespace NurGIS.Runtime.TransformHistory
             };
             foldout.Add(scale);
             #endregion
-            ///////////////// Vector3Fields /////////////////
-            
-            ///////////////// Single Transform Buttons /////////////////
+
             #region buttonStyle
             var buttonRow = foldout.Q<Toggle>().Children().First();
             buttonRow.style.paddingBottom = 6;
@@ -89,9 +84,7 @@ namespace NurGIS.Runtime.TransformHistory
                 }
             };
             #endregion
-            ///////////////// Single Transform Buttons /////////////////
-        
-            ///////////////// Single Transform Toggles /////////////////
+
             #region toggleStyle
             var toggleContainer = new VisualElement
             {
@@ -141,7 +134,6 @@ namespace NurGIS.Runtime.TransformHistory
                 }
             };
             #endregion
-            ///////////////// Single Transform Toggles /////////////////
             
             foldout.Add(toggleContainer);
             buttonRow.Add(renameTransformButton);
@@ -150,8 +142,7 @@ namespace NurGIS.Runtime.TransformHistory
             
             toggleContainer.Add(isActiveCheckbox);
             toggleContainer.Add(appliedToVertexCheckbox);
-
-            ////////// Callbacks //////////
+            
             #region Callbacks
             deleteTransformButton.clicked += () => {ThMethods.DeleteSingleTransform(singleTransformIndex, radioButtonGroup);};
             deleteTransformButton.clicked += () => {ThMethods.CreateAllSingleTransforms(radioButtonGroup.value, radioButtonGroup, radioButtonFoldout, go) ;};
@@ -169,11 +160,9 @@ namespace NurGIS.Runtime.TransformHistory
                 ThMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go); });
             
             appliedToVertexCheckbox.RegisterValueChangedCallback(evt => {activeTransformList[singleTransformIndex].appliedToVertices = evt.newValue;
-                if (evt.newValue) ThMethods.ApplyTransformToVertices(singleTransformIndex, radioButtonGroup, go);
-                else ThMethods.RemoveTransformFromVertices(singleTransformIndex, radioButtonGroup, go);
+                ThMethods.ApplyTransformToVertices(evt.newValue, singleTransformIndex, radioButtonGroup, go);
                 ThMethods.UpdateTransform(Vector3.zero,Vector3.zero , Vector3.one, radioButtonGroup, singleTransformIndex, go);});
             #endregion
-            ////////// Callbacks //////////
         }
     }
 }

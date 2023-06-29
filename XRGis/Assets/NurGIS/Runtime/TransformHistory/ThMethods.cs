@@ -429,49 +429,37 @@ namespace NurGIS.Runtime.TransformHistory
             radioButtonGroup.choices = radioButtonGroupsList;
         }
 
-        public static void ApplyTransformToVertices(int singleTransformIndex, RadioButtonGroup radioButtonGroup, GameObject go)
+        public static void ApplyTransformToVertices(bool apply, int singleTransformIndex, RadioButtonGroup radioButtonGroup, GameObject go)
         {
             if (radioButtonGroup.value == -1) return;
             var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
             var selectedTransform = activeTransformList[singleTransformIndex];
             
             var mesh = go.GetComponent<MeshFilter>().mesh;
+            
             Vector3[] vertices = mesh.vertices;
             Matrix4x4 matrix = Matrix4x4.TRS(selectedTransform.position, Quaternion.Euler(selectedTransform.rotation), selectedTransform.scale);
-            for (var i = 0; i < vertices.Length; i++)
+            Matrix4x4 inverseMatrix = matrix.inverse;
+            
+            if (apply)
             {
-                //Debug.Log("Former vertex # " + i + ": " + vertices[i]);
-                vertices[i] = matrix.MultiplyPoint3x4(vertices[i]);
-                //Debug.Log("New vertex # " + i + ": " + vertices[i]);
+                for (var i = 0; i < vertices.Length; i++)
+                {
+                    vertices[i] = matrix.MultiplyPoint3x4(vertices[i]);
+                }
+            }
+            else
+            {
+                for (var i = 0; i < vertices.Length; i++)
+                {
+                    vertices[i] = inverseMatrix.MultiplyPoint3x4(vertices[i]);
+                }
             }
             
             mesh.vertices = vertices;
             mesh.RecalculateBounds();
         }
 
-        public static void RemoveTransformFromVertices(int singleTransformIndex, RadioButtonGroup radioButtonGroup,
-            GameObject go)
-        {            
-            if (radioButtonGroup.value == -1) return;
-            var activeTransformList = ThMono.TransformListContainer[radioButtonGroup.value].singleTransformList;
-            var selectedTransform = activeTransformList[singleTransformIndex];
-            
-            var mesh = go.GetComponent<MeshFilter>().mesh;
-            Vector3[] vertices = mesh.vertices;
-            var matrix = Matrix4x4.TRS(selectedTransform.position, Quaternion.Euler(selectedTransform.rotation), selectedTransform.scale);
-            var inverseMatrix = matrix.inverse;
-            
-            for (var i = 0; i < vertices.Length; i++)
-            {
-                //Debug.Log("Former vertex # " + i + ": " + vertices[i]);
-                vertices[i] = inverseMatrix.MultiplyPoint3x4(vertices[i]);
-                //Debug.Log("New vertex # " + i + ": " + vertices[i]);
-            }
-            
-            mesh.vertices = vertices;
-            mesh.RecalculateBounds();
-        }
-        
         public static void SaveStartPosition(GameObject go)
         {
             var newTransform = new ThMono.CustomTransform
