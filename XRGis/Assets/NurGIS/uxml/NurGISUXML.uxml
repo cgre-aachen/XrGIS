@@ -1,3 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <Style src="project://database/Assets/NurGIS/uxml/TransformHistoryUss.uss?fileID=7433441132597879392&amp;guid=e9ef29635c186424abe26c72753fd7d9&amp;type=3#TransformHistoryUss" />
-</ui:UXML>
